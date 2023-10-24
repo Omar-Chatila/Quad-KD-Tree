@@ -3,7 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuadTree {
+public class QuadTree { //TODO: Query range, insertion
     private final List<Point> points;
     private final Square square;
     private QuadTree northEast, northWest, southEast, southWest;
