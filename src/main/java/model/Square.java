@@ -11,4 +11,17 @@ public record Square(double xMin, double xMax, double yMin, double yMax) {
         Square sE = new Square(xMid, square.xMax, square.yMin, yMid);
         return new Square[]{nE, nW, sW, sE};
     }
+
+    public double xMid() {
+        return (this.xMin + this.xMax) / 2;
+    }
+
+    public double yMid() {
+        return (this.yMin + this.yMax) / 2;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + xMin + ":" + xMax + "] \n [" + yMin + ":" + yMax + ']';
+    }
 }
