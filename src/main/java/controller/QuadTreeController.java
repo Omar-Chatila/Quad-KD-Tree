@@ -65,7 +65,10 @@ public class QuadTreeController {
     private void addPoint(double x, double y) {
         Circle circle = new Circle(x, y, 2, Color.BLACK);
         drawingPane.getChildren().add(circle);
-        pointSet.add(new Point(x, PANE_HEIGHT - y));
+        Point p = new Point(x, PANE_HEIGHT - y);
+        if (!pointSet.contains(p)) {
+            pointSet.add(new Point(x, PANE_HEIGHT - y));
+        }
         pointsLabel.setText("P = { " + pointSet.toString().substring(1, pointSet.toString().length() - 1) + " }");
     }
 
