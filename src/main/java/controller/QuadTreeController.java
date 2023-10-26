@@ -3,6 +3,9 @@ package controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextArea;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.effect.Glow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -21,6 +24,7 @@ public class QuadTreeController {
 
     public static final double PANE_WIDTH = 400, PANE_HEIGHT = 400;
     private final List<Point> pointSet = new ArrayList<>();
+    public ScrollPane scrollPane;
     @FXML
     private Pane drawingPane;
     @FXML
@@ -29,6 +33,8 @@ public class QuadTreeController {
     private JFXButton clearButton;
     @FXML
     private Pane treePane;
+
+    private Node[][] grid = new Node[400][400];
     //private Square rootSquare = new Square(0, PANE_WIDTH, 0, PANE_HEIGHT);
 
 
@@ -64,6 +70,7 @@ public class QuadTreeController {
 
     private void addPoint(double x, double y) {
         Circle circle = new Circle(x, y, 2, Color.BLACK);
+        grid[(int) x][(int) (PANE_HEIGHT - y)] = circle;
         drawingPane.getChildren().add(circle);
         Point p = new Point(x, PANE_HEIGHT - y);
         if (!pointSet.contains(p)) {
@@ -78,7 +85,7 @@ public class QuadTreeController {
         QuadTree quadTree = new QuadTree(new Square(0, PANE_WIDTH, 0, PANE_HEIGHT), pointSet);
         quadTree.buildQuadTree(quadTree);
         System.out.println(quadTree.getHeight());
-        drawNodeRecursive(400, 20, 400, 20, quadTree, quadTree.getHeight());
+        drawNodeRecursive(1000, 20, 1000, 20, quadTree, quadTree.getHeight());
     }
 
 
@@ -86,7 +93,7 @@ public class QuadTreeController {
         Line line = new Line(x1, y1 + 5, x, y);
         treePane.getChildren().add(line);
         if (node.isPointLeaf()) {
-            Rectangle rectangle = new Rectangle(x, y, 10, 10);
+            Rectangle rectangle = getRectangle(x, y, node);
             treePane.getChildren().add(rectangle);
         } else {
             Circle circle = new Circle(x, y, 10, Paint.valueOf("blue"));
@@ -96,15 +103,38 @@ public class QuadTreeController {
             treePane.getChildren().add(circle);
         }
         int h = node.getHeight();
-        double delta = (Math.pow(2, h) * 10);
+        double delta = (Math.pow(2.8, h - 1) + 20);
         if (node.getNorthEast() != null)
-            drawNodeRecursive(x, y, x - 1.5 * delta, y + 80, node.getNorthEast(), height - 1);
+            drawNodeRecursive(x, y, x - 1.5 * delta, y + (1 + h / 8.0) * 60, node.getNorthEast(), height - 1);
         if (node.getNorthWest() != null)
-            drawNodeRecursive(x, y, x - 0.5 * delta, y + 80, node.getNorthWest(), height - 1);
+            drawNodeRecursive(x, y, x - 0.5 * delta, y + (1 + h / 8.0) * 60, node.getNorthWest(), height - 1);
         if (node.getSouthWest() != null)
-            drawNodeRecursive(x, y, x + 0.5 * delta, y + 80, node.getSouthWest(), height - 1);
+            drawNodeRecursive(x, y, x + 0.5 * delta, y + (1 + h / 8.0) * 60, node.getSouthWest(), height - 1);
         if (node.getSouthEast() != null)
-            drawNodeRecursive(x, y, x + 1.5 * delta, y + 80, node.getSouthEast(), height - 1);
+            drawNodeRecursive(x, y, x + 1.5 * delta, y + (1 + h / 8.0) * 60, node.getSouthEast(), height - 1);
+    }
+
+    private Rectangle getRectangle(double x, double y, QuadTree node) {
+        Rectangle rectangle = new Rectangle(x, y, 10, 10);
+        Point p = node.getPoints().get(0);
+        rectangle.setId(node.getPoints().get(0).toString());
+
+        rectangle.setOnMouseEntered(e -> {
+            Circle corresponding = (Circle) grid[(int) p.x()][(int) p.y()];
+            corresponding.setScaleX(2.5);
+            corresponding.setScaleY(2.5);
+            corresponding.setFill(Color.RED);
+            corresponding.setEffect(new Glow(0.8));
+        });
+
+        rectangle.setOnMouseExited(e -> {
+            Circle corresponding = (Circle) grid[(int) p.x()][(int) p.y()];
+            corresponding.setScaleX(1);
+            corresponding.setScaleY(1);
+            corresponding.setFill(Color.BLACK);
+            corresponding.setEffect(null);
+        });
+        return rectangle;
     }
 
     private void drawSplitLines(QuadTree node) {
