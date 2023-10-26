@@ -4,14 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuadTree { //TODO: Query range, insertion
-    private final List<Point> points;
     private final Square square;
+    private List<Point> points;
     private QuadTree northEast, northWest, southEast, southWest;
 
 
     public QuadTree(Square square, List<Point> points) {
         this.square = square;
         this.points = points;
+    }
+
+    public QuadTree(Square square) {
+        this.square = square;
+        this.points = new ArrayList<>();
     }
 
     public QuadTree getNorthEast() {
@@ -80,6 +85,30 @@ public class QuadTree { //TODO: Query range, insertion
             buildQuadTree(quadTree.northWest);
             buildQuadTree(quadTree.southWest);
             buildQuadTree(quadTree.southEast);
+        }
+    }
+
+    public void add(Point point) {
+        double xMid = (square.xMin() + square.xMax()) / 2;
+        double yMid = (square.yMin() + square.yMax()) / 2;
+        double pointX = point.x();
+        double pointY = point.y();
+        QuadTree current = this;
+        while (!current.isNodeLeaf()) {
+            if (pointX > xMid && pointY > yMid) {
+                current = current.northEast;
+            } else if (pointX <= xMid && pointY > yMid) {
+                current = current.northWest;
+            } else if (pointX <= xMid && pointY <= yMid) {
+                current = current.southWest;
+            } else {
+                current = current.southEast;
+            }
+        }
+        
+        current.points.add(point);
+        if (current.isPointLeaf()) {
+            current.partition();
         }
     }
 
