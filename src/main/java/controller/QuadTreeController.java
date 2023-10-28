@@ -24,6 +24,8 @@ public class QuadTreeController {
 
     public static final double PANE_WIDTH = 400, PANE_HEIGHT = 400;
     private final List<Point> pointSet = new ArrayList<>();
+    private final Square rootSquare = new Square(0, PANE_WIDTH, 0, PANE_HEIGHT);
+    private final Node[][] grid = new Node[400][400];
     public ScrollPane scrollPane;
     @FXML
     private Pane drawingPane;
@@ -33,9 +35,7 @@ public class QuadTreeController {
     private JFXButton clearButton;
     @FXML
     private Pane treePane;
-
-    private Node[][] grid = new Node[400][400];
-    //private Square rootSquare = new Square(0, PANE_WIDTH, 0, PANE_HEIGHT);
+    private QuadTree dynamicTree = new QuadTree(rootSquare);
 
 
     @FXML
@@ -57,7 +57,7 @@ public class QuadTreeController {
         for (int i = 0; i < 32; i++) {
             double x = Math.random() * 400;
             double y = Math.random() * 400;
-            addPoint(x, y);
+            addPointToGui(x, y, new Point(x, y));
         }
     }
 
@@ -66,26 +66,26 @@ public class QuadTreeController {
         drawingPane.getChildren().clear();
         pointsLabel.clear();
         treePane.getChildren().clear();
+        dynamicTree = new QuadTree(rootSquare);
     }
 
     private void addPoint(double x, double y) {
-        Circle circle = new Circle(x, y, 2, Color.BLACK);
-        grid[(int) x][(int) (PANE_HEIGHT - y)] = circle;
-        drawingPane.getChildren().add(circle);
-        Point p = new Point(x, PANE_HEIGHT - y);
-        if (!pointSet.contains(p)) {
-            pointSet.add(new Point(x, PANE_HEIGHT - y));
-        }
-        pointsLabel.setText("P = { " + pointSet.toString().substring(1, pointSet.toString().length() - 1) + " }");
+        Point point = new Point(x, PANE_HEIGHT - y);
+        addPointToGui(x, y, point);
+        dynamicTree.add(point);
+        treePane.getChildren().clear();
+        drawNodeRecursive(500, 20, 500, 20, dynamicTree, dynamicTree.getHeight());
     }
 
     @FXML
     void drawTree() {
         treePane.getChildren().clear();
-        QuadTree quadTree = new QuadTree(new Square(0, PANE_WIDTH, 0, PANE_HEIGHT), pointSet);
-        quadTree.buildQuadTree(quadTree);
-        System.out.println(quadTree.getHeight());
-        drawNodeRecursive(1000, 20, 1000, 20, quadTree, quadTree.getHeight());
+        if (!pointSet.isEmpty()) {
+            QuadTree quadTree = new QuadTree(new Square(0, PANE_WIDTH, 0, PANE_HEIGHT), pointSet);
+            quadTree.buildQuadTree(quadTree);
+            drawNodeRecursive(1000, 20, 1000, 20, quadTree, quadTree.getHeight());
+        }
+
     }
 
 
@@ -142,5 +142,16 @@ public class QuadTreeController {
         Line horizontalSplit = new Line(square.xMin(), PANE_HEIGHT - square.yMid(), square.xMax(), PANE_HEIGHT - square.yMid());
         Line verticalSplit = new Line(square.xMid(), PANE_HEIGHT - square.yMin(), square.xMid(), PANE_HEIGHT - square.yMax());
         drawingPane.getChildren().addAll(horizontalSplit, verticalSplit);
+    }
+
+    private void addPointToGui(double x, double y, Point p) {
+        Circle circle = new Circle(x, y, 2, Color.BLACK);
+        grid[(int) x][(int) (PANE_HEIGHT - y)] = circle;
+        drawingPane.getChildren().add(circle);
+
+        if (!pointSet.contains(p)) {
+            pointSet.add(new Point(x, PANE_HEIGHT - y));
+        }
+        pointsLabel.setText("P = { " + pointSet.toString().substring(1, pointSet.toString().length() - 1) + " }");
     }
 }

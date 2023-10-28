@@ -5,7 +5,7 @@ import java.util.List;
 
 public class QuadTree { //TODO: Query range, insertion
     private final Square square;
-    private List<Point> points;
+    private final List<Point> points;
     private QuadTree northEast, northWest, southEast, southWest;
 
 
@@ -44,14 +44,18 @@ public class QuadTree { //TODO: Query range, insertion
     }
 
     public void partition() {
-        Square[] quadrants = Square.split(this.square);
-        double xMid = (square.xMin() + square.xMax()) / 2;
-        double yMid = (square.yMin() + square.yMax()) / 2;
+        partition(this);
+    }
+
+    public void partition(QuadTree current) {
+        Square[] quadrants = Square.split(current.square);
+        double xMid = (current.square.xMin() + current.square.xMax()) / 2;
+        double yMid = (current.square.yMin() + current.square.yMax()) / 2;
         List<Point> pointsNE = new ArrayList<>();
         List<Point> pointsNW = new ArrayList<>();
         List<Point> pointsSE = new ArrayList<>();
         List<Point> pointsSW = new ArrayList<>();
-        for (Point point : points) {
+        for (Point point : current.points) {
             double pointX = point.x();
             double pointY = point.y();
             if (pointX > xMid && pointY > yMid) {
@@ -64,10 +68,10 @@ public class QuadTree { //TODO: Query range, insertion
                 pointsSE.add(point);
             }
         }
-        this.northEast = new QuadTree(quadrants[0], pointsNE);
-        this.northWest = new QuadTree(quadrants[1], pointsNW);
-        this.southWest = new QuadTree(quadrants[2], pointsSW);
-        this.southEast = new QuadTree(quadrants[3], pointsSE);
+        current.northEast = new QuadTree(quadrants[0], pointsNE);
+        current.northWest = new QuadTree(quadrants[1], pointsNW);
+        current.southWest = new QuadTree(quadrants[2], pointsSW);
+        current.southEast = new QuadTree(quadrants[3], pointsSE);
     }
 
     public boolean isPointLeaf() {
@@ -88,13 +92,17 @@ public class QuadTree { //TODO: Query range, insertion
         }
     }
 
+    public boolean isEmpty() {
+        return this.points.isEmpty();
+    }
+
     public void add(Point point) {
-        double xMid = (square.xMin() + square.xMax()) / 2;
-        double yMid = (square.yMin() + square.yMax()) / 2;
+        QuadTree current = this;
         double pointX = point.x();
         double pointY = point.y();
-        QuadTree current = this;
         while (!current.isNodeLeaf()) {
+            double xMid = (current.square.xMin() + current.square.xMax()) / 2;
+            double yMid = (current.square.yMin() + current.square.yMax()) / 2;
             if (pointX > xMid && pointY > yMid) {
                 current = current.northEast;
             } else if (pointX <= xMid && pointY > yMid) {
@@ -105,10 +113,15 @@ public class QuadTree { //TODO: Query range, insertion
                 current = current.southEast;
             }
         }
-        
-        current.points.add(point);
-        if (current.isPointLeaf()) {
-            current.partition();
+        if (!isEmpty()) {
+            if (current.isPointLeaf()) {
+                current.points.add(point);
+                buildQuadTree(current);
+            } else {
+                current.points.add(point);
+            }
+        } else {
+            current.points.add(point);
         }
     }
 
