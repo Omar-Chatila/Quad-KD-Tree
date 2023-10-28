@@ -1,4 +1,4 @@
-package model;
+package model.quadTree;
 
 public record Square(double xMin, double xMax, double yMin, double yMax) {
 

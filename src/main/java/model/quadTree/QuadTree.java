@@ -1,4 +1,6 @@
-package model;
+package model.quadTree;
+
+import model.Point;
 
 import java.util.ArrayList;
 import java.util.List;

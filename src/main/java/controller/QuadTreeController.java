@@ -14,8 +14,8 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import model.Point;
-import model.QuadTree;
-import model.Square;
+import model.quadTree.QuadTree;
+import model.quadTree.Square;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +27,7 @@ public class QuadTreeController {
     private final Square rootSquare = new Square(0, PANE_WIDTH, 0, PANE_HEIGHT);
     private final Node[][] grid = new Node[400][400];
     public ScrollPane scrollPane;
+    private QuadTree dynamicTree = new QuadTree(rootSquare);
     @FXML
     private Pane drawingPane;
     @FXML
@@ -35,8 +36,6 @@ public class QuadTreeController {
     private JFXButton clearButton;
     @FXML
     private Pane treePane;
-    private QuadTree dynamicTree = new QuadTree(rootSquare);
-
 
     @FXML
     private void initialize() {
