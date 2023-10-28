@@ -169,7 +169,7 @@ public class QuadTreeController {
             Circle circle = new Circle(40 * p.x(), 400 - 40 * p.y(), 3);
             drawingPane.getChildren().add(circle);
         }
-        
+
 
         for (KDTree r : kdTree.getNodeList()) {
             Line horizontalSplit;
@@ -177,7 +177,7 @@ public class QuadTreeController {
             if (!r.isLeaf()) {
                 if (r.getLevel() % 2 == 0) {
                     SplitLine vertical = r.getVerticalSplitLine();
-                    verticalSplit = new Line(40 * vertical.fromX(), PANE_HEIGHT - 40 * vertical.fromY(), 40 * vertical.toX(), 400 - PANE_HEIGHT - vertical.toY());
+                    verticalSplit = new Line(40 * vertical.fromX(), PANE_HEIGHT - 40 * vertical.fromY(), 40 * vertical.toX(), PANE_HEIGHT - 40 * vertical.toY());
                     drawingPane.getChildren().add(verticalSplit);
                 } else {
                     SplitLine horizontal = r.getHorizontalSplitLine();
