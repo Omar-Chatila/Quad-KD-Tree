@@ -2,7 +2,6 @@ package controller;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextArea;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
@@ -157,7 +156,7 @@ public class QuadTreeController {
         pointsLabel.setText("P = { " + pointSet.toString().substring(1, pointSet.toString().length() - 1) + " }");
     }
 
-    public void drawKDTree(ActionEvent actionEvent) {
+    public void drawKDTree() {
         clearPane();
         Point[] points = {new Point(1, 1), new Point(2.3, 3.3), new Point(1.5, 5)
                 , new Point(4.8, 6), new Point(4.7, 1.9), new Point(5.5, 5), new Point(6.5, 6)

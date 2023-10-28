@@ -73,18 +73,6 @@ public class KDTree {
         System.out.println(kdTree.nodeList);
     }
 
-    public List<Point> getPoints() {
-        return points;
-    }
-
-    public KDTree getLeftChild() {
-        return leftChild;
-    }
-
-    public KDTree getRightChild() {
-        return rightChild;
-    }
-
     public int getLevel() {
         return level;
     }
@@ -141,12 +129,7 @@ public class KDTree {
         asList(this);
         return nodeList;
     }
-
-    public Rectangle getRectangle() {
-        return rectangle;
-    }
-
-
+    
     public int getHeight() {
         if (isLeaf()) {
             return 1;
