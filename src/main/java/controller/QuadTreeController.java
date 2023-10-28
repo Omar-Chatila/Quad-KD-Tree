@@ -2,6 +2,7 @@ package controller;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextArea;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
@@ -12,22 +13,24 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
 import model.Point;
+import model.kdTree.KDTree;
+import model.kdTree.SplitLine;
 import model.quadTree.QuadTree;
-import model.quadTree.Square;
+import model.quadTree.Rectangle;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class QuadTreeController {
 
     public static final double PANE_WIDTH = 400, PANE_HEIGHT = 400;
     private final List<Point> pointSet = new ArrayList<>();
-    private final Square rootSquare = new Square(0, PANE_WIDTH, 0, PANE_HEIGHT);
+    private final Rectangle rootRectangle = new Rectangle(0, PANE_WIDTH, 0, PANE_HEIGHT);
     private final Node[][] grid = new Node[400][400];
     public ScrollPane scrollPane;
-    private QuadTree dynamicTree = new QuadTree(rootSquare);
+    private QuadTree dynamicTree = new QuadTree(rootRectangle);
     @FXML
     private Pane drawingPane;
     @FXML
@@ -53,7 +56,7 @@ public class QuadTreeController {
     @FXML
     void randomize() {
         clearPane();
-        for (int i = 0; i < 32; i++) {
+        for (int i = 0; i < 10; i++) {
             double x = Math.random() * 400;
             double y = Math.random() * 400;
             addPointToGui(x, y, new Point(x, y));
@@ -65,7 +68,7 @@ public class QuadTreeController {
         drawingPane.getChildren().clear();
         pointsLabel.clear();
         treePane.getChildren().clear();
-        dynamicTree = new QuadTree(rootSquare);
+        dynamicTree = new QuadTree(rootRectangle);
     }
 
     private void addPoint(double x, double y) {
@@ -80,7 +83,7 @@ public class QuadTreeController {
     void drawTree() {
         treePane.getChildren().clear();
         if (!pointSet.isEmpty()) {
-            QuadTree quadTree = new QuadTree(new Square(0, PANE_WIDTH, 0, PANE_HEIGHT), pointSet);
+            QuadTree quadTree = new QuadTree(new Rectangle(0, PANE_WIDTH, 0, PANE_HEIGHT), pointSet);
             quadTree.buildQuadTree(quadTree);
             drawNodeRecursive(1000, 20, 1000, 20, quadTree, quadTree.getHeight());
         }
@@ -92,7 +95,7 @@ public class QuadTreeController {
         Line line = new Line(x1, y1 + 5, x, y);
         treePane.getChildren().add(line);
         if (node.isPointLeaf()) {
-            Rectangle rectangle = getRectangle(x, y, node);
+            javafx.scene.shape.Rectangle rectangle = getRectangle(x, y, node);
             treePane.getChildren().add(rectangle);
         } else {
             Circle circle = new Circle(x, y, 10, Paint.valueOf("blue"));
@@ -113,8 +116,8 @@ public class QuadTreeController {
             drawNodeRecursive(x, y, x + 1.5 * delta, y + (1 + h / 8.0) * 60, node.getSouthEast(), height - 1);
     }
 
-    private Rectangle getRectangle(double x, double y, QuadTree node) {
-        Rectangle rectangle = new Rectangle(x, y, 10, 10);
+    private javafx.scene.shape.Rectangle getRectangle(double x, double y, QuadTree node) {
+        javafx.scene.shape.Rectangle rectangle = new javafx.scene.shape.Rectangle(x, y, 10, 10);
         Point p = node.getPoints().get(0);
         rectangle.setId(node.getPoints().get(0).toString());
 
@@ -137,9 +140,9 @@ public class QuadTreeController {
     }
 
     private void drawSplitLines(QuadTree node) {
-        Square square = node.getSquare();
-        Line horizontalSplit = new Line(square.xMin(), PANE_HEIGHT - square.yMid(), square.xMax(), PANE_HEIGHT - square.yMid());
-        Line verticalSplit = new Line(square.xMid(), PANE_HEIGHT - square.yMin(), square.xMid(), PANE_HEIGHT - square.yMax());
+        Rectangle rectangle = node.getSquare();
+        Line horizontalSplit = new Line(rectangle.xMin(), PANE_HEIGHT - rectangle.yMid(), rectangle.xMax(), PANE_HEIGHT - rectangle.yMid());
+        Line verticalSplit = new Line(rectangle.xMid(), PANE_HEIGHT - rectangle.yMin(), rectangle.xMid(), PANE_HEIGHT - rectangle.yMax());
         drawingPane.getChildren().addAll(horizontalSplit, verticalSplit);
     }
 
@@ -152,5 +155,39 @@ public class QuadTreeController {
             pointSet.add(new Point(x, PANE_HEIGHT - y));
         }
         pointsLabel.setText("P = { " + pointSet.toString().substring(1, pointSet.toString().length() - 1) + " }");
+    }
+
+    public void drawKDTree(ActionEvent actionEvent) {
+        clearPane();
+        Point[] points = {new Point(1, 1), new Point(2.3, 3.3), new Point(1.5, 5)
+                , new Point(4.8, 6), new Point(4.7, 1.9), new Point(5.5, 5), new Point(6.5, 6)
+                , new Point(6.8, 1.5), new Point(8, 6.3), new Point(9.3, 5.3), new Point(9.1, 2)};
+        KDTree kdTree = new KDTree(Arrays.asList(points), new Rectangle(0, 10, 0, 10), 0);
+        kdTree.buildTree(kdTree, 0);
+        System.out.println("root  " + kdTree.getLevel());
+        for (Point p : points) {
+            Circle circle = new Circle(40 * p.x(), 400 - 40 * p.y(), 3);
+            drawingPane.getChildren().add(circle);
+        }
+        
+
+        for (KDTree r : kdTree.getNodeList()) {
+            Line horizontalSplit;
+            Line verticalSplit;
+            if (!r.isLeaf()) {
+                if (r.getLevel() % 2 == 0) {
+                    SplitLine vertical = r.getVerticalSplitLine();
+                    verticalSplit = new Line(40 * vertical.fromX(), PANE_HEIGHT - 40 * vertical.fromY(), 40 * vertical.toX(), 400 - PANE_HEIGHT - vertical.toY());
+                    drawingPane.getChildren().add(verticalSplit);
+                } else {
+                    SplitLine horizontal = r.getHorizontalSplitLine();
+                    horizontalSplit = new Line(40 * horizontal.fromX(), PANE_HEIGHT - 40 * horizontal.fromY(), 40 * horizontal.toX(), PANE_HEIGHT - 40 * horizontal.toY());
+                    drawingPane.getChildren().add(horizontalSplit);
+                }
+            }
+
+        }
+
+
     }
 }
