@@ -99,31 +99,33 @@ public class QuadTree { //TODO: Query range, insertion
     }
 
     public void add(Point point) {
-        QuadTree current = this;
-        double pointX = point.x();
-        double pointY = point.y();
-        while (!current.isNodeLeaf()) {
-            double xMid = (current.square.xMin() + current.square.xMax()) / 2;
-            double yMid = (current.square.yMin() + current.square.yMax()) / 2;
-            if (pointX > xMid && pointY > yMid) {
-                current = current.northEast;
-            } else if (pointX <= xMid && pointY > yMid) {
-                current = current.northWest;
-            } else if (pointX <= xMid && pointY <= yMid) {
-                current = current.southWest;
-            } else {
-                current = current.southEast;
+        if (!points.contains(point)) {
+            QuadTree current = this;
+            double pointX = point.x();
+            double pointY = point.y();
+            while (!current.isNodeLeaf()) {
+                double xMid = current.square.xMid();
+                double yMid = current.square.yMid();
+                if (pointX > xMid && pointY > yMid) {
+                    current = current.northEast;
+                } else if (pointX <= xMid && pointY > yMid) {
+                    current = current.northWest;
+                } else if (pointX <= xMid && pointY <= yMid) {
+                    current = current.southWest;
+                } else {
+                    current = current.southEast;
+                }
             }
-        }
-        if (!isEmpty()) {
-            if (current.isPointLeaf()) {
-                current.points.add(point);
-                buildQuadTree(current);
+            if (!this.isEmpty()) {
+                if (current.isPointLeaf()) {
+                    current.points.add(point);
+                    buildQuadTree(current);
+                } else {
+                    current.points.add(point);
+                }
             } else {
                 current.points.add(point);
             }
-        } else {
-            current.points.add(point);
         }
     }
 
