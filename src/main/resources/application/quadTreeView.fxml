@@ -8,21 +8,17 @@
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="633.0" prefWidth="1347.0"
             style="-fx-background-color: grey;" xmlns="http://javafx.com/javafx/20.0.1"
             fx:controller="controller.QuadTreeController">
-    <children>
-        <Pane fx:id="drawingPane" layoutX="14.0" layoutY="14.0" onMouseClicked="#drawPoint" prefHeight="400.0"
-              prefWidth="400.0" style="-fx-background-color: white;"/>
-        <JFXTextArea fx:id="pointsLabel" layoutX="14.0" layoutY="465.0" prefHeight="157.0" prefWidth="400.0"
-                     style="-fx-background-color: lightGrey;"/>
-        <ScrollPane fx:id="scrollPane" layoutX="449.0" layoutY="14.0" prefHeight="509.0" prefWidth="885.0">
-            <Pane fx:id="treePane" layoutX="449.0" layoutY="14.0" style="-fx-background-color: white;"/>
-        </ScrollPane>
-        <HBox alignment="CENTER" layoutX="14.0" layoutY="421.0" prefHeight="35.0" prefWidth="400.0" spacing="10.0">
-            <children>
-                <JFXButton fx:id="clearButton" style="-fx-background-color: white;" text="Clear"/>
-                <JFXButton onAction="#randomize" style="-fx-background-color: white;" text="Randomize"/>
-                <JFXButton onAction="#drawTree" style="-fx-background-color: white;" text="Quad - Tree"/>
-                <JFXButton onAction="#drawKDTree" style="-fx-background-color: white;" text="KD - Tree"/>
-            </children>
-        </HBox>
-    </children>
+    <Pane fx:id="drawingPane" layoutX="14.0" layoutY="14.0" onMouseClicked="#drawPoint" prefHeight="400.0"
+          prefWidth="400.0" style="-fx-background-color: white;"/>
+    <JFXTextArea fx:id="pointsLabel" layoutX="14.0" layoutY="465.0" prefHeight="157.0" prefWidth="400.0"
+                 style="-fx-background-color: lightGrey;"/>
+    <ScrollPane fx:id="scrollPane" layoutX="449.0" layoutY="14.0" prefHeight="509.0" prefWidth="885.0">
+        <Pane fx:id="treePane" layoutX="449.0" layoutY="14.0" style="-fx-background-color: white;"/>
+    </ScrollPane>
+    <HBox alignment="CENTER" layoutX="14.0" layoutY="421.0" prefHeight="35.0" prefWidth="400.0" spacing="10.0">
+        <JFXButton fx:id="clearButton" style="-fx-background-color: white;" text="Clear"/>
+        <JFXButton onAction="#randomize" style="-fx-background-color: white;" text="Randomize"/>
+        <JFXButton onAction="#drawTree" style="-fx-background-color: white;" text="Quad - Tree"/>
+        <JFXButton onAction="#drawKDTree" style="-fx-background-color: white;" text="KD - Tree"/>
+    </HBox>
 </AnchorPane>

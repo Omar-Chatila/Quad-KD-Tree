@@ -7,5 +7,8 @@ module application.quadkdtrees {
     opens application to javafx.fxml;
     exports application;
     exports controller;
+    exports model.kdTree;
+    exports model.quadTree;
+    exports model;
     opens controller to javafx.fxml;
 }

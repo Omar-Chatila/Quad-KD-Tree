@@ -19,7 +19,6 @@ import model.quadTree.QuadTree;
 import model.quadTree.Rectangle;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class QuadTreeController {
@@ -86,9 +85,7 @@ public class QuadTreeController {
             quadTree.buildQuadTree(quadTree);
             drawNodeRecursive(1000, 20, 1000, 20, quadTree, quadTree.getHeight());
         }
-
     }
-
 
     public void drawNodeRecursive(double x1, double y1, double x, double y, QuadTree node, int height) {
         Line line = new Line(x1, y1 + 5, x, y);
@@ -161,15 +158,17 @@ public class QuadTreeController {
         Point[] points = {new Point(1, 1), new Point(2.3, 3.3), new Point(1.5, 5)
                 , new Point(4.8, 6), new Point(4.7, 1.9), new Point(5.5, 5), new Point(6.5, 6)
                 , new Point(6.8, 1.5), new Point(8, 6.3), new Point(9.3, 5.3), new Point(9.1, 2)};
-        KDTree kdTree = new KDTree(Arrays.asList(points), new Rectangle(0, 10, 0, 10), 0);
-        kdTree.buildTree(kdTree, 0);
-        System.out.println("root  " + kdTree.getLevel());
+        //KDTree kdTree = new KDTree(Arrays.asList(points), new Rectangle(0, 10, 0, 10), 0);
+        KDTree kdTree = new KDTree(new Rectangle(0, 10, 0, 10), 0);
+        //kdTree.buildTree(kdTree, 0);
+        //System.out.println("root  " + kdTree.getLevel());
         for (Point p : points) {
             Circle circle = new Circle(40 * p.x(), 400 - 40 * p.y(), 3);
             drawingPane.getChildren().add(circle);
+            kdTree.add(p);
         }
 
-
+        System.out.println(kdTree.getNodeList().size());
         for (KDTree r : kdTree.getNodeList()) {
             Line horizontalSplit;
             Line verticalSplit;
@@ -186,7 +185,5 @@ public class QuadTreeController {
             }
 
         }
-
-
     }
 }
