@@ -42,6 +42,18 @@ public class KDTree {
         this.pointsY = new ArrayList<>();
     }
 
+    public List<Point> getPoints() {
+        return points;
+    }
+
+    public KDTree getLeftChild() {
+        return leftChild;
+    }
+
+    public KDTree getRightChild() {
+        return rightChild;
+    }
+
     public int getLevel() {
         return level;
     }
@@ -68,6 +80,10 @@ public class KDTree {
         }
     }
 
+    public SplitLine getSplitLine() {
+        return this.horizontalSplitLine != null ? horizontalSplitLine : verticalSplitLine;
+    }
+
     public boolean isEmpty() {
         return this.points.isEmpty();
     }
@@ -76,34 +92,34 @@ public class KDTree {
         if (isEmpty()) {
             appendPoint(point, this);
         } else {
-            if (!points.contains(point)) {
-                KDTree current = this;
-                double x = point.x();
-                double y = point.y();
-                int level = 0;
-                while (!current.isLeaf()) {
-                    if ((level++ % 2) == 0) {
-                        if (x <= current.verticalSplitLine.toX()) {
-                            current = current.leftChild;
-                        } else {
-                            current = current.rightChild;
-                        }
+
+            KDTree current = this;
+            double x = point.x();
+            double y = point.y();
+            int level = 0;
+            while (!current.isLeaf()) {
+                if ((level++ % 2) == 0) {
+                    if (x <= current.verticalSplitLine.toX()) {
+                        current = current.leftChild;
                     } else {
-                        if (y <= current.horizontalSplitLine.toY()) {
-                            current = current.leftChild;
-                        } else {
-                            current = current.rightChild;
-                        }
+                        current = current.rightChild;
+                    }
+                } else {
+                    if (y <= current.horizontalSplitLine.toY()) {
+                        current = current.leftChild;
+                    } else {
+                        current = current.rightChild;
                     }
                 }
-                appendPoint(point, current);
-                if (level % 2 == 0) {
-                    setVerticalChildren(current, level);
-                } else {
-                    setHorizontalChildren(current, level);
-                }
+            }
+            appendPoint(point, current);
+            if (level % 2 == 0) {
+                setVerticalChildren(current, level);
+            } else {
+                setHorizontalChildren(current, level);
             }
         }
+
     }
 
     private void appendPoint(Point point, KDTree kdTree) {
@@ -166,10 +182,10 @@ public class KDTree {
     }
 
     private double getXMedian() {
-        return getMedian(pointsX);
+        return getMedian(pointsX, true);
     }
 
     private double getYMedian() {
-        return getMedian(pointsY);
+        return getMedian(pointsY, false);
     }
 }

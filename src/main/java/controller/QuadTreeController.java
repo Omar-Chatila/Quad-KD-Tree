@@ -12,13 +12,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 import model.Point;
 import model.kdTree.KDTree;
 import model.kdTree.SplitLine;
 import model.quadTree.QuadTree;
 import model.quadTree.Rectangle;
+import util.ArrayListHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class QuadTreeController {
@@ -74,7 +77,7 @@ public class QuadTreeController {
         addPointToGui(x, y, point);
         dynamicTree.add(point);
         treePane.getChildren().clear();
-        drawNodeRecursive(500, 20, 500, 20, dynamicTree, dynamicTree.getHeight());
+        drawQTRecursive(500, 20, 500, 20, dynamicTree, dynamicTree.getHeight());
     }
 
     @FXML
@@ -83,11 +86,11 @@ public class QuadTreeController {
         if (!pointSet.isEmpty()) {
             QuadTree quadTree = new QuadTree(new Rectangle(0, PANE_WIDTH, 0, PANE_HEIGHT), pointSet);
             quadTree.buildQuadTree(quadTree);
-            drawNodeRecursive(1000, 20, 1000, 20, quadTree, quadTree.getHeight());
+            drawQTRecursive(1000, 20, 1000, 20, quadTree, quadTree.getHeight());
         }
     }
 
-    public void drawNodeRecursive(double x1, double y1, double x, double y, QuadTree node, int height) {
+    public void drawQTRecursive(double x1, double y1, double x, double y, QuadTree node, int height) {
         Line line = new Line(x1, y1 + 5, x, y);
         treePane.getChildren().add(line);
         if (node.isPointLeaf()) {
@@ -103,13 +106,13 @@ public class QuadTreeController {
         int h = node.getHeight();
         double delta = (Math.pow(2.8, h - 1) + 20);
         if (node.getNorthEast() != null)
-            drawNodeRecursive(x, y, x - 1.5 * delta, y + (1 + h / 8.0) * 60, node.getNorthEast(), height - 1);
+            drawQTRecursive(x, y, x - 1.5 * delta, y + (1 + h / 8.0) * 60, node.getNorthEast(), height - 1);
         if (node.getNorthWest() != null)
-            drawNodeRecursive(x, y, x - 0.5 * delta, y + (1 + h / 8.0) * 60, node.getNorthWest(), height - 1);
+            drawQTRecursive(x, y, x - 0.5 * delta, y + (1 + h / 8.0) * 60, node.getNorthWest(), height - 1);
         if (node.getSouthWest() != null)
-            drawNodeRecursive(x, y, x + 0.5 * delta, y + (1 + h / 8.0) * 60, node.getSouthWest(), height - 1);
+            drawQTRecursive(x, y, x + 0.5 * delta, y + (1 + h / 8.0) * 60, node.getSouthWest(), height - 1);
         if (node.getSouthEast() != null)
-            drawNodeRecursive(x, y, x + 1.5 * delta, y + (1 + h / 8.0) * 60, node.getSouthEast(), height - 1);
+            drawQTRecursive(x, y, x + 1.5 * delta, y + (1 + h / 8.0) * 60, node.getSouthEast(), height - 1);
     }
 
     private javafx.scene.shape.Rectangle getRectangle(double x, double y, QuadTree node) {
@@ -158,18 +161,23 @@ public class QuadTreeController {
         Point[] points = {new Point(1, 1), new Point(2.3, 3.3), new Point(1.5, 5)
                 , new Point(4.8, 6), new Point(4.7, 1.9), new Point(5.5, 5), new Point(6.5, 6)
                 , new Point(6.8, 1.5), new Point(8, 6.3), new Point(9.3, 5.3), new Point(9.1, 2)};
-        //KDTree kdTree = new KDTree(Arrays.asList(points), new Rectangle(0, 10, 0, 10), 0);
-        KDTree kdTree = new KDTree(new Rectangle(0, 10, 0, 10), 0);
-        //kdTree.buildTree(kdTree, 0);
+        KDTree kdTree = new KDTree(Arrays.asList(points), new Rectangle(0, 10, 0, 10), 0);
+        //KDTree kdTree = new KDTree(new Rectangle(0, 10, 0, 10), 0);
+        kdTree.buildTree(kdTree, 0);
         //System.out.println("root  " + kdTree.getLevel());
         for (Point p : points) {
             Circle circle = new Circle(40 * p.x(), 400 - 40 * p.y(), 3);
             drawingPane.getChildren().add(circle);
-            kdTree.add(p);
+            //kdTree.add(p);
         }
 
+        System.out.println("split" + ArrayListHelper.splitArrayList(Arrays.asList(points)));
+        System.out.println(kdTree.getPoints());
         System.out.println(kdTree.getNodeList().size());
-        for (KDTree r : kdTree.getNodeList()) {
+        System.out.println(kdTree.getHeight());
+        System.out.println(kdTree.getLeftChild().getPoints());
+        System.out.println(kdTree.getRightChild().getPoints());
+        /*for (KDTree r : kdTree.getNodeList()) {
             Line horizontalSplit;
             Line verticalSplit;
             if (!r.isLeaf()) {
@@ -185,5 +193,28 @@ public class QuadTreeController {
             }
 
         }
+
+         */
+        drawKDRecursive(500, 20, 500, 20, kdTree, kdTree.getHeight());
+    }
+
+    public void drawKDRecursive(double x1, double y1, double x, double y, KDTree node, int height) {
+        Line line = new Line(x1, y1 + 5, x, y);
+        treePane.getChildren().add(line);
+        Circle circle = new Circle(x, y, 10, Paint.valueOf("blue"));
+        Text text = new Text(x, y, node.getPoints().toString());
+        treePane.getChildren().add(circle);
+        treePane.getChildren().add(text);
+        int h = node.getHeight();
+        double delta = (h * Math.pow(2.3, h - 1) + 20);
+        if (!node.isLeaf()) {
+            SplitLine sp = node.getSplitLine();
+            Line splitline = new Line(40 * sp.fromX(), PANE_HEIGHT - 40 * sp.fromY(), 40 * sp.toX(), PANE_HEIGHT - 40 * sp.toY());
+            drawingPane.getChildren().addAll(splitline);
+        }
+        if (node.getLeftChild() != null)
+            drawKDRecursive(x, y, x - 1.5 * delta, y + (1 + h / 8.0) * 60, node.getLeftChild(), height - 1);
+        if (node.getRightChild() != null)
+            drawKDRecursive(x, y, x + 1.5 * delta, y + (1 + h / 8.0) * 60, node.getRightChild(), height - 1);
     }
 }
