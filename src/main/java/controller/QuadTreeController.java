@@ -57,7 +57,7 @@ public class QuadTreeController {
     @FXML
     void randomize() {
         clearPane();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             double x = Math.random() * 400;
             double y = Math.random() * 400;
             addPointToGui(x, y, new Point(x, y));
@@ -160,7 +160,7 @@ public class QuadTreeController {
         clearPane();
         Point[] points = {new Point(1, 1), new Point(2.3, 3.3), new Point(1.5, 5)
                 , new Point(4.8, 6), new Point(4.7, 1.9), new Point(5.5, 5), new Point(6.5, 6)
-                , new Point(6.8, 1.5), new Point(8, 6.3), new Point(9.3, 5.3), new Point(9.1, 2)};
+                , new Point(6.8, 1.5), new Point(8, 6.3), new Point(9.3, 5.3), new Point(9.1, 2), new Point(4, 4)};
         KDTree kdTree = new KDTree(Arrays.asList(points), new Rectangle(0, 10, 0, 10), 0);
         //KDTree kdTree = new KDTree(new Rectangle(0, 10, 0, 10), 0);
         kdTree.buildTree(kdTree, 0);
