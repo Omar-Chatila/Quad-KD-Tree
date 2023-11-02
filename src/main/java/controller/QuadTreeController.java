@@ -18,7 +18,6 @@ import model.kdTree.KDTree;
 import model.kdTree.SplitLine;
 import model.quadTree.QuadTree;
 import model.quadTree.Rectangle;
-import util.ArrayListHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -158,7 +157,7 @@ public class QuadTreeController {
 
     public void drawKDTree() {
         clearPane();
-        Point[] points = {new Point(1, 1), new Point(2.3, 3.3), new Point(1.5, 5)
+        Point[] points = {new Point(1, 1), new Point(1.2, 7), new Point(0.8, 6.3), new Point(2.3, 3.3), new Point(1.5, 5)
                 , new Point(4.8, 6), new Point(4.7, 1.9), new Point(5.5, 5), new Point(6.5, 6)
                 , new Point(6.8, 1.5), new Point(8, 6.3), new Point(9.3, 5.3), new Point(9.1, 2), new Point(4, 4)};
         KDTree kdTree = new KDTree(Arrays.asList(points), new Rectangle(0, 10, 0, 10), 0);
@@ -170,13 +169,6 @@ public class QuadTreeController {
             drawingPane.getChildren().add(circle);
             //kdTree.add(p);
         }
-
-        System.out.println("split" + ArrayListHelper.splitArrayList(Arrays.asList(points)));
-        System.out.println(kdTree.getPoints());
-        System.out.println(kdTree.getNodeList().size());
-        System.out.println(kdTree.getHeight());
-        System.out.println(kdTree.getLeftChild().getPoints());
-        System.out.println(kdTree.getRightChild().getPoints());
         /*for (KDTree r : kdTree.getNodeList()) {
             Line horizontalSplit;
             Line verticalSplit;
@@ -201,17 +193,23 @@ public class QuadTreeController {
     public void drawKDRecursive(double x1, double y1, double x, double y, KDTree node, int height) {
         Line line = new Line(x1, y1 + 5, x, y);
         treePane.getChildren().add(line);
-        Circle circle = new Circle(x, y, 10, Paint.valueOf("blue"));
-        Text text = new Text(x, y, node.getPoints().toString());
-        treePane.getChildren().add(circle);
-        treePane.getChildren().add(text);
-        int h = node.getHeight();
-        double delta = (h * Math.pow(2.3, h - 1) + 20);
         if (!node.isLeaf()) {
+            Circle circle = new Circle(x, y, 10, Paint.valueOf("blue"));
             SplitLine sp = node.getSplitLine();
             Line splitline = new Line(40 * sp.fromX(), PANE_HEIGHT - 40 * sp.fromY(), 40 * sp.toX(), PANE_HEIGHT - 40 * sp.toY());
-            drawingPane.getChildren().addAll(splitline);
+            Text text = new Text(x + 20, y, (height % 2 == 0 ? "y = " + Math.round(sp.toY() * 10) / 10.0 : "x = " + Math.round(sp.toX() * 10.0) / 10.0));
+            drawingPane.getChildren().add(splitline);
+            treePane.getChildren().addAll(circle, text);
+        } else {
+            javafx.scene.shape.Rectangle rectangle = new javafx.scene.shape.Rectangle(x, y);
+            rectangle.setWidth(10);
+            rectangle.setHeight(10);
+            rectangle.setFill(Color.BLACK);
+            Text text = new Text(x - 20, y + 10, node.getPoints().toString());
+            treePane.getChildren().add(text);
         }
+        int h = node.getHeight();
+        double delta = (h * Math.pow(2.3, h - 1) + 20);
         if (node.getLeftChild() != null)
             drawKDRecursive(x, y, x - 1.5 * delta, y + (1 + h / 8.0) * 60, node.getLeftChild(), height - 1);
         if (node.getRightChild() != null)
