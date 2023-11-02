@@ -20,7 +20,6 @@ import model.quadTree.QuadTree;
 import model.quadTree.Rectangle;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class QuadTreeController {
@@ -160,33 +159,15 @@ public class QuadTreeController {
         Point[] points = {new Point(1, 1), new Point(1.2, 7), new Point(0.8, 6.3), new Point(2.3, 3.3), new Point(1.5, 5)
                 , new Point(4.8, 6), new Point(4.7, 1.9), new Point(5.5, 5), new Point(6.5, 6)
                 , new Point(6.8, 1.5), new Point(8, 6.3), new Point(9.3, 5.3), new Point(9.1, 2), new Point(4, 4)};
-        KDTree kdTree = new KDTree(Arrays.asList(points), new Rectangle(0, 10, 0, 10), 0);
-        //KDTree kdTree = new KDTree(new Rectangle(0, 10, 0, 10), 0);
-        kdTree.buildTree(kdTree, 0);
+        //KDTree kdTree = new KDTree(Arrays.asList(points), new Rectangle(0, 10, 0, 10), 0);
+        KDTree kdTree = new KDTree(new Rectangle(0, 10, 0, 10), 0);
+        //kdTree.buildTree(kdTree, 0);
         //System.out.println("root  " + kdTree.getLevel());
         for (Point p : points) {
             Circle circle = new Circle(40 * p.x(), 400 - 40 * p.y(), 3);
             drawingPane.getChildren().add(circle);
-            //kdTree.add(p);
+            kdTree.add(p);
         }
-        /*for (KDTree r : kdTree.getNodeList()) {
-            Line horizontalSplit;
-            Line verticalSplit;
-            if (!r.isLeaf()) {
-                if (r.getLevel() % 2 == 0) {
-                    SplitLine vertical = r.getVerticalSplitLine();
-                    verticalSplit = new Line(40 * vertical.fromX(), PANE_HEIGHT - 40 * vertical.fromY(), 40 * vertical.toX(), PANE_HEIGHT - 40 * vertical.toY());
-                    drawingPane.getChildren().add(verticalSplit);
-                } else {
-                    SplitLine horizontal = r.getHorizontalSplitLine();
-                    horizontalSplit = new Line(40 * horizontal.fromX(), PANE_HEIGHT - 40 * horizontal.fromY(), 40 * horizontal.toX(), PANE_HEIGHT - 40 * horizontal.toY());
-                    drawingPane.getChildren().add(horizontalSplit);
-                }
-            }
-
-        }
-
-         */
         drawKDRecursive(500, 20, 500, 20, kdTree, kdTree.getHeight());
     }
 
@@ -209,10 +190,10 @@ public class QuadTreeController {
             treePane.getChildren().add(text);
         }
         int h = node.getHeight();
-        double delta = (h * Math.pow(2.3, h - 1) + 20);
+        double delta = (Math.pow(1.6, h) * 10 + 20);
         if (node.getLeftChild() != null)
-            drawKDRecursive(x, y, x - 1.5 * delta, y + (1 + h / 8.0) * 60, node.getLeftChild(), height - 1);
+            drawKDRecursive(x, y, x - delta, y + (1 + h / 8.0) * 60, node.getLeftChild(), height - 1);
         if (node.getRightChild() != null)
-            drawKDRecursive(x, y, x + 1.5 * delta, y + (1 + h / 8.0) * 60, node.getRightChild(), height - 1);
+            drawKDRecursive(x, y, x + delta, y + (1 + h / 8.0) * 60, node.getRightChild(), height - 1);
     }
 }

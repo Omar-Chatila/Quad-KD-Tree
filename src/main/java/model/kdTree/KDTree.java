@@ -90,9 +90,8 @@ public class KDTree {
 
     public void add(Point point) {
         if (isEmpty()) {
-            appendPoint(point, this);
+            this.appendPoint(point);
         } else {
-
             KDTree current = this;
             double x = point.x();
             double y = point.y();
@@ -112,28 +111,29 @@ public class KDTree {
                     }
                 }
             }
-            appendPoint(point, current);
+            current.appendPoint(point);
             if (level % 2 == 0) {
-                setVerticalChildren(current, level);
+                current.setVerticalChildren(current, level);
             } else {
-                setHorizontalChildren(current, level);
+                current.setHorizontalChildren(current, level);
             }
         }
-
     }
 
-    private void appendPoint(Point point, KDTree kdTree) {
-        kdTree.points.add(point);
-        kdTree.pointsX.add(point);
-        kdTree.pointsY.add(point);
-        setSplitLines(kdTree);
+    private void appendPoint(Point point) {
+        points.add(point);
+        pointsX.add(point);
+        pointsY.add(point);
+        pointsX.sort((p1, p2) -> (int) (100 * (p1.x() - p2.x())));
+        pointsY.sort((p1, p2) -> (int) (100 * (p1.y() - p2.y())));
+        setSplitLines();
     }
 
-    private void setSplitLines(KDTree current) {
-        if (current.level % 2 == 0)
-            current.verticalSplitLine = new SplitLine(current.getXMedian(), current.rectangle.yMin(), current.getXMedian(), current.rectangle.yMax());
+    private void setSplitLines() {
+        if (level % 2 == 0)
+            verticalSplitLine = new SplitLine(getXMedian(), rectangle.yMin(), getXMedian(), rectangle.yMax());
         else
-            current.horizontalSplitLine = new SplitLine(current.rectangle.xMin(), current.getYMedian(), current.rectangle.xMax(), current.getYMedian());
+            horizontalSplitLine = new SplitLine(rectangle.xMin(), getYMedian(), rectangle.xMax(), getYMedian());
     }
 
 
