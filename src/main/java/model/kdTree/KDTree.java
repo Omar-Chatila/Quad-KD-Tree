@@ -4,6 +4,7 @@ import model.Point;
 import model.quadTree.Area;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static util.ArrayListHelper.getMedian;
@@ -25,8 +26,8 @@ public class KDTree {
         this.area = area;
         this.pointsX = new ArrayList<>(points);
         this.pointsY = new ArrayList<>(points);
-        pointsX.sort((p1, p2) -> (int) (100 * (p1.x() - p2.x())));
-        pointsY.sort((p1, p2) -> (int) (100 * (p1.y() - p2.y())));
+        pointsX.sort(Comparator.comparingDouble(Point::x));
+        pointsY.sort(Comparator.comparingDouble(Point::y));
         this.level = level;
         if (level % 2 == 0)
             this.verticalSplitLine = new SplitLine(getXMedian(), area.yMin(), getXMedian(), area.yMax());

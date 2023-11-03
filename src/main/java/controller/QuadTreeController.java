@@ -5,6 +5,7 @@ import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXToggleButton;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.Glow;
 import javafx.scene.input.MouseEvent;
@@ -43,6 +44,8 @@ public class QuadTreeController {
     private Pane treePane;
     @FXML
     private JFXToggleButton toggleButton;
+    @FXML
+    private Label statsLabel;
 
     @FXML
     private void initialize() {
@@ -76,6 +79,31 @@ public class QuadTreeController {
         } else {
             generateKDTree();
             drawKDRecursive(500, 20, 500, 20, dynamicKDTree, dynamicKDTree.getHeight());
+        }
+    }
+
+    @FXML
+    void stressTest() {
+        int pointsCount = 1000000;
+        List<Point> testList = new ArrayList<>();
+        for (int i = 0; i < pointsCount; i++) {
+            testList.add(new Point(Math.random() * 400, Math.random() * 400));
+        }
+        long start = System.currentTimeMillis();
+        if (mode == TreeMode.QUAD_TREE) {
+            QuadTree quadTree = new QuadTree(rootArea, testList);
+            quadTree.buildQuadTree(quadTree);
+            long time = System.currentTimeMillis() - start;
+            int height = quadTree.getHeight();
+            int number = quadTree.size(quadTree);
+            statsLabel.setText("1 Mio. points -- " + "Height: " + height + " - Number of Nodes: " + number + " - Time: " + time + " ms");
+        } else {
+            KDTree kdTree = new KDTree(testList, rootArea, 0);
+            kdTree.buildTree(kdTree, 0);
+            long time = System.currentTimeMillis() - start;
+            int height = kdTree.getHeight();
+            int number = kdTree.size(kdTree);
+            statsLabel.setText("1 Mio. points -- " + "Height: " + height + " - Number of Nodes: " + number + " - Time: " + time + " ms");
         }
     }
 
@@ -231,13 +259,17 @@ public class QuadTreeController {
         if (mode == TreeMode.KD_TREE) {
             toggleButton.setText("QuadTree");
             mode = TreeMode.QUAD_TREE;
-            generateQuadTree();
-            drawQTRecursive(500, 20, 500, 20, dynamicQuadTree, dynamicQuadTree.getHeight());
+            if (!pointSet.isEmpty()) {
+                generateQuadTree();
+                drawQTRecursive(500, 20, 500, 20, dynamicQuadTree, dynamicQuadTree.getHeight());
+            }
         } else {
             toggleButton.setText("KD-Tree");
             mode = TreeMode.KD_TREE;
-            generateKDTree();
-            drawKDRecursive(500, 20, 500, 20, dynamicKDTree, dynamicKDTree.getHeight());
+            if (!pointSet.isEmpty()) {
+                generateKDTree();
+                drawKDRecursive(500, 20, 500, 20, dynamicKDTree, dynamicKDTree.getHeight());
+            }
         }
     }
 
