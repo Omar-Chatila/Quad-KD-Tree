@@ -129,6 +129,13 @@ public class QuadTree { //TODO: Query range, insertion
         }
     }
 
+    public int size(QuadTree node) {
+        if (node != null) {
+            return 1 + size(node.northEast) + size(node.northWest) + size(node.southEast) + size(node.southWest);
+        }
+        return 0;
+    }
+
     public int getHeight() {
         if (isNodeLeaf()) {
             return 1;

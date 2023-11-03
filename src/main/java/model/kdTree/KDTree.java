@@ -34,12 +34,16 @@ public class KDTree {
             this.horizontalSplitLine = new SplitLine(rectangle.xMin(), getYMedian(), rectangle.xMax(), getYMedian());
     }
 
-    public KDTree(Rectangle rectangle, int level) {
+    private KDTree(Rectangle rectangle, int level) {
         this.rectangle = rectangle;
         this.level = level;
         this.points = new ArrayList<>();
         this.pointsX = new ArrayList<>();
         this.pointsY = new ArrayList<>();
+    }
+
+    public KDTree(Rectangle rectangle) {
+        this(rectangle, 0);
     }
 
     public List<Point> getPoints() {
@@ -89,6 +93,7 @@ public class KDTree {
     }
 
     public void add(Point point) {
+        if (points.contains(point)) return;
         if (isEmpty()) {
             this.appendPoint(point);
         } else {
@@ -161,6 +166,12 @@ public class KDTree {
         } else {
             return h2 + 1;
         }
+    }
+
+    public int size(KDTree node) {
+        if (node != null)
+            return 1 + size(node.leftChild) + size(node.rightChild);
+        return 0;
     }
 
     private void setVerticalChildren(KDTree kdTree, int level) {
