@@ -2,6 +2,7 @@ package controller;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextArea;
+import com.jfoenix.controls.JFXToggleButton;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
@@ -12,25 +13,26 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import model.Point;
 import model.kdTree.KDTree;
 import model.kdTree.SplitLine;
+import model.quadTree.Area;
 import model.quadTree.QuadTree;
-import model.quadTree.Rectangle;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class QuadTreeController {
-
     public static final double PANE_WIDTH = 400, PANE_HEIGHT = 400;
     private final List<Point> pointSet = new ArrayList<>();
-    private final Rectangle rootRectangle = new Rectangle(0, PANE_WIDTH, 0, PANE_HEIGHT);
+    private final Area rootArea = new Area(0, PANE_WIDTH, 0, PANE_HEIGHT);
     private final Node[][] grid = new Node[400][400];
     public ScrollPane scrollPane;
-    private QuadTree dynamicQuadTree = new QuadTree(rootRectangle);
-    private KDTree dynamicKDTree = new KDTree(rootRectangle);
+    TreeMode mode = TreeMode.QUAD_TREE;
+    private QuadTree dynamicQuadTree = new QuadTree(rootArea);
+    private KDTree dynamicKDTree = new KDTree(rootArea);
     @FXML
     private Pane drawingPane;
     @FXML
@@ -39,11 +41,14 @@ public class QuadTreeController {
     private JFXButton clearButton;
     @FXML
     private Pane treePane;
+    @FXML
+    private JFXToggleButton toggleButton;
 
     @FXML
     private void initialize() {
         pointsLabel.setEditable(false);
         clearButton.setOnAction(actionEvent -> clearPane());
+
     }
 
     @FXML
@@ -63,31 +68,46 @@ public class QuadTreeController {
         }
     }
 
+    @FXML
+    void generate() {
+        if (mode == TreeMode.QUAD_TREE) {
+            generateQuadTree();
+            drawQTRecursive(500, 20, 500, 20, dynamicQuadTree, dynamicQuadTree.getHeight());
+        } else {
+            generateKDTree();
+            drawKDRecursive(500, 20, 500, 20, dynamicKDTree, dynamicKDTree.getHeight());
+        }
+    }
+
     private void clearPane() {
         pointSet.clear();
         drawingPane.getChildren().clear();
         pointsLabel.clear();
         treePane.getChildren().clear();
-        dynamicQuadTree = new QuadTree(rootRectangle);
+        dynamicQuadTree = new QuadTree(rootArea);
+        dynamicKDTree = new KDTree(rootArea);
     }
 
     private void addPoint(double x, double y) {
+        treePane.getChildren().clear();
         Point point = new Point(x, PANE_HEIGHT - y);
         addPointToGui(x, y, point);
-        dynamicQuadTree.add(point);
+        if (!pointSet.contains(point)) pointSet.add(point);
         dynamicKDTree.add(point);
-        System.out.println(dynamicKDTree.size(dynamicKDTree));
-        treePane.getChildren().clear();
-        drawKDRecursive(500, 20, 500, 20, dynamicKDTree, dynamicKDTree.getHeight());
+        dynamicQuadTree.add(point);
+        if (mode == TreeMode.KD_TREE) {
+            drawKDRecursive(500, 20, 500, 20, dynamicKDTree, dynamicKDTree.getHeight());
+        } else {
+            drawQTRecursive(500, 20, 500, 20, dynamicQuadTree, dynamicQuadTree.getHeight());
+        }
     }
 
-    @FXML
-    void drawTree() {
+    void generateQuadTree() {
         treePane.getChildren().clear();
+        removeLines();
         if (!pointSet.isEmpty()) {
-            QuadTree quadTree = new QuadTree(new Rectangle(0, PANE_WIDTH, 0, PANE_HEIGHT), pointSet);
-            quadTree.buildQuadTree(quadTree);
-            drawQTRecursive(1000, 20, 1000, 20, quadTree, quadTree.getHeight());
+            dynamicQuadTree = new QuadTree(new Area(0, PANE_WIDTH, 0, PANE_HEIGHT), pointSet);
+            dynamicQuadTree.buildQuadTree(dynamicQuadTree);
         }
     }
 
@@ -95,7 +115,7 @@ public class QuadTreeController {
         Line line = new Line(x1, y1 + 5, x, y);
         treePane.getChildren().add(line);
         if (node.isPointLeaf()) {
-            javafx.scene.shape.Rectangle rectangle = getRectangle(x, y, node);
+            Rectangle rectangle = getRectangle(x, y, node);
             treePane.getChildren().add(rectangle);
         } else {
             Circle circle = new Circle(x, y, 10, Paint.valueOf("blue"));
@@ -116,8 +136,8 @@ public class QuadTreeController {
             drawQTRecursive(x, y, x + 1.5 * delta, y + (1 + h / 8.0) * 60, node.getSouthEast(), height - 1);
     }
 
-    private javafx.scene.shape.Rectangle getRectangle(double x, double y, QuadTree node) {
-        javafx.scene.shape.Rectangle rectangle = new javafx.scene.shape.Rectangle(x, y, 10, 10);
+    private Rectangle getRectangle(double x, double y, QuadTree node) {
+        Rectangle rectangle = new Rectangle(x, y, 10, 10);
         Point p = node.getPoints().get(0);
         rectangle.setId(node.getPoints().get(0).toString());
 
@@ -140,9 +160,9 @@ public class QuadTreeController {
     }
 
     private void drawSplitLines(QuadTree node) {
-        Rectangle rectangle = node.getSquare();
-        Line horizontalSplit = new Line(rectangle.xMin(), PANE_HEIGHT - rectangle.yMid(), rectangle.xMax(), PANE_HEIGHT - rectangle.yMid());
-        Line verticalSplit = new Line(rectangle.xMid(), PANE_HEIGHT - rectangle.yMin(), rectangle.xMid(), PANE_HEIGHT - rectangle.yMax());
+        Area area = node.getSquare();
+        Line horizontalSplit = new Line(area.xMin(), PANE_HEIGHT - area.yMid(), area.xMax(), PANE_HEIGHT - area.yMid());
+        Line verticalSplit = new Line(area.xMid(), PANE_HEIGHT - area.yMin(), area.xMid(), PANE_HEIGHT - area.yMax());
         drawingPane.getChildren().addAll(horizontalSplit, verticalSplit);
     }
 
@@ -156,14 +176,13 @@ public class QuadTreeController {
         pointsLabel.setText("P = { " + pointSet.toString().substring(1, pointSet.toString().length() - 1) + " }");
     }
 
-    public void drawKDTree() {
-        KDTree kdTree = new KDTree(pointSet, rootRectangle, 0);
-        kdTree.buildTree(kdTree, 0);
-        drawKDRecursive(500, 20, 500, 20, kdTree, kdTree.getHeight());
-        System.out.println(kdTree.size(kdTree));
-        QuadTree quadTree = new QuadTree(rootRectangle, pointSet);
-        quadTree.buildQuadTree(quadTree);
-        System.out.println(quadTree.size(quadTree));
+    public void generateKDTree() {
+        if (!pointSet.isEmpty()) {
+            removeLines();
+            treePane.getChildren().clear();
+            dynamicKDTree = new KDTree(pointSet, rootArea, 0);
+            dynamicKDTree.buildTree(dynamicKDTree, 0);
+        }
     }
 
     public void drawKDRecursive(double x1, double y1, double x, double y, KDTree node, int height) {
@@ -175,7 +194,7 @@ public class QuadTreeController {
             createLeaf(x, y, node);
         }
         int h = node.getHeight();
-        double delta = ((h - 1) * 20 + 20);
+        double delta = (Math.pow(Math.E, h / 1.9 - 1) * 20 + 20);
         if (node.getLeftChild() != null)
             drawKDRecursive(x, y, x - delta, y + (1 + h / 8.0) * 60, node.getLeftChild(), height - 1);
         if (node.getRightChild() != null)
@@ -193,11 +212,34 @@ public class QuadTreeController {
     }
 
     private void createLeaf(double x, double y, KDTree node) {
-        javafx.scene.shape.Rectangle rectangle = new javafx.scene.shape.Rectangle(x, y);
+        Rectangle rectangle = new Rectangle(x, y);
         rectangle.setWidth(10);
         rectangle.setHeight(10);
         rectangle.setFill(Color.BLACK);
         Text text = new Text(x - 20, y + 10, node.getPoints().toString());
         treePane.getChildren().add(text);
     }
+
+    private void removeLines() {
+        drawingPane.getChildren().removeIf(node -> node instanceof Line);
+    }
+
+    @FXML
+    void toggleMode() {
+        removeLines();
+        treePane.getChildren().clear();
+        if (mode == TreeMode.KD_TREE) {
+            toggleButton.setText("QuadTree");
+            mode = TreeMode.QUAD_TREE;
+            generateQuadTree();
+            drawQTRecursive(500, 20, 500, 20, dynamicQuadTree, dynamicQuadTree.getHeight());
+        } else {
+            toggleButton.setText("KD-Tree");
+            mode = TreeMode.KD_TREE;
+            generateKDTree();
+            drawKDRecursive(500, 20, 500, 20, dynamicKDTree, dynamicKDTree.getHeight());
+        }
+    }
+
+    public enum TreeMode {QUAD_TREE, KD_TREE}
 }

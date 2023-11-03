@@ -6,17 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuadTree { //TODO: Query range, insertion
-    private final Rectangle square;
+    private final Area square;
     private final List<Point> points;
     private QuadTree northEast, northWest, southEast, southWest;
 
 
-    public QuadTree(Rectangle square, List<Point> points) {
+    public QuadTree(Area square, List<Point> points) {
         this.square = square;
         this.points = points;
     }
 
-    public QuadTree(Rectangle square) {
+    public QuadTree(Area square) {
         this.square = square;
         this.points = new ArrayList<>();
     }
@@ -41,7 +41,7 @@ public class QuadTree { //TODO: Query range, insertion
         return southWest;
     }
 
-    public Rectangle getSquare() {
+    public Area getSquare() {
         return square;
     }
 
@@ -50,7 +50,7 @@ public class QuadTree { //TODO: Query range, insertion
     }
 
     public void partition(QuadTree current) {
-        Rectangle[] quadrants = Rectangle.split(current.square);
+        Area[] quadrants = Area.split(current.square);
         double xMid = (current.square.xMin() + current.square.xMax()) / 2;
         double yMid = (current.square.yMin() + current.square.yMax()) / 2;
         List<Point> pointsNE = new ArrayList<>();

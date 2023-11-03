@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.*?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextArea?>
+<?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="633.0" prefWidth="1347.0"
-            style="-fx-background-color: grey;" xmlns="http://javafx.com/javafx/20.0.1"
-            fx:controller="controller.QuadTreeController">
-    <Pane fx:id="drawingPane" layoutX="14.0" layoutY="14.0" onMouseClicked="#drawPoint" prefHeight="400.0"
-          prefWidth="400.0" style="-fx-background-color: white;"/>
-    <JFXTextArea fx:id="pointsLabel" layoutX="14.0" layoutY="465.0" prefHeight="157.0" prefWidth="400.0"
-                 style="-fx-background-color: lightGrey;"/>
-    <ScrollPane fx:id="scrollPane" layoutX="449.0" layoutY="14.0" prefHeight="509.0" prefWidth="885.0">
-        <Pane fx:id="treePane" layoutX="449.0" layoutY="14.0" style="-fx-background-color: white;"/>
-    </ScrollPane>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="633.0" prefWidth="1347.0" style="-fx-background-color: #1E3050;" stylesheets="@../mainView.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.QuadTreeController">
+    <Pane fx:id="drawingPane" layoutX="14.0" layoutY="14.0" onMouseClicked="#drawPoint" prefHeight="400.0" prefWidth="400.0" style="-fx-background-color: white;" />
+    <JFXTextArea fx:id="pointsLabel" layoutX="14.0" layoutY="465.0" prefHeight="157.0" prefWidth="400.0" style="-fx-background-color: lightGrey;" />
+    <VBox layoutX="438.0" layoutY="14.0" spacing="10.0">
+        <children>
+            <ScrollPane fx:id="scrollPane" prefHeight="509.0" prefWidth="885.0">
+                <Pane fx:id="treePane" layoutX="449.0" layoutY="14.0" style="-fx-background-color: white;" />
+            </ScrollPane>
+            <JFXToggleButton fx:id="toggleButton" alignment="CENTER_LEFT" onAction="#toggleMode" prefHeight="90.0" prefWidth="231.0" size="15.0" text="QuadTree" textFill="WHITE" unToggleColor="#ff5722" unToggleLineColor="#ff9500ed">
+                <font>
+                    <Font size="20.0" />
+                </font>
+            </JFXToggleButton>
+        </children>
+    </VBox>
     <HBox alignment="CENTER" layoutX="14.0" layoutY="421.0" prefHeight="35.0" prefWidth="400.0" spacing="10.0">
-        <JFXButton fx:id="clearButton" style="-fx-background-color: white;" text="Clear"/>
-        <JFXButton onAction="#randomize" style="-fx-background-color: white;" text="Randomize"/>
-        <JFXButton onAction="#drawTree" style="-fx-background-color: white;" text="Quad - Tree"/>
-        <JFXButton onAction="#drawKDTree" style="-fx-background-color: white;" text="KD - Tree"/>
+        <JFXButton fx:id="clearButton" style="-fx-background-color: white;" text="Clear" />
+        <JFXButton onAction="#randomize" style="-fx-background-color: white;" text="Randomize" />
+      <JFXButton onAction="#generate" text="Generate" />
     </HBox>
 </AnchorPane>

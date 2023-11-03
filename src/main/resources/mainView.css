@@ -1,0 +1,47 @@
+/* ModernStyles.css */
+
+/* Apply styles to the root AnchorPane */
+#QuadTreeController {
+    -fx-background-color: #f2f2f2;
+}
+
+/* Apply styles to the drawingPane */
+#drawingPane {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #000000;
+    -fx-border-width: 1px;
+}
+
+/* Apply styles to the pointsLabel */
+#pointsLabel {
+    -fx-background-color: #f5f5f5;
+    -fx-border-color: #000000;
+    -fx-border-width: 1px;
+    -fx-text-fill: #000000;
+}
+
+/* Apply styles to the scrollPane */
+#scrollPane {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #000000;
+    -fx-border-width: 1px;
+}
+
+/* Apply styles to the treePane */
+#treePane {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #000000;
+    -fx-border-width: 1px;
+}
+
+/* Apply styles to the HBox containing buttons */
+#buttonContainer {
+    -fx-spacing: 10px;
+}
+
+/* Apply styles to the buttons */
+.jfx-button {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #000000;
+}
+
