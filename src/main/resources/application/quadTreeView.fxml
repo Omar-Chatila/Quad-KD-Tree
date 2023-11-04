@@ -8,11 +8,17 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="633.0" prefWidth="1347.0" style="-fx-background-color: #1E3050;" stylesheets="@../mainView.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.QuadTreeController">
-    <Pane fx:id="drawingPane" layoutX="14.0" layoutY="14.0" onMouseClicked="#drawPoint" prefHeight="400.0" prefWidth="400.0" style="-fx-background-color: white;" />
+   <StackPane layoutX="14.0" layoutY="14.0">
+      <children>
+          <Pane fx:id="drawingPane" onMouseClicked="#drawPoint" prefHeight="400.0" prefWidth="400.0" style="-fx-background-color: white;" />
+         <Pane fx:id="rectanglePane" prefHeight="200.0" prefWidth="200.0" />
+      </children>
+   </StackPane>
     <JFXTextArea fx:id="pointsLabel" layoutX="14.0" layoutY="465.0" prefHeight="157.0" prefWidth="400.0" style="-fx-background-color: lightGrey;" />
     <VBox layoutX="438.0" layoutY="14.0" spacing="10.0">
         <children>
@@ -40,5 +46,6 @@
         <JFXButton onAction="#randomize" style="-fx-background-color: white;" text="Randomize" />
       <JFXButton onAction="#generate" text="Generate" />
       <JFXButton onAction="#stressTest" text="Stress Test" />
+      <JFXToggleButton alignment="CENTER_LEFT" onAction="#colorize" prefHeight="43.0" prefWidth="98.0" size="7.0" text="Color" textFill="WHITE" />
     </HBox>
 </AnchorPane>

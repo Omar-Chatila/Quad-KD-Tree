@@ -9,8 +9,7 @@ public class QuadTree { //TODO: Query range, insertion
     private final Area square;
     private final List<Point> points;
     private QuadTree northEast, northWest, southEast, southWest;
-
-
+    
     public QuadTree(Area square, List<Point> points) {
         this.square = square;
         this.points = points;
