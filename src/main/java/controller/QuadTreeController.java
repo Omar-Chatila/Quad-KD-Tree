@@ -89,23 +89,28 @@ public class QuadTreeController {
         for (int i = 0; i < pointsCount; i++) {
             testList.add(new Point(Math.random() * 400, Math.random() * 400));
         }
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
         if (mode == TreeMode.QUAD_TREE) {
             QuadTree quadTree = new QuadTree(rootArea, testList);
             quadTree.buildQuadTree(quadTree);
-            long time = System.currentTimeMillis() - start;
+            long time = (System.nanoTime() - start) / 1000000;
             int height = quadTree.getHeight();
             int number = quadTree.size(quadTree);
-            statsLabel.setText("1 Mio. points -- " + "Height: " + height + " - Number of Nodes: " + number + " - Time: " + time + " ms");
+            updateLabel(pointsCount, height, number, time);
         } else {
             KDTree kdTree = new KDTree(testList, rootArea, 0);
             kdTree.buildTree(kdTree, 0);
-            long time = System.currentTimeMillis() - start;
+            long time = (System.currentTimeMillis() - start) / 1000000;
             int height = kdTree.getHeight();
             int number = kdTree.size(kdTree);
-            statsLabel.setText("1 Mio. points -- " + "Height: " + height + " - Number of Nodes: " + number + " - Time: " + time + " ms");
+            updateLabel(pointsCount, height, number, time);
         }
     }
+
+    private void updateLabel(int points, int height, int size, long time) {
+        statsLabel.setText(points + " points -- " + "Height: " + height + " - # Nodes: " + size + " - Time: " + time + " ms");
+    }
+
 
     private void clearPane() {
         pointSet.clear();
@@ -114,6 +119,7 @@ public class QuadTreeController {
         treePane.getChildren().clear();
         dynamicQuadTree = new QuadTree(rootArea);
         dynamicKDTree = new KDTree(rootArea);
+        statsLabel.setText("");
     }
 
     private void addPoint(double x, double y) {
@@ -134,8 +140,11 @@ public class QuadTreeController {
         treePane.getChildren().clear();
         removeLines();
         if (!pointSet.isEmpty()) {
+            long start1 = System.nanoTime();
             dynamicQuadTree = new QuadTree(new Area(0, PANE_WIDTH, 0, PANE_HEIGHT), pointSet);
             dynamicQuadTree.buildQuadTree(dynamicQuadTree);
+            long end = (long) ((System.nanoTime() - start1) / 1000);
+            updateLabel(dynamicQuadTree.getPoints().size(), dynamicQuadTree.getHeight(), dynamicQuadTree.size(dynamicQuadTree), end);
         }
     }
 
@@ -208,8 +217,11 @@ public class QuadTreeController {
         if (!pointSet.isEmpty()) {
             removeLines();
             treePane.getChildren().clear();
+            long start1 = System.nanoTime();
             dynamicKDTree = new KDTree(pointSet, rootArea, 0);
             dynamicKDTree.buildTree(dynamicKDTree, 0);
+            long end = (long) ((System.nanoTime() - start1) / 1000);
+            updateLabel(dynamicKDTree.getPoints().size(), dynamicKDTree.getHeight(), dynamicKDTree.size(dynamicKDTree), end);
         }
     }
 
@@ -234,7 +246,7 @@ public class QuadTreeController {
         circle.setFill(node.getLevel() % 2 == 0 ? Color.FORESTGREEN : Color.BLUEVIOLET);
         SplitLine sp = node.getSplitLine();
         Line splitline = new Line(sp.fromX(), PANE_HEIGHT - sp.fromY(), sp.toX(), PANE_HEIGHT - sp.toY());
-        Text text = new Text(x + 20, y, (height % 2 == 0 ? "y = " + Math.round(sp.toY() * 10) / 10.0 : "x = " + Math.round(sp.toX() * 10.0) / 10.0));
+        Text text = new Text(x + 20, y, (node.getLevel() % 2 == 0 ? "x = " + Math.round(sp.fromX() * 10) / 10.0 : "y = " + Math.round(sp.fromY() * 10.0) / 10.0));
         drawingPane.getChildren().add(splitline);
         treePane.getChildren().addAll(circle, text);
     }

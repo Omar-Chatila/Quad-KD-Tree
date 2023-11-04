@@ -15,8 +15,8 @@ public class KDTree {
     private final Area area;
     private final int level;
     private final List<Point> points;
-    private final List<Point> pointsX;
-    private final List<Point> pointsY;
+    private List<Point> pointsX;
+    private List<Point> pointsY;
     private SplitLine verticalSplitLine;
     private SplitLine horizontalSplitLine;
     private KDTree leftChild, rightChild;
@@ -24,15 +24,16 @@ public class KDTree {
     public KDTree(List<Point> points, Area area, int level) {
         this.points = points;
         this.area = area;
-        this.pointsX = new ArrayList<>(points);
-        this.pointsY = new ArrayList<>(points);
-        pointsX.sort(Comparator.comparingDouble(Point::x));
-        pointsY.sort(Comparator.comparingDouble(Point::y));
         this.level = level;
-        if (level % 2 == 0)
+        if (level % 2 == 0) {
+            this.pointsX = new ArrayList<>(points);
+            pointsX.sort(Comparator.comparingDouble(Point::x));
             this.verticalSplitLine = new SplitLine(getXMedian(), area.yMin(), getXMedian(), area.yMax());
-        else
+        } else {
+            this.pointsY = new ArrayList<>(points);
+            pointsY.sort(Comparator.comparingDouble(Point::y));
             this.horizontalSplitLine = new SplitLine(area.xMin(), getYMedian(), area.xMax(), getYMedian());
+        }
     }
 
     private KDTree(Area area, int level) {
@@ -88,7 +89,7 @@ public class KDTree {
     public void add(Point point) {
         if (points.contains(point)) return;
         if (isEmpty()) {
-            this.appendPoint(point);
+            this.appendPoint(point, 0);
         } else {
             KDTree current = this;
             double x = point.x();
@@ -109,7 +110,7 @@ public class KDTree {
                     }
                 }
             }
-            current.appendPoint(point);
+            current.appendPoint(point, level);
             if (level % 2 == 0) {
                 current.setVerticalChildren(current, level);
             } else {
@@ -118,12 +119,15 @@ public class KDTree {
         }
     }
 
-    private void appendPoint(Point point) {
+    private void appendPoint(Point point, int level) {
         points.add(point);
-        pointsX.add(point);
-        pointsY.add(point);
-        pointsX.sort((p1, p2) -> (int) (100 * (p1.x() - p2.x())));
-        pointsY.sort((p1, p2) -> (int) (100 * (p1.y() - p2.y())));
+        if (level % 2 == 0) {
+            pointsX.add(point);
+            pointsX.sort((p1, p2) -> (int) (100 * (p1.x() - p2.x())));
+        } else {
+            pointsY.add(point);
+            pointsY.sort((p1, p2) -> (int) (100 * (p1.y() - p2.y())));
+        }
         setSplitLines();
     }
 

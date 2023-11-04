@@ -21,12 +21,12 @@
             </ScrollPane>
          <HBox alignment="CENTER_LEFT">
             <children>
-                  <JFXToggleButton fx:id="toggleButton" alignment="CENTER_LEFT" onAction="#toggleMode" prefHeight="90.0" prefWidth="231.0" size="15.0" text="QuadTree" textFill="WHITE" unToggleColor="#ff5722" unToggleLineColor="#ff9500ed">
+                  <JFXToggleButton fx:id="toggleButton" alignment="CENTER_LEFT" onAction="#toggleMode" prefHeight="90.0" prefWidth="201.0" size="15.0" text="QuadTree" textFill="WHITE" unToggleColor="#ff5722" unToggleLineColor="#ff9500ed">
                       <font>
                           <Font size="20.0" />
                       </font>
                   </JFXToggleButton>
-               <Label fx:id="statsLabel" prefHeight="59.0" prefWidth="649.0" text="Height: 0 - Number of Nodes: 10 - Time: " textFill="WHITE">
+               <Label fx:id="statsLabel" prefHeight="59.0" prefWidth="695.0" text="Height: 0 - #Nodes: 10 - Time: " textFill="WHITE" wrapText="true">
                   <font>
                      <Font size="20.0" />
                   </font>
