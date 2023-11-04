@@ -11,7 +11,6 @@ import javafx.scene.effect.Glow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
@@ -27,6 +26,7 @@ import java.util.List;
 
 public class QuadTreeController {
     public static final double PANE_WIDTH = 400, PANE_HEIGHT = 400;
+    static int n = 0;
     private final List<Point> pointSet = new ArrayList<>();
     private final Area rootArea = new Area(0, PANE_WIDTH, 0, PANE_HEIGHT);
     private final Node[][] grid = new Node[400][400];
@@ -49,6 +49,7 @@ public class QuadTreeController {
     private Label statsLabel;
     @FXML
     private Pane rectanglePane;
+    private String KDBench, QTBench;
 
     @FXML
     private void initialize() {
@@ -59,6 +60,14 @@ public class QuadTreeController {
         rectanglePane.setStyle("-fx-background-color: white");
     }
 
+    private void benchQT() {
+        long start1 = System.nanoTime();
+        dynamicQuadTree = new QuadTree(rootArea, pointSet);
+        dynamicQuadTree.buildQuadTree(dynamicQuadTree);
+        long end = (System.nanoTime() - start1) / 1000;
+        updateLabel(dynamicQuadTree.getPoints().size(), dynamicQuadTree.getHeight(), dynamicQuadTree.size(dynamicQuadTree), end, "µs", TreeMode.QUAD_TREE);
+    }
+
     @FXML
     void toggleMode() {
         removeLines();
@@ -67,18 +76,34 @@ public class QuadTreeController {
             toggleButton.setText("QuadTree");
             mode = TreeMode.QUAD_TREE;
             if (!pointSet.isEmpty()) {
-                //generateQuadTree();
+                if (dynamicQuadTree.getPoints().isEmpty()) {
+                    benchQT();
+                    dynamicQuadTree.buildQuadTree(dynamicQuadTree);
+                }
                 drawQTRecursive(500, 20, 500, 20, dynamicQuadTree, dynamicQuadTree.getHeight(), Color.YELLOW);
             }
+            statsLabel.setText(this.QTBench);
             setRectVisibility(colorized);
         } else {
             removeRectangles();
             toggleButton.setText("KD-Tree");
             mode = TreeMode.KD_TREE;
             if (!pointSet.isEmpty()) {
+                if (dynamicKDTree.getPoints().isEmpty()) {
+                    benchKD();
+                }
                 drawKDRecursive(500, 20, 500, 20, dynamicKDTree, dynamicKDTree.getHeight());
             }
+            statsLabel.setText(this.KDBench);
         }
+    }
+
+    private void benchKD() {
+        long start1 = System.nanoTime();
+        dynamicKDTree = new KDTree(pointSet, rootArea, 0);
+        dynamicKDTree.buildTree(dynamicKDTree, 0);
+        long end = (System.nanoTime() - start1) / 1000;
+        updateLabel(dynamicKDTree.getPoints().size(), dynamicKDTree.getHeight(), dynamicKDTree.size(dynamicKDTree), end, "µs", TreeMode.KD_TREE);
     }
 
     @FXML
@@ -91,7 +116,7 @@ public class QuadTreeController {
     @FXML
     void randomize() {
         clearPane();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 200; i++) {
             double x = Math.random() * 400;
             double y = Math.random() * 400;
             addPointToGui(x, y, new Point(x, y));
@@ -103,6 +128,9 @@ public class QuadTreeController {
         if (mode == TreeMode.QUAD_TREE) {
             generateQuadTree();
             drawQTRecursive(500, 20, 500, 20, dynamicQuadTree, dynamicQuadTree.getHeight(), Color.YELLOW);
+            if (!colorized) {
+                setRectVisibility(false);
+            }
         } else {
             generateKDTree();
             drawKDRecursive(500, 20, 500, 20, dynamicKDTree, dynamicKDTree.getHeight());
@@ -111,26 +139,28 @@ public class QuadTreeController {
 
     @FXML
     void stressTest() {
+        clearPane();
         int pointsCount = 1000000;
         List<Point> testList = new ArrayList<>();
         for (int i = 0; i < pointsCount; i++) {
-            testList.add(new Point(Math.random() * 400, Math.random() * 400));
+            testList.add(new Point(Math.random() * 4000, Math.random() * 4000));
         }
         long start = System.nanoTime();
+        Area testArea = new Area(0, 4000, 0, 4000);
         if (mode == TreeMode.QUAD_TREE) {
-            QuadTree quadTree = new QuadTree(rootArea, testList);
+            QuadTree quadTree = new QuadTree(testArea, testList);
             quadTree.buildQuadTree(quadTree);
             long time = (System.nanoTime() - start) / 1000000;
             int height = quadTree.getHeight();
             int number = quadTree.size(quadTree);
-            updateLabel(pointsCount, height, number, time, "ms");
+            updateLabel(pointsCount, height, number, time, "ms", mode);
         } else {
-            KDTree kdTree = new KDTree(testList, rootArea, 0);
+            KDTree kdTree = new KDTree(testList, testArea, 0);
             kdTree.buildTree(kdTree, 0);
             long time = (System.nanoTime() - start) / 1000000;
             int height = kdTree.getHeight();
             int number = kdTree.size(kdTree);
-            updateLabel(pointsCount, height, number, time, "ms");
+            updateLabel(pointsCount, height, number, time, "ms", mode);
         }
     }
 
@@ -171,14 +201,18 @@ public class QuadTreeController {
     }
 
     void generateQuadTree() {
-        treePane.getChildren().clear();
-        removeLines();
         if (!pointSet.isEmpty()) {
-            long start1 = System.nanoTime();
-            dynamicQuadTree = new QuadTree(new Area(0, PANE_WIDTH, 0, PANE_HEIGHT), pointSet);
-            dynamicQuadTree.buildQuadTree(dynamicQuadTree);
-            long end = (System.nanoTime() - start1) / 1000;
-            updateLabel(dynamicQuadTree.getPoints().size(), dynamicQuadTree.getHeight(), dynamicQuadTree.size(dynamicQuadTree), end, "µ");
+            removeLines();
+            treePane.getChildren().clear();
+            benchQT();
+        }
+    }
+
+    public void generateKDTree() {
+        if (!pointSet.isEmpty()) {
+            removeLines();
+            treePane.getChildren().clear();
+            benchKD();
         }
     }
 
@@ -188,9 +222,8 @@ public class QuadTreeController {
         if (node.isPointLeaf()) {
             Rectangle rectangle = getRectangle(x, y, node);
             treePane.getChildren().add(rectangle);
-
         } else {
-            Circle circle = new Circle(x, y, 10, Paint.valueOf("blue"));
+            Circle circle = new Circle(x, y, 10, color);
             if (!node.isNodeLeaf()) {
                 drawSplitLines(node);
             }
@@ -250,18 +283,6 @@ public class QuadTreeController {
             pointSet.add(new Point(x, PANE_HEIGHT - y));
         }
         pointsLabel.setText("P = { " + pointSet.toString().substring(1, pointSet.toString().length() - 1) + " }");
-    }
-
-    public void generateKDTree() {
-        if (!pointSet.isEmpty()) {
-            removeLines();
-            treePane.getChildren().clear();
-            long start1 = System.nanoTime();
-            dynamicKDTree = new KDTree(pointSet, rootArea, 0);
-            dynamicKDTree.buildTree(dynamicKDTree, 0);
-            long end = (System.nanoTime() - start1) / 1000;
-            updateLabel(dynamicKDTree.getPoints().size(), dynamicKDTree.getHeight(), dynamicKDTree.size(dynamicKDTree), end, "µ");
-        }
     }
 
     public void drawKDRecursive(double x1, double y1, double x, double y, KDTree node, int height) {
@@ -325,8 +346,14 @@ public class QuadTreeController {
         }
     }
 
-    private void updateLabel(int points, int height, int size, long time, String timeUnit) {
-        statsLabel.setText(points + " points -- " + "Height: " + height + " - # Nodes: " + size + " - Time: " + time + " " + timeUnit);
+    private void updateLabel(int points, int height, int size, long time, String timeUnit, TreeMode mode) {
+        if (mode == TreeMode.KD_TREE) {
+            this.KDBench = points + " points -- " + "Height: " + height + " - # Nodes: " + size + " - Time: " + time + " " + timeUnit;
+            statsLabel.setText(this.KDBench);
+        } else {
+            this.QTBench = points + " points -- " + "Height: " + height + " - # Nodes: " + size + " - Time: " + time + " " + timeUnit;
+            statsLabel.setText(this.QTBench);
+        }
     }
 
     public enum TreeMode {QUAD_TREE, KD_TREE}
