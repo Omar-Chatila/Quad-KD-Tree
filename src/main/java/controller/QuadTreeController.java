@@ -3,6 +3,7 @@ package controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXToggleButton;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -14,7 +15,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
+import jfxtras.labs.util.event.MouseControlUtil;
 import model.Point;
 import model.kdTree.KDTree;
 import model.kdTree.SplitLine;
@@ -23,32 +26,34 @@ import model.quadTree.QuadTree;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class QuadTreeController {
     public static final double PANE_WIDTH = 400, PANE_HEIGHT = 400;
-    static int n = 0;
     private final List<Point> pointSet = new ArrayList<>();
     private final Area rootArea = new Area(0, PANE_WIDTH, 0, PANE_HEIGHT);
     private final Node[][] grid = new Node[400][400];
+    private final List<Shape> selected = new ArrayList<>();
     public ScrollPane scrollPane;
     TreeMode mode = TreeMode.QUAD_TREE;
     boolean colorized = false;
     private QuadTree dynamicQuadTree = new QuadTree(rootArea);
     private KDTree dynamicKDTree = new KDTree(rootArea);
     @FXML
+    private JFXButton clearButton;
+    @FXML
     private Pane drawingPane;
     @FXML
     private JFXTextArea pointsLabel;
     @FXML
-    private JFXButton clearButton;
-    @FXML
-    private Pane treePane;
-    @FXML
-    private JFXToggleButton toggleButton;
+    private Pane rectanglePane;
     @FXML
     private Label statsLabel;
     @FXML
-    private Pane rectanglePane;
+    private JFXToggleButton toggleButton;
+    @FXML
+    private Pane treePane;
+    private boolean isDrawMode = true;
     private String KDBench, QTBench;
 
     @FXML
@@ -58,6 +63,18 @@ public class QuadTreeController {
         rectanglePane.toBack();
         drawingPane.setStyle("-fx-background-color: transparent");
         rectanglePane.setStyle("-fx-background-color: white");
+        initQuery();
+    }
+
+    @FXML
+    void selectDrawMode() {
+        this.isDrawMode = true;
+        removeQueryRect();
+    }
+
+    @FXML
+    void selectQueryMode() {
+        this.isDrawMode = false;
     }
 
     private void benchQT() {
@@ -108,9 +125,11 @@ public class QuadTreeController {
 
     @FXML
     void drawPoint(MouseEvent event) {
-        double x = event.getX();
-        double y = event.getY();
-        addPoint(x, y);
+        if (this.isDrawMode) {
+            double x = event.getX();
+            double y = event.getY();
+            addPoint(x, y);
+        }
     }
 
     @FXML
@@ -353,6 +372,58 @@ public class QuadTreeController {
         } else {
             this.QTBench = points + " points -- " + "Height: " + height + " - # Nodes: " + size + " - Time: " + time + " " + timeUnit;
             statsLabel.setText(this.QTBench);
+        }
+    }
+
+    private void initQuery() {
+        final Rectangle selectionRect = new Rectangle(10, 10, Color.TRANSPARENT);
+        selectionRect.setStroke(Color.BLACK);
+        EventHandler<MouseEvent> mouseDragHandler = event -> {
+            if (!this.isDrawMode) {
+                drawingPane.getChildren().removeIf(node -> node != selectionRect && node.getId() != null);
+                for (Node shape : drawingPane.getChildren()) {
+                    handleSelection(selectionRect, (Shape) shape);
+                }
+            }
+        };
+        final AtomicInteger[] width = {new AtomicInteger()};
+        final AtomicInteger[] height = {new AtomicInteger()};
+        final AtomicInteger[] x = {new AtomicInteger()};
+        final AtomicInteger[] y = {new AtomicInteger()};
+
+
+        MouseControlUtil.addSelectionRectangleGesture(drawingPane, selectionRect, mouseDragHandler, null, e -> {
+            if (!this.isDrawMode) {
+                width[0] = new AtomicInteger((int) selectionRect.getWidth());
+                height[0] = new AtomicInteger((int) selectionRect.getHeight());
+                x[0] = new AtomicInteger((int) selectionRect.getX());
+                y[0] = new AtomicInteger((int) selectionRect.getY());
+                Rectangle rectangle = new Rectangle(x[0].doubleValue(), y[0].doubleValue(), width[0].doubleValue(), height[0].doubleValue());
+                drawingPane.getChildren().add(rectangle);
+                rectangle.setFill(Color.TRANSPARENT);
+                rectangle.setStroke(Color.BLUE);
+                rectangle.setId("query");
+                System.out.println(rectangle.getWidth() + ":" + rectangle.getHeight() + " at " + rectangle.getX() + " - " + rectangle.getY());
+            }
+        });
+
+
+    }
+
+    private void removeQueryRect() {
+        this.drawingPane.getChildren().removeIf(node -> node.getId() != null && node.getId().equals("query"));
+    }
+
+    private void handleSelection(Rectangle selectionRect, Shape shape) {
+        if (!this.isDrawMode) {
+            if (selectionRect.getBoundsInParent().intersects(shape.getBoundsInParent())) {
+                if (shape instanceof Circle) shape.setFill(Color.RED);
+                if (!this.selected.contains(shape))
+                    this.selected.add(shape);
+            } else {
+                shape.setFill(Color.BLACK);
+                this.selected.remove(shape);
+            }
         }
     }
 
