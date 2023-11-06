@@ -3,6 +3,7 @@ package controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXToggleButton;
+import javafx.animation.ScaleTransition;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -17,6 +18,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import jfxtras.labs.util.event.MouseControlUtil;
 import model.Point;
 import model.kdTree.KDTree;
@@ -417,7 +419,10 @@ public class QuadTreeController {
     private void handleSelection(Rectangle selectionRect, Shape shape) {
         if (!this.isDrawMode) {
             if (selectionRect.getBoundsInParent().intersects(shape.getBoundsInParent())) {
-                if (shape instanceof Circle) shape.setFill(Color.RED);
+                if (shape instanceof Circle circle) {
+                    circle.setFill(Color.RED);
+                    playScaleAnimation(circle);
+                }
                 if (!this.selected.contains(shape))
                     this.selected.add(shape);
             } else {
@@ -425,6 +430,15 @@ public class QuadTreeController {
                 this.selected.remove(shape);
             }
         }
+    }
+
+    private void playScaleAnimation(Circle button) {
+        ScaleTransition scaleTransition = new ScaleTransition(Duration.seconds(0.5), button);
+        scaleTransition.setToX(2.2);
+        scaleTransition.setToY(2.2);
+        scaleTransition.setCycleCount(10);
+        scaleTransition.setAutoReverse(true);
+        scaleTransition.play();
     }
 
     public enum TreeMode {QUAD_TREE, KD_TREE}
