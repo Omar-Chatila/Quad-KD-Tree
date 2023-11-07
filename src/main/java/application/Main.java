@@ -16,7 +16,7 @@ public class Main extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("quadTreeView.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-        stage.setTitle("Quad Tree - Demo");
+        stage.setTitle("QuadTree & KD-Tree - Demo");
         stage.setScene(scene);
         stage.show();
         stage.setResizable(false);
