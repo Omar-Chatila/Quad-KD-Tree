@@ -9,7 +9,7 @@ public class QuadTree { //TODO: Query range, insertion
     private final Area square;
     private final List<Point> points;
     private QuadTree northEast, northWest, southEast, southWest;
-    
+
     public QuadTree(Area square, List<Point> points) {
         this.square = square;
         this.points = points;
@@ -83,48 +83,47 @@ public class QuadTree { //TODO: Query range, insertion
         return this.southEast == null && this.southWest == null && this.northEast == null && this.northWest == null;
     }
 
-    public void buildQuadTree(QuadTree quadTree) {
-        if (quadTree.points.size() > 1) {
-            quadTree.partition();
-            buildQuadTree(quadTree.northEast);
-            buildQuadTree(quadTree.northWest);
-            buildQuadTree(quadTree.southWest);
-            buildQuadTree(quadTree.southEast);
+    public void buildQuadTree() {
+        if (this.points.size() > 1) {
+            this.partition();
+            this.northEast.buildQuadTree();
+            this.northWest.buildQuadTree();
+            this.southWest.buildQuadTree();
+            this.southEast.buildQuadTree();
         }
     }
+
+    public boolean contains(Point point) {
+        double pointX = point.x();
+        double pointY = point.y();
+        QuadTree current = this;
+        while (!current.isPointLeaf()) {
+            current = locateQuadrant(pointX, pointY, current);
+        }
+        return (current.points.contains(point));
+    }
+
 
     public boolean isEmpty() {
         return this.points.isEmpty();
     }
 
     public void add(Point point) {
-        if (!points.contains(point)) {
-            QuadTree current = this;
+        QuadTree current = this;
+        if (!current.isEmpty()) {
             double pointX = point.x();
             double pointY = point.y();
             while (!current.isNodeLeaf()) {
-                double xMid = current.square.xMid();
-                double yMid = current.square.yMid();
-                if (pointX > xMid && pointY > yMid) {
-                    current = current.northEast;
-                } else if (pointX <= xMid && pointY > yMid) {
-                    current = current.northWest;
-                } else if (pointX <= xMid && pointY <= yMid) {
-                    current = current.southWest;
-                } else {
-                    current = current.southEast;
-                }
+                current = locateQuadrant(pointX, pointY, current);
             }
-            if (!this.isEmpty()) {
-                if (current.isPointLeaf()) {
-                    current.points.add(point);
-                    buildQuadTree(current);
-                } else {
-                    current.points.add(point);
-                }
+            if (current.isPointLeaf()) {
+                current.points.add(point);
+                current.buildQuadTree();
             } else {
                 current.points.add(point);
             }
+        } else {
+            current.points.add(point);
         }
     }
 
@@ -152,5 +151,20 @@ public class QuadTree { //TODO: Query range, insertion
         } else {
             return h4 + 1;
         }
+    }
+
+    private QuadTree locateQuadrant(double pointX, double pointY, QuadTree current) {
+        double centerX = current.square.xMid();
+        double centerY = current.square.yMid();
+        if (pointX > centerX && pointY > centerY) {
+            current = current.northEast;
+        } else if (pointX <= centerX && pointY > centerY) {
+            current = current.northWest;
+        } else if (pointX <= centerX && pointY <= centerY) {
+            current = current.southWest;
+        } else {
+            current = current.southEast;
+        }
+        return current;
     }
 }

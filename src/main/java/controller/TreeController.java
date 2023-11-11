@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class QuadTreeController {
+public class TreeController {
     public static final double PANE_WIDTH = 400, PANE_HEIGHT = 400;
     private final List<Point> pointSet = new ArrayList<>();
     private final Area rootArea = new Area(0, PANE_WIDTH, 0, PANE_HEIGHT);
@@ -82,7 +82,7 @@ public class QuadTreeController {
     private void benchQT() {
         long start1 = System.nanoTime();
         dynamicQuadTree = new QuadTree(rootArea, pointSet);
-        dynamicQuadTree.buildQuadTree(dynamicQuadTree);
+        dynamicQuadTree.buildQuadTree();
         long end = (System.nanoTime() - start1) / 1000;
         updateLabel(dynamicQuadTree.getPoints().size(), dynamicQuadTree.getHeight(), dynamicQuadTree.size(dynamicQuadTree), end, "µs", TreeMode.QUAD_TREE);
     }
@@ -97,7 +97,7 @@ public class QuadTreeController {
             if (!pointSet.isEmpty()) {
                 if (dynamicQuadTree.getPoints().isEmpty()) {
                     benchQT();
-                    dynamicQuadTree.buildQuadTree(dynamicQuadTree);
+                    dynamicQuadTree.buildQuadTree();
                 }
                 drawQTRecursive(500, 20, 500, 20, dynamicQuadTree, dynamicQuadTree.getHeight(), Color.YELLOW);
             }
@@ -170,7 +170,7 @@ public class QuadTreeController {
         Area testArea = new Area(0, 4000, 0, 4000);
         if (mode == TreeMode.QUAD_TREE) {
             QuadTree quadTree = new QuadTree(testArea, testList);
-            quadTree.buildQuadTree(quadTree);
+            quadTree.buildQuadTree();
             long time = (System.nanoTime() - start) / 1000000;
             int height = quadTree.getHeight();
             int number = quadTree.size(quadTree);
