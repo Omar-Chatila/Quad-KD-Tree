@@ -86,8 +86,22 @@ public class KDTree {
         return this.points.isEmpty();
     }
 
+    public boolean contains(Point point) {
+        double pointX = point.x();
+        double pointY = point.y();
+        KDTree current = this;
+        while (!current.isLeaf()) {
+            if (current.level % 2 == 0) {
+                current = current.verticalSplitLine.fromX() >= pointX ? current.leftChild : current.rightChild;
+            } else {
+                current = current.horizontalSplitLine.fromY() >= pointY ? current.leftChild : current.rightChild;
+            }
+        }
+        return (current.points.contains(point));
+    }
+
     public void add(Point point) {
-        if (points.contains(point)) return;
+        if (!isEmpty() && this.contains(point)) return;
         if (isEmpty()) {
             this.appendPoint(point, 0);
         } else {

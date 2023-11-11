@@ -13,7 +13,6 @@ public class ArrayListHelper {
         ArrayList<ArrayList<Point>> result = new ArrayList<>();
         result.add(sublist1);
         result.add(sublist2);
-
         return result;
     }
 

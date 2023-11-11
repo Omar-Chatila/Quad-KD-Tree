@@ -137,7 +137,7 @@ public class QuadTreeController {
     @FXML
     void randomize() {
         clearPane();
-        for (int i = 0; i < 200; i++) {
+        for (int i = 0; i < 10; i++) {
             double x = Math.random() * 400;
             double y = Math.random() * 400;
             addPointToGui(x, y, new Point(x, y));
@@ -207,7 +207,6 @@ public class QuadTreeController {
         if (!pointSet.contains(point)) {
             treePane.getChildren().clear();
             addPointToGui(x, y, point);
-            pointSet.add(point);
             dynamicKDTree.add(point);
             dynamicQuadTree.add(point);
             removeLines();
