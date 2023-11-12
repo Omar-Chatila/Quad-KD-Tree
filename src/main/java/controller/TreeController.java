@@ -161,7 +161,7 @@ public class TreeController {
     @FXML
     void stressTest() {
         clearPane();
-        int pointsCount = 1000000;
+        int pointsCount = (int) 1E6;
         List<Point> testList = new ArrayList<>();
         for (int i = 0; i < pointsCount; i++) {
             testList.add(new Point(Math.random() * 4000, Math.random() * 4000));
