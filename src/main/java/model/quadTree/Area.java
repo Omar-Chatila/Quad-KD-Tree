@@ -20,6 +20,14 @@ public record Area(double xMin, double xMax, double yMin, double yMax) {
         return (this.yMin + this.yMax) / 2.0;
     }
 
+    public boolean intersects(Area other) {
+        return this.xMin < other.xMax && this.xMax > other.xMin && this.yMax > other.yMin && this.yMin < other.yMax;
+    }
+
+    public boolean contains(Area other) {
+        return this.equals(other) || (this.xMin <= other.xMin && this.xMax >= other.xMax && this.yMin <= other.yMin && this.yMax <= other.yMax);
+    }
+
     @Override
     public String toString() {
         return "[" + xMin + ":" + xMax + "] \n [" + yMin + ":" + yMax + ']';
