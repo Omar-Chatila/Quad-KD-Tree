@@ -5,7 +5,7 @@ import java.util.Objects;
 public record Point(double x, double y) {
     @Override
     public String toString() {
-        return "(" + x + ", " + y + ")";
+        return "(" + (int) x + ", " + (int) y + ")";
     }
 
     @Override

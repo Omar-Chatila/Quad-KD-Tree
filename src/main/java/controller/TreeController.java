@@ -17,6 +17,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import jfxtras.labs.util.event.MouseControlUtil;
@@ -27,6 +28,7 @@ import model.quadTree.Area;
 import model.quadTree.QuadTree;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -297,6 +299,9 @@ public class TreeController {
 
     private void addPointToGui(double x, double y, Point p) {
         Circle circle = new Circle(x, y, 2, Color.BLACK);
+        circle.setId("(" + (int) x + ", " + (int) y + ")");
+        circle.setOnMouseEntered(mouseEvent -> drawingPane.getChildren().add(new Text(x + 5, y - 5, circle.getId())));
+        circle.setOnMouseExited(mouseEvent -> drawingPane.getChildren().removeIf((node) -> node instanceof Text));
         grid[(int) x][(int) (PANE_HEIGHT - y)] = circle;
         drawingPane.getChildren().add(circle);
         if (!pointSet.contains(p)) {
@@ -381,17 +386,13 @@ public class TreeController {
         selectionRect.setStroke(Color.BLACK);
         EventHandler<MouseEvent> mouseDragHandler = event -> {
             if (!this.isDrawMode) {
-                drawingPane.getChildren().removeIf(node -> node != selectionRect && node.getId() != null);
-                for (Node shape : drawingPane.getChildren()) {
-                    handleSelection(selectionRect, (Shape) shape);
-                }
+                drawingPane.getChildren().removeIf(node -> node != selectionRect && (node instanceof Rectangle));
             }
         };
         final AtomicInteger[] width = {new AtomicInteger()};
         final AtomicInteger[] height = {new AtomicInteger()};
         final AtomicInteger[] x = {new AtomicInteger()};
         final AtomicInteger[] y = {new AtomicInteger()};
-
 
         MouseControlUtil.addSelectionRectangleGesture(drawingPane, selectionRect, mouseDragHandler, null, e -> {
             if (!this.isDrawMode) {
@@ -404,11 +405,19 @@ public class TreeController {
                 rectangle.setFill(Color.TRANSPARENT);
                 rectangle.setStroke(Color.BLUE);
                 rectangle.setId("query");
-                System.out.println(rectangle.getWidth() + ":" + rectangle.getHeight() + " at " + rectangle.getX() + " - " + rectangle.getY());
+                performQuery(rectangle, selectionRect);
             }
         });
+    }
 
-
+    private void performQuery(Rectangle rectangle, Rectangle selectionRect) {
+        Area queryArea = new Area(rectangle.getX(), rectangle.getX() + rectangle.getWidth(), PANE_HEIGHT - rectangle.getY() - rectangle.getHeight(), PANE_HEIGHT - rectangle.getY());
+        HashSet<Point> queried = dynamicKDTree.query(queryArea);
+        statsLabel.setText("Points in " + queryArea + ": " + queried);
+        statsLabel.setFont(Font.font(18));
+        for (Node shape : drawingPane.getChildren()) {
+            handleSelection(selectionRect, (Shape) shape);
+        }
     }
 
     private void removeQueryRect() {

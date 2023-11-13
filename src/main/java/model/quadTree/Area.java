@@ -54,6 +54,6 @@ public record Area(double xMin, double xMax, double yMin, double yMax) {
 
     @Override
     public String toString() {
-        return "[" + xMin + ":" + xMax + "] \n [" + yMin + ":" + yMax + ']';
+        return "[" + (int) xMin + ":" + (int) xMax + "] ⨯ [" + (int) yMin + ":" + (int) yMax + ']';
     }
 }
