@@ -1,12 +1,13 @@
 package model.quadTree;
 
 import model.Point;
+import model.Tree;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class QuadTree { //TODO: Query range, insertion
+public class QuadTree extends Tree { //TODO: Query range, insertion
     private final Area square;
     private final List<Point> points;
     private QuadTree northEast, northWest, southEast, southWest;

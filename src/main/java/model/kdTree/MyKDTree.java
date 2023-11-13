@@ -1,6 +1,7 @@
 package model.kdTree;
 
 import model.Point;
+import model.Tree;
 import model.quadTree.Area;
 
 import java.util.ArrayList;
@@ -11,8 +12,8 @@ import java.util.List;
 import static util.ArrayListHelper.getMedian;
 import static util.ArrayListHelper.splitArrayList;
 
-public class KDTree {
-    private final List<KDTree> nodeList = new ArrayList<>();
+public class MyKDTree extends Tree {
+    private final List<MyKDTree> nodeList = new ArrayList<>();
     private final Area area;
     private final int level;
     private final List<Point> points;
@@ -20,9 +21,9 @@ public class KDTree {
     private List<Point> pointsY;
     private SplitLine verticalSplitLine;
     private SplitLine horizontalSplitLine;
-    private KDTree leftChild, rightChild;
+    private MyKDTree leftChild, rightChild;
 
-    public KDTree(List<Point> points, Area area, int level) {
+    public MyKDTree(List<Point> points, Area area, int level) {
         this.points = points;
         this.area = area;
         this.level = level;
@@ -37,7 +38,7 @@ public class KDTree {
         }
     }
 
-    private KDTree(Area area, int level) {
+    private MyKDTree(Area area, int level) {
         this.area = area;
         this.level = level;
         this.points = new ArrayList<>();
@@ -45,29 +46,19 @@ public class KDTree {
         this.pointsY = new ArrayList<>();
     }
 
-    public KDTree(Area area) {
+    public MyKDTree(Area area) {
         this(area, 0);
-    }
-
-    public static void main(String[] args) {
-        Point[] points1 = {new Point(1, 1), new Point(1.8, 4.8), new Point(2.5, 3.5), new Point(4, 6)
-                , new Point(4.8, 1.8), new Point(6.8, 1.5), new Point(9, 2), new Point(8, 6), new Point(4, 4)};
-        List<Point> pointss = new ArrayList<>(List.of(points1));
-        KDTree kdTree = new KDTree(pointss, new Area(0, 10, 0, 10), 0);
-        kdTree.buildTree(kdTree, 0);
-        System.out.println(kdTree.reportSubTree());
-        System.out.println(kdTree.query(new Area(2, 20, 2, 20)));
     }
 
     public List<Point> getPoints() {
         return points;
     }
 
-    public KDTree getLeftChild() {
+    public MyKDTree getLeftChild() {
         return leftChild;
     }
 
-    public KDTree getRightChild() {
+    public MyKDTree getRightChild() {
         return rightChild;
     }
 
@@ -75,17 +66,17 @@ public class KDTree {
         return level;
     }
 
-    public void buildTree(KDTree kdTree, int level) {
-        if (kdTree.points.size() > 1) {
+    public void buildTree(int level) {
+        if (this.points.size() > 1) {
             // vertical split
             if (level % 2 == 0) {
-                setVerticalChildren(kdTree, level);
+                this.setVerticalChildren(level);
             } else {
                 // horizontal split
-                setHorizontalChildren(kdTree, level);
+                this.setHorizontalChildren(level);
             }
-            buildTree(kdTree.leftChild, level + 1);
-            buildTree(kdTree.rightChild, level + 1);
+            leftChild.buildTree(level + 1);
+            rightChild.buildTree(level + 1);
         }
     }
 
@@ -100,7 +91,7 @@ public class KDTree {
     public boolean contains(Point point) {
         double pointX = point.x();
         double pointY = point.y();
-        KDTree current = this;
+        MyKDTree current = this;
         while (!current.isLeaf()) {
             if (current.level % 2 == 0) {
                 current = current.verticalSplitLine.fromX() >= pointX ? current.leftChild : current.rightChild;
@@ -116,7 +107,7 @@ public class KDTree {
         if (isEmpty()) {
             this.appendPoint(point, 0);
         } else {
-            KDTree current = this;
+            MyKDTree current = this;
             double x = point.x();
             double y = point.y();
             int level = 0;
@@ -137,9 +128,9 @@ public class KDTree {
             }
             current.appendPoint(point, level);
             if (level % 2 == 0) {
-                current.setVerticalChildren(current, level);
+                current.setVerticalChildren(level);
             } else {
-                current.setHorizontalChildren(current, level);
+                current.setHorizontalChildren(level);
             }
         }
     }
@@ -206,24 +197,24 @@ public class KDTree {
         }
     }
 
-    public int size(KDTree node) {
+    public int size(MyKDTree node) {
         if (node != null)
             return 1 + size(node.leftChild) + size(node.rightChild);
         return 0;
     }
 
-    private void setVerticalChildren(KDTree kdTree, int level) {
-        Area leftArea = new Area(kdTree.area.xMin(), kdTree.getXMedian(), kdTree.area.yMin(), kdTree.area.yMax());
-        kdTree.leftChild = new KDTree(splitArrayList(kdTree.pointsX).get(0), leftArea, level + 1);
-        Area rightArea = new Area(kdTree.getXMedian(), kdTree.area.xMax(), kdTree.area.yMin(), kdTree.area.yMax());
-        kdTree.rightChild = new KDTree(splitArrayList(kdTree.pointsX).get(1), rightArea, level + 1);
+    private void setVerticalChildren(int level) {
+        Area leftArea = new Area(this.area.xMin(), this.getXMedian(), this.area.yMin(), this.area.yMax());
+        this.leftChild = new MyKDTree(splitArrayList(this.pointsX).get(0), leftArea, level + 1);
+        Area rightArea = new Area(this.getXMedian(), this.area.xMax(), this.area.yMin(), this.area.yMax());
+        this.rightChild = new MyKDTree(splitArrayList(this.pointsX).get(1), rightArea, level + 1);
     }
 
-    private void setHorizontalChildren(KDTree kdTree, int level) {
-        Area lowerArea = new Area(kdTree.area.xMin(), kdTree.area.xMax(), kdTree.area.yMin(), kdTree.getYMedian());
-        kdTree.leftChild = new KDTree(splitArrayList(kdTree.pointsY).get(0), lowerArea, level + 1);
-        Area higherArea = new Area(kdTree.area.xMin(), kdTree.area.xMax(), kdTree.getYMedian(), kdTree.area.yMax());
-        kdTree.rightChild = new KDTree(splitArrayList(kdTree.pointsY).get(1), higherArea, level + 1);
+    private void setHorizontalChildren(int level) {
+        Area lowerArea = new Area(this.area.xMin(), this.area.xMax(), this.area.yMin(), this.getYMedian());
+        this.leftChild = new MyKDTree(splitArrayList(this.pointsY).get(0), lowerArea, level + 1);
+        Area higherArea = new Area(this.area.xMin(), this.area.xMax(), this.getYMedian(), this.area.yMax());
+        this.rightChild = new MyKDTree(splitArrayList(this.pointsY).get(1), higherArea, level + 1);
     }
 
     public boolean isLeaf() {
@@ -237,4 +228,5 @@ public class KDTree {
     private double getYMedian() {
         return getMedian(pointsY, false);
     }
+
 }

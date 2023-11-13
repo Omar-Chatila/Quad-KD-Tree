@@ -22,7 +22,7 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 import jfxtras.labs.util.event.MouseControlUtil;
 import model.Point;
-import model.kdTree.KDTree;
+import model.kdTree.MyKDTree;
 import model.kdTree.SplitLine;
 import model.quadTree.Area;
 import model.quadTree.QuadTree;
@@ -42,7 +42,7 @@ public class TreeController {
     TreeMode mode = TreeMode.QUAD_TREE;
     boolean colorized = false;
     private QuadTree dynamicQuadTree = new QuadTree(rootArea);
-    private KDTree dynamicKDTree = new KDTree(rootArea);
+    private MyKDTree dynamicKDTree = new MyKDTree(rootArea);
     @FXML
     private JFXButton clearButton;
     @FXML
@@ -121,8 +121,8 @@ public class TreeController {
 
     private void benchKD() {
         long start1 = System.nanoTime();
-        dynamicKDTree = new KDTree(pointSet, rootArea, 0);
-        dynamicKDTree.buildTree(dynamicKDTree, 0);
+        dynamicKDTree = new MyKDTree(pointSet, rootArea, 0);
+        dynamicKDTree.buildTree(0);
         long end = (System.nanoTime() - start1) / 1000;
         updateLabel(dynamicKDTree.getPoints().size(), dynamicKDTree.getHeight(), dynamicKDTree.size(dynamicKDTree), end, "µs", TreeMode.KD_TREE);
     }
@@ -139,9 +139,9 @@ public class TreeController {
     @FXML
     void randomize() {
         clearPane();
-        for (int i = 0; i < 10000; i++) {
-            double x = Math.random() * 400;
-            double y = Math.random() * 400;
+        for (int i = 0; i < 100; i++) {
+            double x = Math.random() * PANE_WIDTH;
+            double y = Math.random() * PANE_HEIGHT;
             addPointToGui(x, y, new Point(x, y));
         }
     }
@@ -178,8 +178,8 @@ public class TreeController {
             int number = quadTree.size(quadTree);
             updateLabel(pointsCount, height, number, time, "ms", mode);
         } else {
-            KDTree kdTree = new KDTree(testList, testArea, 0);
-            kdTree.buildTree(kdTree, 0);
+            MyKDTree kdTree = new MyKDTree(testList, testArea, 0);
+            kdTree.buildTree(0);
             long time = (System.nanoTime() - start) / 1000000;
             int height = kdTree.getHeight();
             int number = kdTree.size(kdTree);
@@ -199,7 +199,7 @@ public class TreeController {
         pointsLabel.clear();
         treePane.getChildren().clear();
         dynamicQuadTree = new QuadTree(rootArea);
-        dynamicKDTree = new KDTree(rootArea);
+        dynamicKDTree = new MyKDTree(rootArea);
         statsLabel.setText("");
         removeRectangles();
     }
@@ -310,7 +310,7 @@ public class TreeController {
         pointsLabel.setText("P = { " + pointSet.toString().substring(1, pointSet.toString().length() - 1) + " }");
     }
 
-    public void drawKDRecursive(double x1, double y1, double x, double y, KDTree node, int height) {
+    public void drawKDRecursive(double x1, double y1, double x, double y, MyKDTree node, int height) {
         Line line = new Line(x1, y1 + 5, x, y);
         treePane.getChildren().add(line);
         if (!node.isLeaf()) {
@@ -326,7 +326,7 @@ public class TreeController {
             drawKDRecursive(x, y, x + delta, y + (1 + h / 8.0) * 60, node.getRightChild(), height - 1);
     }
 
-    private void createInnerNode(double x, double y, KDTree node) {
+    private void createInnerNode(double x, double y, MyKDTree node) {
         Circle circle = new Circle(x, y, 10);
         circle.setFill(node.getLevel() % 2 == 0 ? Color.FORESTGREEN : Color.BLUEVIOLET);
         SplitLine sp = node.getSplitLine();
@@ -336,7 +336,7 @@ public class TreeController {
         treePane.getChildren().addAll(circle, text);
     }
 
-    private void createLeaf(double x, double y, KDTree node) {
+    private void createLeaf(double x, double y, MyKDTree node) {
         Rectangle rectangle = new Rectangle(x, y);
         rectangle.setWidth(10);
         rectangle.setHeight(10);
