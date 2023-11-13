@@ -1,5 +1,9 @@
 package model.quadTree;
 
+import model.Point;
+
+import java.util.Objects;
+
 public record Area(double xMin, double xMax, double yMin, double yMax) {
 
     public static Area[] split(Area area) {
@@ -21,11 +25,31 @@ public record Area(double xMin, double xMax, double yMin, double yMax) {
     }
 
     public boolean intersects(Area other) {
-        return this.xMin < other.xMax && this.xMax > other.xMin && this.yMax > other.yMin && this.yMin < other.yMax;
+
+        return other != null && this.xMin < other.xMax && this.xMax > other.xMin && this.yMax > other.yMin && this.yMin < other.yMax;
     }
 
-    public boolean contains(Area other) {
-        return this.equals(other) || (this.xMin <= other.xMin && this.xMax >= other.xMax && this.yMin <= other.yMin && this.yMax <= other.yMax);
+    public boolean containsArea(Area other) {
+        return other != null &&
+                (this.equals(other) ||
+                        (this.xMin <= other.xMin && this.xMax >= other.xMax && this.yMin <= other.yMin && this.yMax <= other.yMax));
+    }
+
+    public boolean containsPoint(Point point) {
+        return (point.x() >= xMin && point.y() >= yMin && point.x() <= xMax && point.y() <= yMax);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Area area = (Area) o;
+        return Double.compare(xMin, area.xMin) == 0 && Double.compare(xMax, area.xMax) == 0 && Double.compare(yMin, area.yMin) == 0 && Double.compare(yMax, area.yMax) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(xMin, xMax, yMin, yMax);
     }
 
     @Override

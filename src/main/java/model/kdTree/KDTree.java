@@ -48,6 +48,16 @@ public class KDTree {
         this(area, 0);
     }
 
+    public static void main(String[] args) {
+        Point[] points1 = {new Point(1, 1), new Point(1.8, 4.8), new Point(2.5, 3.5), new Point(4, 6)
+                , new Point(4.8, 1.8), new Point(6.8, 1.5), new Point(9, 2), new Point(8, 6), new Point(4, 4)};
+        List<Point> pointss = new ArrayList<>(List.of(points1));
+        KDTree kdTree = new KDTree(pointss, new Area(0, 10, 0, 10), 0);
+        kdTree.buildTree(kdTree, 0);
+        System.out.println(kdTree.reportSubTree());
+        System.out.println(kdTree.query(new Area(2, 20, 2, 20)));
+    }
+
     public List<Point> getPoints() {
         return points;
     }
@@ -145,25 +155,41 @@ public class KDTree {
         setSplitLines();
     }
 
+    // Returns all points contained by the Area queryRectangle
+    public ArrayList<Point> query(Area queryRectangle) {
+        ArrayList<Point> result = new ArrayList<>();
+        if (this.isLeaf()) {
+            if (queryRectangle.containsPoint(this.points.get(0))) {
+                result.add(this.points.get(0));
+            }
+        } else if (queryRectangle.containsArea(this.area)) {
+            result.addAll(reportSubTree());
+        }
+        if (this.leftChild != null && queryRectangle.intersects(this.leftChild.area)) {
+            result.addAll(this.leftChild.query(queryRectangle));
+        }
+        if (this.rightChild != null && queryRectangle.intersects(this.rightChild.area)) {
+            result.addAll(this.rightChild.query(queryRectangle));
+        }
+        return result;
+    }
+
+    private ArrayList<Point> reportSubTree() {
+        ArrayList<Point> result = new ArrayList<>();
+        if (this.isLeaf())
+            result.addAll(this.points);
+        if (this.leftChild != null)
+            result.addAll(this.leftChild.reportSubTree());
+        if (this.rightChild != null)
+            result.addAll(this.rightChild.reportSubTree());
+        return result;
+    }
+
     private void setSplitLines() {
         if (level % 2 == 0)
             verticalSplitLine = new SplitLine(getXMedian(), area.yMin(), getXMedian(), area.yMax());
         else
             horizontalSplitLine = new SplitLine(area.xMin(), getYMedian(), area.xMax(), getYMedian());
-    }
-
-
-    public void asList(KDTree kdTree) {
-        if (kdTree != null) {
-            asList(kdTree.leftChild);
-            this.nodeList.add(kdTree);
-            asList(kdTree.rightChild);
-        }
-    }
-
-    public List<KDTree> getNodeList() {
-        asList(this);
-        return nodeList;
     }
 
     public int getHeight() {
