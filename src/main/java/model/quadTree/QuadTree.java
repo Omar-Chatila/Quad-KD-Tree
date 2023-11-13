@@ -3,6 +3,7 @@ package model.quadTree;
 import model.Point;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class QuadTree { //TODO: Query range, insertion
@@ -91,6 +92,46 @@ public class QuadTree { //TODO: Query range, insertion
             this.southWest.buildQuadTree();
             this.southEast.buildQuadTree();
         }
+    }
+
+    // Returns all points contained by the Area queryRectangle
+    public HashSet<Point> query(Area queryRectangle) {
+        HashSet<Point> result = new HashSet<>();
+        if (this.isPointLeaf()) {
+            if (queryRectangle.containsPoint(this.points.get(0))) {
+                result.add(this.points.get(0));
+            }
+        } else if (queryRectangle.containsArea(this.square)) {
+            result.addAll(this.reportSubTree());
+        }
+        if (this.northEast != null && queryRectangle.intersects(this.northEast.square)) {
+            result.addAll(this.northEast.query(queryRectangle));
+        }
+        if (this.northWest != null && queryRectangle.intersects(this.northWest.square)) {
+            result.addAll(this.northWest.query(queryRectangle));
+        }
+        if (this.southEast != null && queryRectangle.intersects(this.southEast.square)) {
+            result.addAll(this.southEast.query(queryRectangle));
+        }
+        if (this.southWest != null && queryRectangle.intersects(this.southWest.square)) {
+            result.addAll(this.southWest.query(queryRectangle));
+        }
+        return result;
+    }
+
+    private ArrayList<Point> reportSubTree() {
+        ArrayList<Point> result = new ArrayList<>();
+        if (this.isNodeLeaf())
+            result.addAll(this.points);
+        if (this.northEast != null)
+            result.addAll(this.northEast.reportSubTree());
+        if (this.northWest != null)
+            result.addAll(this.northWest.reportSubTree());
+        if (this.southEast != null)
+            result.addAll(this.southEast.reportSubTree());
+        if (this.southWest != null)
+            result.addAll(this.southWest.reportSubTree());
+        return result;
     }
 
     public boolean contains(Point point) {

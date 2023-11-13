@@ -139,7 +139,7 @@ public class TreeController {
     @FXML
     void randomize() {
         clearPane();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10000; i++) {
             double x = Math.random() * 400;
             double y = Math.random() * 400;
             addPointToGui(x, y, new Point(x, y));
@@ -412,7 +412,12 @@ public class TreeController {
 
     private void performQuery(Rectangle rectangle, Rectangle selectionRect) {
         Area queryArea = new Area(rectangle.getX(), rectangle.getX() + rectangle.getWidth(), PANE_HEIGHT - rectangle.getY() - rectangle.getHeight(), PANE_HEIGHT - rectangle.getY());
-        HashSet<Point> queried = dynamicKDTree.query(queryArea);
+        HashSet<Point> queried;
+        if (mode == TreeMode.KD_TREE) {
+            queried = dynamicKDTree.query(queryArea);
+        } else {
+            queried = dynamicQuadTree.query(queryArea);
+        }
         statsLabel.setText("Points in " + queryArea + ": " + queried);
         statsLabel.setFont(Font.font(18));
         for (Node shape : drawingPane.getChildren()) {

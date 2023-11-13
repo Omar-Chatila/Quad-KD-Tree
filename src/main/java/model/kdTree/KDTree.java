@@ -164,7 +164,7 @@ public class KDTree {
                 result.add(this.points.get(0));
             }
         } else if (queryRectangle.containsArea(this.area)) {
-            result.addAll(reportSubTree());
+            result.addAll(this.reportSubTree());
         }
         if (this.leftChild != null && queryRectangle.intersects(this.leftChild.area)) {
             result.addAll(this.leftChild.query(queryRectangle));
