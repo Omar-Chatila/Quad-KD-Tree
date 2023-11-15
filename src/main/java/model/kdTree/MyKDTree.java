@@ -166,15 +166,8 @@ public class MyKDTree extends Tree {
         return result;
     }
 
-    private ArrayList<Point> reportSubTree() {
-        ArrayList<Point> result = new ArrayList<>();
-        if (this.isLeaf())
-            result.addAll(this.points);
-        if (this.leftChild != null)
-            result.addAll(this.leftChild.reportSubTree());
-        if (this.rightChild != null)
-            result.addAll(this.rightChild.reportSubTree());
-        return result;
+    private List<Point> reportSubTree() {
+        return this.points;
     }
 
     private void setSplitLines() {

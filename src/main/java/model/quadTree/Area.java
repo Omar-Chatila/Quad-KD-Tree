@@ -30,9 +30,7 @@ public record Area(double xMin, double xMax, double yMin, double yMax) {
     }
 
     public boolean containsArea(Area other) {
-        return other != null &&
-                (this.equals(other) ||
-                        (this.xMin <= other.xMin && this.xMax >= other.xMax && this.yMin <= other.yMin && this.yMax <= other.yMax));
+        return other != null && (this.xMin <= other.xMin && this.xMax >= other.xMax && this.yMin <= other.yMin && this.yMax >= other.yMax);
     }
 
     public boolean containsPoint(Point point) {

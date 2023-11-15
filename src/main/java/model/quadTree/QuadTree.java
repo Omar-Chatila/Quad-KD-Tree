@@ -120,19 +120,8 @@ public class QuadTree extends Tree { //TODO: Query range, insertion
         return result;
     }
 
-    private ArrayList<Point> reportSubTree() {
-        ArrayList<Point> result = new ArrayList<>();
-        if (this.isNodeLeaf())
-            result.addAll(this.points);
-        if (this.northEast != null)
-            result.addAll(this.northEast.reportSubTree());
-        if (this.northWest != null)
-            result.addAll(this.northWest.reportSubTree());
-        if (this.southEast != null)
-            result.addAll(this.southEast.reportSubTree());
-        if (this.southWest != null)
-            result.addAll(this.southWest.reportSubTree());
-        return result;
+    private List<Point> reportSubTree() {
+        return this.points;
     }
 
     public boolean contains(Point point) {

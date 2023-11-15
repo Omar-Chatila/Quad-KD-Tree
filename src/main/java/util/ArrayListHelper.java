@@ -4,7 +4,6 @@ import model.Point;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class ArrayListHelper {
@@ -34,10 +33,10 @@ public class ArrayListHelper {
         }
     }
 
-    public static double median(List<Point> values, boolean x) {
+    public static double median(List<Point> values, boolean x, int from, int to) {
         // Select the median element using quickselect
-        int middleIndex = values.size() / 2;
-        return quickselect(values, 0, values.size() - 1, middleIndex, x);
+        int middleIndex = (from + to + 1) / 2;
+        return quickselect(values, from, to, middleIndex, x);
     }
 
     private static double quickselect(List<Point> values, int low, int high, int k, boolean x) {
@@ -54,26 +53,6 @@ public class ArrayListHelper {
         } else {
             return quickselect(values, pivotIndex + 1, high, k, x);
         }
-    }
-
-    public static void test() {
-        int pointsCount = (int) 1E6;
-        ArrayList<Point> testList = new ArrayList<>();
-        for (int i = 0; i < pointsCount; i++) {
-            testList.add(new Point(Math.random() * 10000, Math.random() * 10000));
-        }
-        System.out.println("Bard method: ");
-        long start = System.nanoTime();
-        System.out.println(median(testList, true));
-        long time = (System.nanoTime() - start) / 1000000;
-        System.out.println("Time " + time + "ms\n\n");
-
-        System.out.println("Sort method: ");
-        long start2 = System.nanoTime();
-        testList.sort(Comparator.comparingDouble(Point::x));
-        System.out.println(testList.get(testList.size() / 2));
-        long time2 = (System.nanoTime() - start2) / 1000000;
-        System.out.println("Time " + time2 + "ms\n\n");
     }
 
     private static int partition(List<Point> values, int low, int high, boolean x) {

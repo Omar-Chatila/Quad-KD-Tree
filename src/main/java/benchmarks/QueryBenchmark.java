@@ -41,7 +41,7 @@ public class QueryBenchmark {
 
         // Build Efficient KD-Tree
         long start4 = System.nanoTime();
-        KDTreeEfficient ekdTree = new KDTreeEfficient(points, 0, testArea);
+        KDTreeEfficient ekdTree = new KDTreeEfficient(points, testArea);
         ekdTree.buildTree(0);
         System.out.println("Efficient KD Build time " + Math.round((System.nanoTime() - start4) / 1E6));
 
