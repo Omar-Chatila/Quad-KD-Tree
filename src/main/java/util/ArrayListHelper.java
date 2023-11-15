@@ -53,8 +53,8 @@ public class ArrayListHelper {
     }
 
     private static int partition(Point[] values, int low, int high, boolean x) {
-        int randIndex = (int) (low + (Math.random() * (high - low)));
-        double pivot = x ? values[randIndex].x() : values[randIndex].y();
+        int mid = low + (high - low) / 2;
+        double pivot = medianOfThree(values[low], values[mid], values[high], x);
         int i = low - 1;
         for (int j = low; j < high; j++) {
             double element = x ? values[j].x() : values[j].y();
@@ -71,5 +71,17 @@ public class ArrayListHelper {
         return i + 1;
     }
 
+    private static double medianOfThree(Point a, Point b, Point c, boolean x) {
+        double ax = x ? a.x() : a.y();
+        double bx = x ? b.x() : b.y();
+        double cx = x ? c.x() : c.y();
 
+        if ((ax <= bx && bx <= cx) || (cx <= bx && bx <= ax)) {
+            return bx;
+        } else if ((bx <= ax && ax <= cx) || (cx <= ax && ax <= bx)) {
+            return ax;
+        } else {
+            return cx;
+        }
+    }
 }
