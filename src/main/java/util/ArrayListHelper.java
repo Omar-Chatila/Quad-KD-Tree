@@ -43,9 +43,7 @@ public class ArrayListHelper {
         if (low == high) {
             return x ? values.get(low).x() : values.get(low).y();
         }
-
         int pivotIndex = partition(values, low, high, x);
-
         if (k == pivotIndex) {
             return x ? values.get(pivotIndex).x() : values.get(pivotIndex).y();
         } else if (k < pivotIndex) {

@@ -4,7 +4,6 @@ import model.Point;
 import model.Tree;
 import model.quadTree.Area;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -60,7 +59,7 @@ public class KDTreeEfficient extends Tree {
     }
 
     private List<Point> reportSubTree() {
-        return new ArrayList<>(this.points).subList(from, to + 1);
+        return (this.points).subList(from, to + 1);
     }
 
     public void buildTree(int level) {
