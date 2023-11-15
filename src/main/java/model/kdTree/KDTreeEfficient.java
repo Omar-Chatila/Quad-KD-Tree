@@ -4,6 +4,7 @@ import model.Point;
 import model.Tree;
 import model.quadTree.Area;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -11,13 +12,13 @@ import static util.ArrayListHelper.median;
 
 public class KDTreeEfficient extends Tree {
     private final int level;
-    private final List<Point> points;
+    private final Point[] points;
     private final Area area;
     private KDTreeEfficient leftChild, rightChild;
     private double xMedian, yMedian;
     private int from, to;
 
-    private KDTreeEfficient(List<Point> points, int level, Area area, int from, int to) {
+    private KDTreeEfficient(Point[] points, int level, Area area, int from, int to) {
         this.points = points;
         this.level = level;
         this.area = area;
@@ -30,19 +31,19 @@ public class KDTreeEfficient extends Tree {
         }
     }
 
-    public KDTreeEfficient(List<Point> points, Area area) {
+    public KDTreeEfficient(Point[] points, Area area) {
         this.points = points;
         this.area = area;
         this.level = 0;
         this.from = 0;
-        this.to = points.size() - 1;
+        this.to = points.length - 1;
         this.xMedian = getXMedian();
     }
 
     public HashSet<Point> query(Area queryRectangle) {
         HashSet<Point> result = new HashSet<>();
         if (this.isLeaf()) {
-            Point leafPoint = this.points.get(from);
+            Point leafPoint = this.points[from];
             if (queryRectangle.containsPoint(leafPoint)) {
                 result.add(leafPoint);
             }
@@ -59,7 +60,7 @@ public class KDTreeEfficient extends Tree {
     }
 
     private List<Point> reportSubTree() {
-        return (this.points).subList(from, to + 1);
+        return Arrays.asList(this.points).subList(from, to + 1);
     }
 
     public void buildTree(int level) {
@@ -74,61 +75,6 @@ public class KDTreeEfficient extends Tree {
             this.leftChild.buildTree(level + 1);
             this.rightChild.buildTree(level + 1);
         }
-    }
-
-    public boolean isEmpty() {
-        return this.points.isEmpty();
-    }
-
-    public boolean contains(Point point) {
-        double pointX = point.x();
-        double pointY = point.y();
-        KDTreeEfficient current = this;
-        while (!current.isLeaf()) {
-            if (current.level % 2 == 0) {
-                current = current.xMedian >= pointX ? current.leftChild : current.rightChild;
-            } else {
-                current = current.yMedian >= pointY ? current.leftChild : current.rightChild;
-            }
-        }
-        return (current.points.get(0).equals(point));
-    }
-
-    public void add(Point point) {
-        if (!isEmpty() && this.contains(point)) return;
-        if (isEmpty()) {
-            this.appendPoint(point);
-        } else {
-            KDTreeEfficient current = this;
-            double x = point.x();
-            double y = point.y();
-            int level = 0;
-            while (!current.isLeaf()) {
-                if ((level++ % 2) == 0) {
-                    if (x <= current.xMedian) {
-                        current = current.leftChild;
-                    } else {
-                        current = current.rightChild;
-                    }
-                } else {
-                    if (y <= current.yMedian) {
-                        current = current.leftChild;
-                    } else {
-                        current = current.rightChild;
-                    }
-                }
-            }
-            current.appendPoint(point);
-            if (level % 2 == 0) {
-                current.setVerticalChildren(level);
-            } else {
-                current.setHorizontalChildren(level);
-            }
-        }
-    }
-
-    private void appendPoint(Point point) {
-        points.add(point);
     }
 
     public int getHeight() {
@@ -156,16 +102,16 @@ public class KDTreeEfficient extends Tree {
     private void setVerticalChildren(int level) {
         int midIndex = (from + to) / 2;
         Area leftArea = new Area(this.area.xMin(), this.xMedian, this.area.yMin(), this.area.yMax());
-        this.leftChild = new KDTreeEfficient(this.points, level + 1, leftArea, from, midIndex);
         Area rightArea = new Area(this.xMedian, this.area.xMax(), this.area.yMin(), this.area.yMax());
+        this.leftChild = new KDTreeEfficient(this.points, level + 1, leftArea, from, midIndex);
         this.rightChild = new KDTreeEfficient(this.points, level + 1, rightArea, midIndex + 1, to);
     }
 
     private void setHorizontalChildren(int level) {
         int midIndex = (from + to) / 2;
         Area lowerArea = new Area(this.area.xMin(), this.area.xMax(), this.area.yMin(), this.yMedian);
-        this.leftChild = new KDTreeEfficient(this.points, level + 1, lowerArea, from, midIndex);
         Area higherArea = new Area(this.area.xMin(), this.area.xMax(), this.yMedian, this.area.yMax());
+        this.leftChild = new KDTreeEfficient(this.points, level + 1, lowerArea, from, midIndex);
         this.rightChild = new KDTreeEfficient(this.points, level + 1, higherArea, midIndex + 1, to);
     }
 

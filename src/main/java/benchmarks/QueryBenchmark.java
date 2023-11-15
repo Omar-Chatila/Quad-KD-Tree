@@ -19,13 +19,16 @@ public class QueryBenchmark {
         // Create random Points for testing
         List<Point> points = new ArrayList<>();
         int pointCount = (int) 1E6;
+        Point[] points1 = new Point[pointCount];
         for (int i = 0; i < pointCount; i++) {
-            points.add(new Point(Math.random() * 10000, Math.random() * 10000));
+            Point p = new Point(Math.random() * 10000, Math.random() * 10000);
+            points.add(p);
+            points1[i] = p;
         }
 
         // Create rootArea and QueryArea
         Area testArea = new Area(0, 10000, 0, 10000);
-        Area queryRect = new Area(2000, 5999, 2999, 3999);
+        Area queryRect = new Area(100, 5999, 1000, 8000);
 
         // Build Quad-Tree
         long start2 = System.nanoTime();
@@ -41,7 +44,7 @@ public class QueryBenchmark {
 
         // Build Efficient KD-Tree
         long start4 = System.nanoTime();
-        KDTreeEfficient ekdTree = new KDTreeEfficient(points, testArea);
+        KDTreeEfficient ekdTree = new KDTreeEfficient(points1, testArea);
         ekdTree.buildTree(0);
         System.out.println("Efficient KD Build time " + Math.round((System.nanoTime() - start4) / 1E6));
 
@@ -74,13 +77,16 @@ public class QueryBenchmark {
     private static Runnable runQuery(Tree tree, String type, Area queryArea, CountDownLatch latch) {
         return () -> {
             double average = 0;
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 10; i++) {
                 long start7 = System.nanoTime();
                 tree.query(queryArea);
+                if (tree instanceof KDTreeEfficient) {
+                    System.out.println(i);
+                }
                 double time = (System.nanoTime() - start7) / 1E6;
                 average += time;
             }
-            System.out.println("AVERAGE " + type + " : " + average / 100.0);
+            System.out.println("AVERAGE " + type + " : " + Math.round(average) / 100 + " ms");
             latch.countDown();
         };
     }

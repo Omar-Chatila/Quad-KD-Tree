@@ -25,7 +25,6 @@ public record Area(double xMin, double xMax, double yMin, double yMax) {
     }
 
     public boolean intersects(Area other) {
-
         return other != null && this.xMin < other.xMax && this.xMax > other.xMin && this.yMax > other.yMin && this.yMin < other.yMax;
     }
 
