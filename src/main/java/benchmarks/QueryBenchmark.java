@@ -18,10 +18,10 @@ public class QueryBenchmark {
     public static void main(String[] args) {
         // Create random Points for testing
         List<Point> points = new ArrayList<>();
-        int pointCount = (int) 10;
+        int pointCount = (int) 1E6;
         Point[] points1 = new Point[pointCount];
         for (int i = 0; i < pointCount; i++) {
-            Point p = new Point(i, i + 1);
+            Point p = new Point(Math.random() * 10000, Math.random() * 10000);
             points.add(p);
             points1[i] = p;
         }
@@ -47,9 +47,8 @@ public class QueryBenchmark {
 
         // Build Efficient KD-Tree
         long start4 = System.nanoTime();
-        KDTreeEfficient ekdTree = new KDTreeEfficient(points1, new Area(0, 20, 0, 20));
+        KDTreeEfficient ekdTree = new KDTreeEfficient(points1, testArea);
         ekdTree.buildTree();
-        System.out.println(ekdTree.query(new Area(0, 10, 0, 10)));
         long end4 = Math.round((System.nanoTime() - start4) / 1E6);
         System.out.println("Efficient KD Build time " + end4);
         System.out.println("Start");

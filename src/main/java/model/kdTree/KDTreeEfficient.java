@@ -8,15 +8,15 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import static util.ArrayListHelper.isDistinct;
 import static util.ArrayListHelper.median;
 
 public class KDTreeEfficient extends Tree {
     private final Point[] points;
     private final Area area;
+    private final int from;
+    private final int to;
     private KDTreeEfficient leftChild, rightChild;
     private double xMedian, yMedian;
-    private int from, to;
 
     private KDTreeEfficient(Point[] points, int level, Area area, int from, int to) {
         this.points = points;
@@ -66,7 +66,6 @@ public class KDTreeEfficient extends Tree {
     }
 
     public void buildTree(int level) {
-        if (!isDistinct(List.of(points).subList(from, to + 1))) return;
         if ((this.to - this.from) > 0) {
             // vertical split
             if (level % 2 == 0) {
