@@ -16,6 +16,10 @@ public class ArrayListHelper {
         return result;
     }
 
+    public static boolean isDistinct(List<Point> points) {
+        return !points.stream().allMatch(points.get(0)::equals);
+    }
+
     public static double getMedian(List<Point> list, boolean x) {
         if (x) {
             if (list.size() > 1) {

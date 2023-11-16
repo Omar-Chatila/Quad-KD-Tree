@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import static util.ArrayListHelper.isDistinct;
+
 public class QuadTree extends Tree { //TODO: Query range, insertion
     private final Area square;
     private final List<Point> points;
     private QuadTree northEast, northWest, southEast, southWest;
 
-    public QuadTree(Area square, List<Point> points) {
+    public QuadTree(List<Point> points, Area square) {
         this.square = square;
         this.points = points;
     }
@@ -71,10 +73,10 @@ public class QuadTree extends Tree { //TODO: Query range, insertion
                 pointsSE.add(point);
             }
         }
-        current.northEast = new QuadTree(quadrants[0], pointsNE);
-        current.northWest = new QuadTree(quadrants[1], pointsNW);
-        current.southWest = new QuadTree(quadrants[2], pointsSW);
-        current.southEast = new QuadTree(quadrants[3], pointsSE);
+        current.northEast = new QuadTree(pointsNE, quadrants[0]);
+        current.northWest = new QuadTree(pointsNW, quadrants[1]);
+        current.southWest = new QuadTree(pointsSW, quadrants[2]);
+        current.southEast = new QuadTree(pointsSE, quadrants[3]);
     }
 
     public boolean isPointLeaf() {
@@ -85,13 +87,13 @@ public class QuadTree extends Tree { //TODO: Query range, insertion
         return this.southEast == null && this.southWest == null && this.northEast == null && this.northWest == null;
     }
 
-    public void buildQuadTree() {
-        if (this.points.size() > 1) {
+    public void buildTree() {
+        if (this.points.size() > 1 && isDistinct(this.points)) {
             this.partition();
-            this.northEast.buildQuadTree();
-            this.northWest.buildQuadTree();
-            this.southWest.buildQuadTree();
-            this.southEast.buildQuadTree();
+            this.northEast.buildTree();
+            this.northWest.buildTree();
+            this.southWest.buildTree();
+            this.southEast.buildTree();
         }
     }
 
@@ -100,7 +102,7 @@ public class QuadTree extends Tree { //TODO: Query range, insertion
         HashSet<Point> result = new HashSet<>();
         if (this.isPointLeaf()) {
             if (queryRectangle.containsPoint(this.points.get(0))) {
-                result.add(this.points.get(0));
+                result.addAll(this.points);
             }
         } else if (queryRectangle.containsArea(this.square)) {
             result.addAll(this.reportSubTree());
@@ -149,7 +151,7 @@ public class QuadTree extends Tree { //TODO: Query range, insertion
             }
             if (current.isPointLeaf()) {
                 current.points.add(point);
-                current.buildQuadTree();
+                current.buildTree();
             } else {
                 current.points.add(point);
             }

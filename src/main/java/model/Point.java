@@ -2,10 +2,15 @@ package model;
 
 import java.util.Objects;
 
-public record Point(double x, double y) {
+public record Point(String id, double x, double y) {
+
+    public Point(double x, double y) {
+        this("", x, y);
+    }
+
     @Override
     public String toString() {
-        return "(" + (int) x + ", " + (int) y + ")";
+        return id + "  (" + (int) x + ", " + (int) y + ")";
     }
 
     @Override

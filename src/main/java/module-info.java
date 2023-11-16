@@ -4,6 +4,7 @@ module application.quadkdtrees {
     requires com.jfoenix;
     requires jfxtras.common;
     requires jfxtras.labs;
+    requires java.sql;
 
 
     opens application to javafx.fxml;

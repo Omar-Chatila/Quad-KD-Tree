@@ -18,10 +18,10 @@ public class QueryBenchmark {
     public static void main(String[] args) {
         // Create random Points for testing
         List<Point> points = new ArrayList<>();
-        int pointCount = (int) 1E6;
+        int pointCount = (int) 10;
         Point[] points1 = new Point[pointCount];
         for (int i = 0; i < pointCount; i++) {
-            Point p = new Point(Math.random() * 10000, Math.random() * 10000);
+            Point p = new Point(i, i + 1);
             points.add(p);
             points1[i] = p;
         }
@@ -34,21 +34,22 @@ public class QueryBenchmark {
         // Build KD-Tree
         long start3 = System.nanoTime();
         MyKDTree kdTree = new MyKDTree(points, testArea, 0);
-        kdTree.buildTree(0);
+        kdTree.buildTree();
         System.out.println("KD Build time " + Math.round((System.nanoTime() - start3) / 1E6));
 
 
         // Build Quad-Tree
         long start2 = System.nanoTime();
-        QuadTree quadTree = new QuadTree(testArea, points);
-        quadTree.buildQuadTree();
+        QuadTree quadTree = new QuadTree(points, testArea);
+        quadTree.buildTree();
         long end = Math.round((System.nanoTime() - start2) / 1E6);
         System.out.println("QT Build time " + end);
 
         // Build Efficient KD-Tree
         long start4 = System.nanoTime();
-        KDTreeEfficient ekdTree = new KDTreeEfficient(points1, testArea);
-        ekdTree.buildTree(0);
+        KDTreeEfficient ekdTree = new KDTreeEfficient(points1, new Area(0, 20, 0, 20));
+        ekdTree.buildTree();
+        System.out.println(ekdTree.query(new Area(0, 10, 0, 10)));
         long end4 = Math.round((System.nanoTime() - start4) / 1E6);
         System.out.println("Efficient KD Build time " + end4);
         System.out.println("Start");
@@ -65,7 +66,7 @@ public class QueryBenchmark {
         for (Runnable task : tasks) {
             threadPool.execute(task);
         }
-        
+
         try {
             latch.await(); // Wait for both tasks to complete
         } catch (InterruptedException e) {

@@ -83,8 +83,8 @@ public class TreeController {
 
     private void benchQT() {
         long start1 = System.nanoTime();
-        dynamicQuadTree = new QuadTree(rootArea, pointSet);
-        dynamicQuadTree.buildQuadTree();
+        dynamicQuadTree = new QuadTree(pointSet, rootArea);
+        dynamicQuadTree.buildTree();
         long end = (System.nanoTime() - start1) / 1000;
         updateLabel(dynamicQuadTree.getPoints().size(), dynamicQuadTree.getHeight(), dynamicQuadTree.size(dynamicQuadTree), end, "µs", TreeMode.QUAD_TREE);
     }
@@ -99,7 +99,7 @@ public class TreeController {
             if (!pointSet.isEmpty()) {
                 if (dynamicQuadTree.getPoints().isEmpty()) {
                     benchQT();
-                    dynamicQuadTree.buildQuadTree();
+                    dynamicQuadTree.buildTree();
                 }
                 drawQTRecursive(500, 20, 500, 20, dynamicQuadTree, dynamicQuadTree.getHeight(), Color.YELLOW);
             }
@@ -122,7 +122,7 @@ public class TreeController {
     private void benchKD() {
         long start1 = System.nanoTime();
         dynamicKDTree = new MyKDTree(pointSet, rootArea, 0);
-        dynamicKDTree.buildTree(0);
+        dynamicKDTree.buildTree();
         long end = (System.nanoTime() - start1) / 1000;
         updateLabel(dynamicKDTree.getPoints().size(), dynamicKDTree.getHeight(), dynamicKDTree.size(dynamicKDTree), end, "µs", TreeMode.KD_TREE);
     }
@@ -171,15 +171,15 @@ public class TreeController {
         long start = System.nanoTime();
         Area testArea = new Area(0, 4000, 0, 4000);
         if (mode == TreeMode.QUAD_TREE) {
-            QuadTree quadTree = new QuadTree(testArea, testList);
-            quadTree.buildQuadTree();
+            QuadTree quadTree = new QuadTree(testList, testArea);
+            quadTree.buildTree();
             long time = (System.nanoTime() - start) / 1000000;
             int height = quadTree.getHeight();
             int number = quadTree.size(quadTree);
             updateLabel(pointsCount, height, number, time, "ms", mode);
         } else {
             MyKDTree kdTree = new MyKDTree(testList, testArea, 0);
-            kdTree.buildTree(0);
+            kdTree.buildTree();
             long time = (System.nanoTime() - start) / 1000000;
             int height = kdTree.getHeight();
             int number = kdTree.size(kdTree);

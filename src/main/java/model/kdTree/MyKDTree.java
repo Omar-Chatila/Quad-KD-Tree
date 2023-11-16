@@ -66,7 +66,11 @@ public class MyKDTree extends Tree {
         return level;
     }
 
-    public void buildTree(int level) {
+    public void buildTree() {
+        this.buildTree(0);
+    }
+
+    private void buildTree(int level) {
         if (this.points.size() > 1) {
             // vertical split
             if (level % 2 == 0) {
