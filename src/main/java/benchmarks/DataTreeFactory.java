@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 public class DataTreeFactory {
@@ -22,24 +23,28 @@ public class DataTreeFactory {
     public static final String American_New_Cars_and_Trucks_of_1993 = "src/main/resources/Datasets/American New Cars of 1993.csv";
 
     public static void main(String[] args) {
+        Area queryArea = new Area(35000, 40000, 250, 300);
+
         KDTreeEfficient carDTree = (KDTreeEfficient) carDataKDTree(American_New_Cars_and_Trucks_of_2004, TreeType.KDTree);
         carDTree.buildTree();
-        System.out.println(carDTree.query(new Area(0, 40000, 300, 5000)));
+        System.out.println(carDTree.query(queryArea));
 
-        KDTreeEfficient carDTree2 = (KDTreeEfficient) carDataKDTree(American_New_Cars_and_Trucks_of_1993, TreeType.KDTree);
+       /* KDTreeEfficient carDTree2 = (KDTreeEfficient) carDataKDTree(American_New_Cars_and_Trucks_of_1993, TreeType.KDTree);
         carDTree2.buildTree();
-        System.out.println(carDTree2.query(new Area(0, 40000, 100, 150)));
+        System.out.println(carDTree2.query(queryArea));
+
+        */
 
         QuadTree quadTree = (QuadTree) carDataKDTree(American_New_Cars_and_Trucks_of_2004, TreeType.QuadTree);
         quadTree.buildTree();
-        System.out.println(quadTree.query(new Area(0, 40000, 300, 5000)));
+        System.out.println(quadTree.query(queryArea));
     }
 
     public static Tree carDataKDTree(String dataSet, TreeType type) {
         int index3 = dataSet.equals(American_New_Cars_and_Trucks_of_2004) ? 7 : 11;
         List<List<String>> records = setCarRecord(dataSet);
         int i = 0;
-        Point[] pointSet = new Point[records.size()];
+        HashSet<Point> pointSet = new HashSet<>();
         double xMax = 0, yMax = 0, xMin = 0, yMin = 0;
         for (List<String> entry : records) {
             String carModel = entry.get(0);
@@ -49,10 +54,12 @@ public class DataTreeFactory {
             yMax = Math.max(horsePower, yMax);
             xMin = Math.min(price, xMin);
             yMin = Math.min(horsePower, yMin);
-            pointSet[i++] = new Point(carModel, price, horsePower);
+            pointSet.add(new Point(carModel, price, horsePower));
         }
         Area domain = new Area(xMin - 10, xMax + 10, yMin - 10, yMax + 10);
-        return type == TreeType.KDTree ? new KDTreeEfficient(pointSet, domain) : new QuadTree(Arrays.asList(pointSet), domain);
+        Point[] points = new Point[pointSet.size()];
+        pointSet.toArray(points);
+        return type == TreeType.KDTree ? new KDTreeEfficient(points, domain) : new QuadTree(new ArrayList<>(pointSet), domain);
     }
 
     private static List<List<String>> setCarRecord(String fileUrl) {
