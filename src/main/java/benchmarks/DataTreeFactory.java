@@ -38,12 +38,17 @@ public class DataTreeFactory {
         QuadTree quadTree = (QuadTree) carDataKDTree(American_New_Cars_and_Trucks_of_2004, TreeType.QuadTree);
         quadTree.buildTree();
         System.out.println(quadTree.query(queryArea));
+
+        QuadTree dbTree = (QuadTree) getDBTree(TreeType.QuadTree);
+        dbTree.buildTree();
+        for (Point p : dbTree.query(new Area(1990, 2015, 40000, 50000))) {
+            System.out.println(p.x() + " : " + p.y());
+        }
     }
 
     public static Tree carDataKDTree(String dataSet, TreeType type) {
         int index3 = dataSet.equals(American_New_Cars_and_Trucks_of_2004) ? 7 : 11;
         List<List<String>> records = setCarRecord(dataSet);
-        int i = 0;
         HashSet<Point> pointSet = new HashSet<>();
         double xMax = 0, yMax = 0, xMin = 0, yMin = 0;
         for (List<String> entry : records) {
@@ -59,7 +64,15 @@ public class DataTreeFactory {
         Area domain = new Area(xMin - 10, xMax + 10, yMin - 10, yMax + 10);
         Point[] points = new Point[pointSet.size()];
         pointSet.toArray(points);
-        return type == TreeType.KDTree ? new KDTreeEfficient(points, domain) : new QuadTree(new ArrayList<>(pointSet), domain);
+        return getTree(points, domain, type);
+    }
+
+    public static Tree getDBTree(TreeType type) {
+        return getTree(JDBCAccessTest.connectAndQuery(), new Area(1950, 2020, 30000, 60000), type);
+    }
+
+    public static Tree getTree(Point[] points, Area domain, TreeType type) {
+        return type == TreeType.KDTree ? new KDTreeEfficient(points, domain) : new QuadTree(new ArrayList<>(Arrays.asList(points)), domain);
     }
 
     private static List<List<String>> setCarRecord(String fileUrl) {
