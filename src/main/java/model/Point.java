@@ -1,14 +1,25 @@
 package model;
 
-public record Point(String id, double x, double y) {
+import java.text.DecimalFormat;
 
+public record Point(String id, double x, double y) {
     public Point(double x, double y) {
         this("", x, y);
     }
 
+    private static String formatDouble(double value) {
+        DecimalFormat decimalFormat;
+        if (value == (int) value) {
+            decimalFormat = new DecimalFormat("#");
+        } else {
+            decimalFormat = new DecimalFormat("#.##");
+        }
+        return decimalFormat.format(value);
+    }
+
     @Override
     public String toString() {
-        return id + "  (" + (int) x + ", " + (int) y + ")";
+        return id + "(" + formatDouble(x) + ", " + formatDouble(y) + ")";
     }
 
     @Override

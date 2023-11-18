@@ -14,6 +14,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import static benchmarks.JDBCAccessTest.HEALTH_DB_URL;
+import static benchmarks.JDBCAccessTest.INCOME_DB_URL;
+
 public class DataTreeFactory {
     /*
         [Vehicle Name, Car Type, Drive Train Type, Retail Price ($US), Cost Price ($US), Engine Size (litres), Number cylinders, Horsepower (hp), City  (km/100L), Open Road (km/100L), Weight (kg), Wheel base (cm), Length (cm), Width (cm)]
@@ -23,26 +26,18 @@ public class DataTreeFactory {
     public static final String American_New_Cars_and_Trucks_of_1993 = "src/main/resources/Datasets/American New Cars of 1993.csv";
 
     public static void main(String[] args) {
-        Area queryArea = new Area(35000, 40000, 250, 300);
 
-        KDTreeEfficient carDTree = (KDTreeEfficient) carDataKDTree(American_New_Cars_and_Trucks_of_2004, TreeType.KDTree);
-        carDTree.buildTree();
-        System.out.println(carDTree.query(queryArea));
-
-       /* KDTreeEfficient carDTree2 = (KDTreeEfficient) carDataKDTree(American_New_Cars_and_Trucks_of_1993, TreeType.KDTree);
-        carDTree2.buildTree();
-        System.out.println(carDTree2.query(queryArea));
-
-        */
-
-        QuadTree quadTree = (QuadTree) carDataKDTree(American_New_Cars_and_Trucks_of_2004, TreeType.QuadTree);
-        quadTree.buildTree();
-        System.out.println(quadTree.query(queryArea));
-
-        QuadTree dbTree = (QuadTree) getDBTree(TreeType.QuadTree);
+        KDTreeEfficient dbTree = (KDTreeEfficient) getDBTree(TreeType.KDTree, HEALTH_DB_URL);
         dbTree.buildTree();
-        for (Point p : dbTree.query(new Area(1990, 2015, 40000, 50000))) {
-            System.out.println(p.x() + " : " + p.y());
+        for (Point p : dbTree.query(new Area(2000, 2015, 50, 100))) {
+            System.out.println(p);
+        }
+
+        KDTreeEfficient dbTree2 = (KDTreeEfficient) getDBTree(TreeType.KDTree, INCOME_DB_URL);
+        dbTree2.buildTree();
+        System.out.println(dbTree2.getHeight());
+        for (Point p : dbTree2.query(new Area(1900, 2015, 45000, 50000))) {
+            System.out.println(p);
         }
     }
 
@@ -67,8 +62,8 @@ public class DataTreeFactory {
         return getTree(points, domain, type);
     }
 
-    public static Tree getDBTree(TreeType type) {
-        return getTree(JDBCAccessTest.connectAndQuery(), new Area(1950, 2020, 30000, 60000), type);
+    public static Tree getDBTree(TreeType type, String URL) {
+        return getTree(JDBCAccessTest.connectAndQuery(URL), new Area(0, 100000, 0, 100000), type);
     }
 
     public static Tree getTree(Point[] points, Area domain, TreeType type) {
