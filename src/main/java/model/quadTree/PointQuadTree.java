@@ -21,7 +21,6 @@ public class PointQuadTree extends QuadTree<Point> { //TODO: Query range, insert
         return new PointQuadTree(elements, quadrant);
     }
 
-
     public boolean isPointLeaf() {
         return this.elements.size() == 1;
     }

@@ -86,7 +86,7 @@ public class TreeController {
         dynamicPointQuadTree = new PointQuadTree(pointSet, rootArea);
         dynamicPointQuadTree.buildTree();
         long end = (System.nanoTime() - start1) / 1000;
-        updateLabel(dynamicPointQuadTree.getPoints().size(), dynamicPointQuadTree.getHeight(), dynamicPointQuadTree.size(dynamicPointQuadTree), end, "µs", TreeMode.QUAD_TREE);
+        updateLabel(dynamicPointQuadTree.getElements().size(), dynamicPointQuadTree.getHeight(), dynamicPointQuadTree.size(dynamicPointQuadTree), end, "µs", TreeMode.QUAD_TREE);
     }
 
     @FXML
@@ -97,7 +97,7 @@ public class TreeController {
             toggleButton.setText("QuadTree");
             mode = TreeMode.QUAD_TREE;
             if (!pointSet.isEmpty()) {
-                if (dynamicPointQuadTree.getPoints().isEmpty()) {
+                if (dynamicPointQuadTree.getElements().isEmpty()) {
                     benchQT();
                     dynamicPointQuadTree.buildTree();
                 }
@@ -123,6 +123,7 @@ public class TreeController {
         long start1 = System.nanoTime();
         dynamicKDTree = new MyKDTree(pointSet, rootArea, 0);
         dynamicKDTree.buildTree();
+        System.out.println(dynamicKDTree.getHeight());
         long end = (System.nanoTime() - start1) / 1000;
         updateLabel(dynamicKDTree.getPoints().size(), dynamicKDTree.getHeight(), dynamicKDTree.size(dynamicKDTree), end, "µs", TreeMode.KD_TREE);
     }
@@ -269,8 +270,8 @@ public class TreeController {
 
     private Rectangle getRectangle(double x, double y, PointQuadTree node) {
         Rectangle rectangle = new Rectangle(x, y, 10, 10);
-        Point p = node.getPoints().get(0);
-        rectangle.setId(node.getPoints().get(0).toString());
+        Point p = node.getElements().get(0);
+        rectangle.setId(node.getElements().get(0).toString());
 
         rectangle.setOnMouseEntered(e -> {
             Circle corresponding = (Circle) grid[(int) p.x()][(int) p.y()];
@@ -414,9 +415,9 @@ public class TreeController {
         Area queryArea = new Area(rectangle.getX(), rectangle.getX() + rectangle.getWidth(), PANE_HEIGHT - rectangle.getY() - rectangle.getHeight(), PANE_HEIGHT - rectangle.getY());
         HashSet<Point> queried;
         if (mode == TreeMode.KD_TREE) {
-            queried = (HashSet<Point>) dynamicKDTree.query(queryArea);
+            queried = dynamicKDTree.query(queryArea);
         } else {
-            queried = (HashSet<Point>) dynamicPointQuadTree.query(queryArea);
+            queried = dynamicPointQuadTree.query(queryArea);
         }
         statsLabel.setText("Points in " + queryArea + ": " + queried);
         statsLabel.setFont(Font.font(18));

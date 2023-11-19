@@ -14,8 +14,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("quadTreeView.fxml"));
-        //FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("ImagePane.fxml"));
+        //FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("quadTreeView.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("ImagePane.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("QuadTree & KD-Tree - Demo");
         stage.setScene(scene);

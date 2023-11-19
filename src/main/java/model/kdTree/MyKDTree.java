@@ -185,8 +185,11 @@ public class MyKDTree extends Tree {
         if (isLeaf()) {
             return 1;
         }
-        int h1 = this.leftChild.getHeight();
-        int h2 = this.rightChild.getHeight();
+        int h1 = 0, h2 = 0;
+        if (leftChild != null)
+            h1 = this.leftChild.getHeight();
+        if (rightChild != null)
+            h2 = this.rightChild.getHeight();
         if (h1 > h2) {
             return h1 + 1;
         } else {

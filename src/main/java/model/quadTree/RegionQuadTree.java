@@ -1,6 +1,7 @@
 package model.quadTree;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
 import javafx.scene.paint.Color;
 
 import java.util.HashSet;
@@ -14,7 +15,12 @@ public class RegionQuadTree extends QuadTree<Pixel> {
 
     public RegionQuadTree(Image image) {
         super(new Area(0, image.getWidth(), 0, image.getHeight()));
-
+        PixelReader pixelReader = image.getPixelReader();
+        for (int x = 0; x < image.getWidth(); x++) {
+            for (int y = 0; y < (image.getHeight()); y++) {
+                this.elements.add(new Pixel(x, y, pixelReader.getColor(x, y)));
+            }
+        }
     }
 
     @Override
@@ -31,15 +37,19 @@ public class RegionQuadTree extends QuadTree<Pixel> {
     public void buildTree() {
         if (isMixedNode()) {
             super.partition();
-            this.northEast.buildTree();
-            this.northWest.buildTree();
-            this.southWest.buildTree();
-            this.southEast.buildTree();
+            if (this.northEast != null)
+                this.northEast.buildTree();
+            if (this.northWest != null)
+                this.northWest.buildTree();
+            if (this.southWest != null)
+                this.southWest.buildTree();
+            if (this.southEast != null)
+                this.southEast.buildTree();
         }
     }
 
     // sub Image contains more than one color ("grey node")
-    private boolean isMixedNode() {
+    public boolean isMixedNode() {
         for (Pixel element : elements) {
             if (!elements.get(0).equals(element)) {
                 return true;
@@ -59,5 +69,17 @@ public class RegionQuadTree extends QuadTree<Pixel> {
             opacity += color.getOpacity();
         }
         return new Color(red / n, green / n, blue / n, opacity / n);
+    }
+
+    public int countLeaves(RegionQuadTree node) {
+        if (node != null) {
+            if (node.isNodeLeaf()) {
+                return 1 + countLeaves((RegionQuadTree) node.northEast) +
+                        countLeaves((RegionQuadTree) node.northWest) + countLeaves((RegionQuadTree) node.southEast) + countLeaves((RegionQuadTree) node.southWest);
+            } else {
+                return countLeaves((RegionQuadTree) node.northEast) + countLeaves((RegionQuadTree) node.northWest) + countLeaves((RegionQuadTree) node.southEast) + countLeaves((RegionQuadTree) node.southWest);
+            }
+        }
+        return 0;
     }
 }

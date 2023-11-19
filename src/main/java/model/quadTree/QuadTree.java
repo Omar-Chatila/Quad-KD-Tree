@@ -36,7 +36,7 @@ public abstract class QuadTree<T extends HasCoordinates> extends Tree<T> {
         return southWest;
     }
 
-    public List<T> getPoints() {
+    public List<T> getElements() {
         return elements;
     }
 
@@ -90,6 +90,7 @@ public abstract class QuadTree<T extends HasCoordinates> extends Tree<T> {
                 pointsSE.add(point);
             }
         }
+        this.getElements().clear();
         this.northEast = createSubtree(pointsNE, quadrants[0]);
         this.northWest = createSubtree(pointsNW, quadrants[1]);
         this.southWest = createSubtree(pointsSW, quadrants[2]);
