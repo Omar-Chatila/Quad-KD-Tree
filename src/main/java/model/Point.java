@@ -1,8 +1,10 @@
 package model;
 
+import model.quadTree.HasCoordinates;
+
 import java.text.DecimalFormat;
 
-public record Point(String id, double x, double y) {
+public record Point(String id, double x, double y) implements HasCoordinates {
     public Point(double x, double y) {
         this("", x, y);
     }

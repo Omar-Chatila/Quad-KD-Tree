@@ -1,170 +1,47 @@
 package model.quadTree;
 
-import model.Point;
 import model.Tree;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
-import static util.ArrayListHelper.isDistinct;
+public abstract class QuadTree<T extends HasCoordinates> extends Tree<T> {
+    protected final Area square;
+    protected List<T> elements;
+    protected QuadTree<T> northEast, northWest, southEast, southWest;
 
-public class QuadTree extends Tree { //TODO: Query range, insertion
-    private final Area square;
-    private final List<Point> points;
-    private QuadTree northEast, northWest, southEast, southWest;
-
-    public QuadTree(List<Point> points, Area square) {
+    public QuadTree(Area square, List<T> elements) {
         this.square = square;
-        this.points = points;
+        this.elements = elements;
     }
 
     public QuadTree(Area square) {
         this.square = square;
-        this.points = new ArrayList<>();
+        this.elements = new ArrayList<>();
     }
 
-    public QuadTree getNorthEast() {
+    public QuadTree<T> getNorthEast() {
         return northEast;
     }
 
-    public QuadTree getNorthWest() {
+    public QuadTree<T> getNorthWest() {
         return northWest;
     }
 
-    public QuadTree getSouthEast() {
+    public QuadTree<T> getSouthEast() {
         return southEast;
     }
 
-    public List<Point> getPoints() {
-        return points;
+    public QuadTree<T> getSouthWest() {
+        return southWest;
     }
 
-    public QuadTree getSouthWest() {
-        return southWest;
+    public List<T> getPoints() {
+        return elements;
     }
 
     public Area getSquare() {
         return square;
-    }
-
-    public void partition() {
-        partition(this);
-    }
-
-    public void partition(QuadTree current) {
-        Area[] quadrants = Area.split(current.square);
-        double xMid = (current.square.xMin() + current.square.xMax()) / 2;
-        double yMid = (current.square.yMin() + current.square.yMax()) / 2;
-        List<Point> pointsNE = new ArrayList<>();
-        List<Point> pointsNW = new ArrayList<>();
-        List<Point> pointsSE = new ArrayList<>();
-        List<Point> pointsSW = new ArrayList<>();
-        for (Point point : current.points) {
-            double pointX = point.x();
-            double pointY = point.y();
-            if (pointX > xMid && pointY > yMid) {
-                pointsNE.add(point);
-            } else if (pointX <= xMid && pointY > yMid) {
-                pointsNW.add(point);
-            } else if (pointX <= xMid && pointY <= yMid) {
-                pointsSW.add(point);
-            } else {
-                pointsSE.add(point);
-            }
-        }
-        current.northEast = new QuadTree(pointsNE, quadrants[0]);
-        current.northWest = new QuadTree(pointsNW, quadrants[1]);
-        current.southWest = new QuadTree(pointsSW, quadrants[2]);
-        current.southEast = new QuadTree(pointsSE, quadrants[3]);
-    }
-
-    public boolean isPointLeaf() {
-        return this.points.size() == 1;
-    }
-
-    public boolean isNodeLeaf() {
-        return this.southEast == null && this.southWest == null && this.northEast == null && this.northWest == null;
-    }
-
-    public void buildTree() {
-        if (this.points.size() > 1 && isDistinct(this.points)) {
-            this.partition();
-            this.northEast.buildTree();
-            this.northWest.buildTree();
-            this.southWest.buildTree();
-            this.southEast.buildTree();
-        }
-    }
-
-    // Returns all points contained by the Area queryRectangle
-    public HashSet<Point> query(Area queryRectangle) {
-        HashSet<Point> result = new HashSet<>();
-        if (this.isPointLeaf()) {
-            if (queryRectangle.containsPoint(this.points.get(0))) {
-                result.addAll(this.points);
-            }
-        } else if (queryRectangle.containsArea(this.square)) {
-            result.addAll(this.reportSubTree());
-        }
-        if (this.northEast != null && queryRectangle.intersects(this.northEast.square)) {
-            result.addAll(this.northEast.query(queryRectangle));
-        }
-        if (this.northWest != null && queryRectangle.intersects(this.northWest.square)) {
-            result.addAll(this.northWest.query(queryRectangle));
-        }
-        if (this.southEast != null && queryRectangle.intersects(this.southEast.square)) {
-            result.addAll(this.southEast.query(queryRectangle));
-        }
-        if (this.southWest != null && queryRectangle.intersects(this.southWest.square)) {
-            result.addAll(this.southWest.query(queryRectangle));
-        }
-        return result;
-    }
-
-    private List<Point> reportSubTree() {
-        return this.points;
-    }
-
-    public boolean contains(Point point) {
-        double pointX = point.x();
-        double pointY = point.y();
-        QuadTree current = this;
-        while (!current.isPointLeaf()) {
-            current = locateQuadrant(pointX, pointY, current);
-        }
-        return (current.points.contains(point));
-    }
-
-
-    public boolean isEmpty() {
-        return this.points.isEmpty();
-    }
-
-    public void add(Point point) {
-        QuadTree current = this;
-        if (!current.isEmpty()) {
-            double pointX = point.x();
-            double pointY = point.y();
-            while (!current.isNodeLeaf()) {
-                current = locateQuadrant(pointX, pointY, current);
-            }
-            if (current.isPointLeaf()) {
-                current.points.add(point);
-                current.buildTree();
-            } else {
-                current.points.add(point);
-            }
-        } else {
-            current.points.add(point);
-        }
-    }
-
-    public int size(QuadTree node) {
-        if (node != null) {
-            return 1 + size(node.northEast) + size(node.northWest) + size(node.southEast) + size(node.southWest);
-        }
-        return 0;
     }
 
     public int getHeight() {
@@ -186,18 +63,43 @@ public class QuadTree extends Tree { //TODO: Query range, insertion
         }
     }
 
-    private QuadTree locateQuadrant(double pointX, double pointY, QuadTree current) {
-        double centerX = current.square.xMid();
-        double centerY = current.square.yMid();
-        if (pointX > centerX && pointY > centerY) {
-            current = current.northEast;
-        } else if (pointX <= centerX && pointY > centerY) {
-            current = current.northWest;
-        } else if (pointX <= centerX && pointY <= centerY) {
-            current = current.southWest;
-        } else {
-            current = current.southEast;
+    public boolean isNodeLeaf() {
+        return this.southEast == null && this.southWest == null && this.northEast == null && this.northWest == null;
+    }
+
+    protected abstract QuadTree<T> createSubtree(List<T> elements, Area quadrant);
+
+    public void partition() {
+        Area[] quadrants = Area.split(this.square);
+        double xMid = (this.square.xMin() + this.square.xMax()) / 2;
+        double yMid = (this.square.yMin() + this.square.yMax()) / 2;
+        List<T> pointsNE = new ArrayList<>();
+        List<T> pointsNW = new ArrayList<>();
+        List<T> pointsSE = new ArrayList<>();
+        List<T> pointsSW = new ArrayList<>();
+        for (T point : this.elements) {
+            double pointX = point.x();
+            double pointY = point.y();
+            if (pointX > xMid && pointY > yMid) {
+                pointsNE.add(point);
+            } else if (pointX <= xMid && pointY > yMid) {
+                pointsNW.add(point);
+            } else if (pointX <= xMid && pointY <= yMid) {
+                pointsSW.add(point);
+            } else {
+                pointsSE.add(point);
+            }
         }
-        return current;
+        this.northEast = createSubtree(pointsNE, quadrants[0]);
+        this.northWest = createSubtree(pointsNW, quadrants[1]);
+        this.southWest = createSubtree(pointsSW, quadrants[2]);
+        this.southEast = createSubtree(pointsSE, quadrants[3]);
+    }
+
+    public int size(QuadTree<T> node) {
+        if (node != null) {
+            return 1 + size(node.northEast) + size(node.northWest) + size(node.southEast) + size(node.southWest);
+        }
+        return 0;
     }
 }

@@ -5,7 +5,7 @@ import model.Tree;
 import model.kdTree.KDTreeEfficient;
 import model.kdTree.MyKDTree;
 import model.quadTree.Area;
-import model.quadTree.QuadTree;
+import model.quadTree.PointQuadTree;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +40,8 @@ public class QueryBenchmark {
 
         // Build Quad-Tree
         long start2 = System.nanoTime();
-        QuadTree quadTree = new QuadTree(points, testArea);
-        quadTree.buildTree();
+        PointQuadTree pointQuadTree = new PointQuadTree(points, testArea);
+        pointQuadTree.buildTree();
         long end = Math.round((System.nanoTime() - start2) / 1E6);
         System.out.println("QT Build time " + end);
 
@@ -60,7 +60,7 @@ public class QueryBenchmark {
         Runnable[] tasks = new Runnable[3];
         tasks[0] = runQuery(kdTree, queryRect, latch);
         tasks[1] = runQuery(ekdTree, queryRect, latch);
-        tasks[2] = runQuery(quadTree, queryRect, latch);
+        tasks[2] = runQuery(pointQuadTree, queryRect, latch);
 
         for (Runnable task : tasks) {
             threadPool.execute(task);

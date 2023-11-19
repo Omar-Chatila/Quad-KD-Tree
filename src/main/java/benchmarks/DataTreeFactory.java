@@ -4,7 +4,7 @@ import model.Point;
 import model.Tree;
 import model.kdTree.KDTreeEfficient;
 import model.quadTree.Area;
-import model.quadTree.QuadTree;
+import model.quadTree.PointQuadTree;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -67,7 +67,7 @@ public class DataTreeFactory {
     }
 
     public static Tree getTree(Point[] points, Area domain, TreeType type) {
-        return type == TreeType.KDTree ? new KDTreeEfficient(points, domain) : new QuadTree(new ArrayList<>(Arrays.asList(points)), domain);
+        return type == TreeType.KDTree ? new KDTreeEfficient(points, domain) : new PointQuadTree(new ArrayList<>(Arrays.asList(points)), domain);
     }
 
     private static List<List<String>> setCarRecord(String fileUrl) {
