@@ -4,56 +4,65 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-
-<AnchorPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ImagePaneController">
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/20.0.1"
+            fx:controller="controller.ImagePaneController">
     <children>
         <VBox>
             <children>
                 <HBox>
                     <children>
-                        <ImageView fx:id="compressedImage" fitHeight="512.0" fitWidth="512.0" pickOnBounds="true" preserveRatio="true" />
+                        <ImageView fx:id="compressedImageView" fitHeight="512.0" fitWidth="512.0" pickOnBounds="true"
+                                   preserveRatio="true"/>
                         <StackPane>
                             <children>
-                                <ImageView fx:id="originalImage" fitHeight="512.0" fitWidth="512.0" pickOnBounds="true" preserveRatio="true" />
-                                <Pane fx:id="treepane" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent;" />
+                                <ImageView fx:id="originalImageView" fitHeight="512.0" fitWidth="512.0"
+                                           pickOnBounds="true" preserveRatio="true"/>
+                                <Pane fx:id="treepane" prefHeight="200.0" prefWidth="200.0"
+                                      style="-fx-background-color: transparent;"/>
                             </children>
                         </StackPane>
                     </children>
                 </HBox>
-                <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="20.0" style="-fx-background-color: #1E3050;">
+                <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="20.0"
+                      style="-fx-background-color: #1E3050;">
                     <children>
-                        <Label fx:id="infoLabel" prefHeight="53.0" prefWidth="620.0" textFill="WHITE">
+                        <Label fx:id="infoLabel" prefHeight="54.0" prefWidth="564.0" textFill="WHITE">
                             <font>
-                                <Font size="24.0" />
+                                <Font size="24.0"/>
                             </font>
-                     <HBox.margin>
-                        <Insets />
-                     </HBox.margin>
+                            <HBox.margin>
+                                <Insets/>
+                            </HBox.margin>
                         </Label>
-                        <JFXButton fx:id="decodeButton" disable="true" prefHeight="53.0" prefWidth="89.0" style="-fx-background-color: white;" text="Decode">
+                        <JFXButton fx:id="blurButton" disable="true" prefHeight="53.0" prefWidth="89.0"
+                                   style="-fx-background-color: white;" text="Blur">
                             <font>
-                                <Font size="17.0" />
+                                <Font size="17.0"/>
                             </font>
                         </JFXButton>
-                        <JFXButton fx:id="encodeButton" disable="true" prefHeight="53.0" prefWidth="89.0" style="-fx-background-color: white;" text="Encode">
+                        <JFXButton fx:id="decodeButton" disable="true" prefHeight="53.0" prefWidth="89.0"
+                                   style="-fx-background-color: white;" text="Decode">
                             <font>
-                                <Font size="17.0" />
+                                <Font size="17.0"/>
                             </font>
                         </JFXButton>
-                        <JFXButton fx:id="pickImageButton" prefHeight="53.0" prefWidth="134.0" style="-fx-background-color: white;" text="Pick Image">
+                        <JFXButton fx:id="encodeButton" disable="true" prefHeight="53.0" prefWidth="89.0"
+                                   style="-fx-background-color: white;" text="Encode">
                             <font>
-                                <Font size="17.0" />
+                                <Font size="17.0"/>
+                            </font>
+                        </JFXButton>
+                        <JFXButton fx:id="pickImageButton" prefHeight="53.0" prefWidth="134.0"
+                                   style="-fx-background-color: white;" text="Pick Image">
+                            <font>
+                                <Font size="17.0"/>
                             </font>
                         </JFXButton>
                     </children>
                     <padding>
-                        <Insets right="20.0" />
+                        <Insets right="20.0"/>
                     </padding>
                 </HBox>
             </children>

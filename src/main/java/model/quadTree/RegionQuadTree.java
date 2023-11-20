@@ -48,7 +48,7 @@ public class RegionQuadTree extends QuadTree<Pixel> {
                 this.southWest.buildTree();
             if (this.southEast != null)
                 this.southEast.buildTree();
-        } else if (this.elements.size() > 1) {
+        } else if (!this.elements.isEmpty()) {
             this.blendedColor = elements.get(0).color();
             this.elements.subList(1, elements.size()).clear();
         }
@@ -114,7 +114,7 @@ public class RegionQuadTree extends QuadTree<Pixel> {
 
     public int countLeaves(RegionQuadTree node) {
         if (node != null) {
-            int count = node.isNodeLeaf() ? 1 : 0;
+            int count = node.isNodeLeaf() && !node.elements.isEmpty() ? 1 : 0;
             return count + countLeaves((RegionQuadTree) node.northEast) +
                     countLeaves((RegionQuadTree) node.northWest) +
                     countLeaves((RegionQuadTree) node.southEast) +
