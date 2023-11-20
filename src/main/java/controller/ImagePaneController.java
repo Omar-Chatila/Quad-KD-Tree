@@ -53,13 +53,14 @@ public class ImagePaneController {
         treepane.getChildren().clear();
         compressedImage.setImage(this.qtImage);
         Image image = originalImage.getImage();
+        double time = System.nanoTime();
         this.regionQuadTree = new RegionQuadTree(image);
         this.regionQuadTree.buildTree();
-
+        long end = (long) ((System.nanoTime() - time) / (int) 1E6);
         int treeHeight = this.regionQuadTree.getHeight();
         double pixelCount = this.regionQuadTree.countLeaves(this.regionQuadTree);
         String compressionRate = Math.round((1 - pixelCount / (512.0 * 512.0)) * 100) + "%";
-        infoLabel.setText("Tree height: " + treeHeight + ". Compression rate: " + compressionRate);
+        infoLabel.setText("Tree height: " + treeHeight + ". Compression rate: " + compressionRate + " | " + end + " ms");
         decodeTree(this.regionQuadTree);
         decodeButton.setDisable(false);
     }
@@ -85,10 +86,10 @@ public class ImagePaneController {
     private void drawSplitLines(RegionQuadTree node) {
         Area square = node.getSquare();
         double width = square.xMax() - square.xMin();
-        if (width >= 8) {
+        if (width >= 6) {
             Rectangle rectangle = new Rectangle(square.xMin(), square.yMax(), width, width);
             rectangle.setFill(Color.TRANSPARENT);
-            rectangle.setStroke(Color.GREEN);
+            rectangle.setStroke(Color.LIMEGREEN);
             treepane.getChildren().add(rectangle);
         }
     }
