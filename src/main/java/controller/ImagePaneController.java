@@ -93,6 +93,19 @@ public class ImagePaneController {
         }
     }
 
+    private void blur() {
+        for (RegionQuadTree node : this.regionQuadTree.getNodesAtLevel(7)) {
+            Color pixelColor = node.getBlendedColor();
+            if (pixelColor != null) {
+                for (int x = (int) node.getSquare().xMin(); x < node.getSquare().xMax(); x++) {
+                    for (int y = (int) node.getSquare().yMin(); y < node.getSquare().yMax(); y++) {
+                        this.pixelWriter.setColor(x, y, pixelColor);
+                    }
+                }
+            }
+        }
+    }
+
     public void decodeTree(RegionQuadTree node) {
         if (!node.isMixedNode()) {
             drawSplitLines(node);

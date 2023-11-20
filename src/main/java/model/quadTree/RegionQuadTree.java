@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 
 public class RegionQuadTree extends QuadTree<Pixel> {
+    private Color blendedColor;
 
     public RegionQuadTree(Area square, List<Pixel> elements) {
         super(square, elements);
@@ -37,6 +38,7 @@ public class RegionQuadTree extends QuadTree<Pixel> {
     @Override
     public void buildTree() {
         if (this.isMixedNode()) {
+            this.blendedColor = getBlendedColor(this.elements);
             super.partition();
             if (this.northEast != null)
                 this.northEast.buildTree();
@@ -47,6 +49,7 @@ public class RegionQuadTree extends QuadTree<Pixel> {
             if (this.southEast != null)
                 this.southEast.buildTree();
         } else if (this.elements.size() > 1) {
+            this.blendedColor = elements.get(0).color();
             this.elements.subList(1, elements.size()).clear();
         }
     }
@@ -80,6 +83,12 @@ public class RegionQuadTree extends QuadTree<Pixel> {
         return leaves;
     }
 
+    public List<RegionQuadTree> getNodesAtLevel(int level) {
+        List<RegionQuadTree> leaves = new ArrayList<>();
+        nodesAtLevelHelper(this, leaves, level);
+        return leaves;
+    }
+
     private void gatherLeavesHelper(RegionQuadTree node, List<RegionQuadTree> leaves) {
         if (node != null) {
             if (node.isNodeLeaf() && !node.getElements().isEmpty()) {
@@ -93,6 +102,16 @@ public class RegionQuadTree extends QuadTree<Pixel> {
         }
     }
 
+    private void nodesAtLevelHelper(RegionQuadTree node, List<RegionQuadTree> nodes, int level) {
+        if (node != null && level >= 0) {
+            nodes.add(node);
+            nodesAtLevelHelper((RegionQuadTree) node.northEast, nodes, level - 1);
+            nodesAtLevelHelper((RegionQuadTree) node.northWest, nodes, level - 1);
+            nodesAtLevelHelper((RegionQuadTree) node.southWest, nodes, level - 1);
+            nodesAtLevelHelper((RegionQuadTree) node.southEast, nodes, level - 1);
+        }
+    }
+
     public int countLeaves(RegionQuadTree node) {
         if (node != null) {
             int count = node.isNodeLeaf() ? 1 : 0;
@@ -103,5 +122,9 @@ public class RegionQuadTree extends QuadTree<Pixel> {
 
         }
         return 0;
+    }
+
+    public Color getBlendedColor() {
+        return blendedColor;
     }
 }
