@@ -54,6 +54,33 @@ public class RegionQuadTree extends QuadTree<Pixel> {
         }
     }
 
+    public List<RegionQuadTree> getCropped(Area queryRectangle) {
+        List<RegionQuadTree> result = new ArrayList<>();
+        if (this.isNodeLeaf()) {
+            if (queryRectangle.containsArea(this.square)) {
+                result.add(this);
+            } else if (this.square.intersects(queryRectangle)) {
+                RegionQuadTree toAdd = new RegionQuadTree(this.square.intersection(queryRectangle), this.elements);
+                toAdd.blendedColor = this.blendedColor;
+                result.add(toAdd);
+            }
+        }
+        if (this.northEast != null && queryRectangle.intersects(this.northEast.square)) {
+            result.addAll(this.northEast.getCropped(queryRectangle));
+        }
+
+        if (this.northWest != null && queryRectangle.intersects(this.northWest.square)) {
+            result.addAll(this.northWest.getCropped(queryRectangle));
+        }
+        if (this.southEast != null && queryRectangle.intersects(this.southEast.square)) {
+            result.addAll(this.southEast.getCropped(queryRectangle));
+        }
+        if (this.southWest != null && queryRectangle.intersects(this.southWest.square)) {
+            result.addAll(this.southWest.getCropped(queryRectangle));
+        }
+        return result;
+    }
+
     // sub Image contains more than one color ("grey node")
     public boolean isMixedNode() {
         for (Pixel element : elements) {

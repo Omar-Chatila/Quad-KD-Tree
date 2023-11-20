@@ -21,6 +21,11 @@ public class PointQuadTree extends QuadTree<Point> { //TODO: Query range, insert
         return new PointQuadTree(elements, quadrant);
     }
 
+    @Override
+    protected List<RegionQuadTree> getCropped(Area queryRectangle) {
+        return null;
+    }
+
     public boolean isPointLeaf() {
         return this.elements.size() == 1;
     }

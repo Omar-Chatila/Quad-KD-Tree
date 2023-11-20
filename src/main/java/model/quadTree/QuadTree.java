@@ -62,6 +62,8 @@ public abstract class QuadTree<T extends HasCoordinates> extends Tree<T> {
 
     protected abstract QuadTree<T> createSubtree(List<T> elements, Area quadrant);
 
+    protected abstract List<RegionQuadTree> getCropped(Area queryRectangle);
+
     public void partition() {
         Area[] quadrants = Area.split(this.square);
         double xMid = (this.square.xMin() + this.square.xMax()) / 2;

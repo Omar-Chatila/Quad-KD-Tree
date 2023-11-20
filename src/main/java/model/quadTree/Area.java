@@ -32,6 +32,18 @@ public record Area(double xMin, double xMax, double yMin, double yMax) {
         return other != null && (this.xMin <= other.xMin && this.xMax >= other.xMax && this.yMin <= other.yMin && this.yMax >= other.yMax);
     }
 
+    public Area intersection(Area other) {
+        double xMin = Math.max(this.xMin, other.xMin);
+        double xMax = Math.min(this.xMax, other.xMax);
+        double yMin = Math.max(this.yMin, other.yMin);
+        double yMax = Math.min(this.yMax, other.yMax);
+
+        if (xMin < xMax && yMin < yMax)
+            return new Area(xMin, xMax, yMin, yMax);
+        else
+            return null; // No intersection
+    }
+
     public boolean containsPoint(Point point) {
         return (point.x() >= xMin && point.y() >= yMin && point.x() <= xMax && point.y() <= yMax);
     }

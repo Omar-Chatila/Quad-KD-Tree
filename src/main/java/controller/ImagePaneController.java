@@ -4,23 +4,27 @@ import application.PixelGenerator;
 import com.jfoenix.controls.JFXButton;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
+import jfxtras.labs.util.event.MouseControlUtil;
 import model.quadTree.Area;
 import model.quadTree.RegionQuadTree;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ImagePaneController {
     public static final int IMAGE_WIDTH = 512, IMAGE_HEIGHT = 512;
@@ -41,6 +45,10 @@ public class ImagePaneController {
     private JFXButton blurButton;
     @FXML
     private JFXButton decodeButton;
+    @FXML
+    private JFXButton cropButton;
+    @FXML
+    private Pane cropPane;
     private RegionQuadTree regionQuadTree;
     private WritableImage qtImage;
     private List<Image> blurredImages;
@@ -56,6 +64,42 @@ public class ImagePaneController {
         encodeButton.setOnAction(actionEvent -> encode());
         decodeButton.setOnAction(e -> decode());
         blurButton.setOnAction(e -> blur());
+        cropButton.setOnAction(e -> crop());
+    }
+
+    private void crop() {
+        compressedImageView.setImage(this.originalImageView.getImage());
+        cropPane.getChildren().clear();
+        final Rectangle selectionRect = new Rectangle(10, 10, Color.TRANSPARENT);
+        selectionRect.setStroke(Color.BLACK);
+        EventHandler<MouseEvent> mouseDragHandler = event -> cropPane.getChildren().removeIf(node -> node != selectionRect && (node instanceof Rectangle));
+        final AtomicInteger[] width = {new AtomicInteger()};
+        final AtomicInteger[] height = {new AtomicInteger()};
+        final AtomicInteger[] x = {new AtomicInteger()};
+        final AtomicInteger[] y = {new AtomicInteger()};
+
+        MouseControlUtil.addSelectionRectangleGesture(cropPane, selectionRect, mouseDragHandler, null, e -> {
+
+            width[0] = new AtomicInteger((int) selectionRect.getWidth());
+            height[0] = new AtomicInteger((int) selectionRect.getHeight());
+            x[0] = new AtomicInteger((int) selectionRect.getX());
+            y[0] = new AtomicInteger((int) selectionRect.getY());
+            Rectangle rectangle = new Rectangle(x[0].doubleValue(), y[0].doubleValue(), width[0].doubleValue(), height[0].doubleValue());
+            cropPane.getChildren().add(rectangle);
+            rectangle.setFill(Color.TRANSPARENT);
+            rectangle.setStroke(Color.BLUE);
+            rectangle.setId("query");
+
+            Area cropArea = new Area(rectangle.getX(), rectangle.getX() + rectangle.getWidth(), rectangle.getY(), rectangle.getY() + rectangle.getHeight());
+            WritableImage image = new WritableImage(IMAGE_WIDTH, IMAGE_HEIGHT);
+            PixelWriter pixelWriterI = image.getPixelWriter();
+            compressedImageView.setImage(image);
+            List<RegionQuadTree> list = this.regionQuadTree.getCropped(cropArea);
+            renderImageFromTree(list, pixelWriterI);
+
+            //performQuery(rectangle, selectionRect);
+
+        });
     }
 
     private void encode() {
@@ -74,6 +118,7 @@ public class ImagePaneController {
         decodeTree(this.regionQuadTree);
         decodeButton.setDisable(false);
         blurButton.setDisable(false);
+        cropButton.setDisable(false);
     }
 
     private void pickImage() {
@@ -114,19 +159,22 @@ public class ImagePaneController {
             PixelWriter pixelWriterI = image.getPixelWriter();
             blurredImages.add(image);
             List<RegionQuadTree> list = this.regionQuadTree.getNodesAtLevel(i);
-            System.out.println(i + ": " + list.size());
-            for (RegionQuadTree node : list) {
-                Color pixelColor = node.getBlendedColor();
-                if (pixelColor != null) {
-                    for (int x = (int) node.getSquare().xMin(); x < node.getSquare().xMax(); x++) {
-                        for (int y = (int) node.getSquare().yMin(); y < node.getSquare().yMax(); y++) {
-                            pixelWriterI.setColor(x, y, pixelColor);
-                        }
+            renderImageFromTree(list, pixelWriterI);
+        }
+        playBlurredDiashow();
+    }
+
+    private void renderImageFromTree(List<RegionQuadTree> list, PixelWriter pixelWriterI) {
+        for (RegionQuadTree node : list) {
+            Color pixelColor = node.getBlendedColor();
+            if (pixelColor != null) {
+                for (int x = (int) node.getSquare().xMin(); x < node.getSquare().xMax(); x++) {
+                    for (int y = (int) node.getSquare().yMin(); y < node.getSquare().yMax(); y++) {
+                        pixelWriterI.setColor(x, y, pixelColor);
                     }
                 }
             }
         }
-        playBlurredDiashow();
     }
 
     private void playBlurredDiashow() {
