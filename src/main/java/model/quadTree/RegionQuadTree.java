@@ -36,7 +36,7 @@ public class RegionQuadTree extends QuadTree<Pixel> {
 
     @Override
     public void buildTree() {
-        if (isMixedNode()) {
+        if (this.isMixedNode()) {
             super.partition();
             if (this.northEast != null)
                 this.northEast.buildTree();
@@ -46,6 +46,8 @@ public class RegionQuadTree extends QuadTree<Pixel> {
                 this.southWest.buildTree();
             if (this.southEast != null)
                 this.southEast.buildTree();
+        } else if (this.elements.size() > 1) {
+            this.elements.subList(1, elements.size()).clear();
         }
     }
 
@@ -72,19 +74,19 @@ public class RegionQuadTree extends QuadTree<Pixel> {
         return new Color(red / n, green / n, blue / n, opacity / n);
     }
 
-    public List<Pixel> gatherLeaves() {
-        List<Pixel> leaves = new ArrayList<>();
+    public List<RegionQuadTree> gatherLeaves() {
+        List<RegionQuadTree> leaves = new ArrayList<>();
         gatherLeavesHelper(this, leaves);
         return leaves;
     }
 
-    private void gatherLeavesHelper(RegionQuadTree node, List<Pixel> leaves) {
+    private void gatherLeavesHelper(RegionQuadTree node, List<RegionQuadTree> leaves) {
         if (node != null) {
-            if (node.isNodeLeaf()) {
-                leaves.addAll(node.elements);
+            if (node.isNodeLeaf() && !node.getElements().isEmpty()) {
+                leaves.add(node);
             } else {
-                gatherLeavesHelper((RegionQuadTree) node.northWest, leaves);
                 gatherLeavesHelper((RegionQuadTree) node.northEast, leaves);
+                gatherLeavesHelper((RegionQuadTree) node.northWest, leaves);
                 gatherLeavesHelper((RegionQuadTree) node.southWest, leaves);
                 gatherLeavesHelper((RegionQuadTree) node.southEast, leaves);
             }

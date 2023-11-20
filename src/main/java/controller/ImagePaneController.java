@@ -13,7 +13,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import model.quadTree.Area;
-import model.quadTree.Pixel;
 import model.quadTree.RegionQuadTree;
 
 import java.io.File;
@@ -109,7 +108,7 @@ public class ImagePaneController {
     }
 
     private void decode() {
-        List<Pixel> leaves = this.regionQuadTree.gatherLeaves();
+        List<RegionQuadTree> leaves = this.regionQuadTree.gatherLeaves();
         PixelGenerator generator = new PixelGenerator(this.pixelWriter, leaves);
         Thread th = new Thread(generator);
         th.setDaemon(true);
