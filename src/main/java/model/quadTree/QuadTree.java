@@ -52,15 +52,8 @@ public abstract class QuadTree<T extends HasCoordinates> extends Tree<T> {
         int h2 = this.northWest.getHeight();
         int h3 = this.southWest.getHeight();
         int h4 = this.southEast.getHeight();
-        if (h1 > h2 && h1 > h3 && h1 > h4) {
-            return h1 + 1;
-        } else if (h2 > h1 && h2 > h3 && h2 > h4) {
-            return h2 + 1;
-        } else if (h3 > h2 && h3 > h1 && h3 > h4) {
-            return h3 + 1;
-        } else {
-            return h4 + 1;
-        }
+        int maxHeight = Math.max(Math.max(h1, h2), Math.max(h3, h4));
+        return maxHeight + 1;
     }
 
     public boolean isNodeLeaf() {

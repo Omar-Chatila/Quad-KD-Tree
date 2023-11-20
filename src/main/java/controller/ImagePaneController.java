@@ -56,7 +56,7 @@ public class ImagePaneController {
         this.regionQuadTree = new RegionQuadTree(image);
         this.regionQuadTree.buildTree();
         long end = (long) ((System.nanoTime() - time) / (int) 1E6);
-        int treeHeight = this.regionQuadTree.getHeight();
+        int treeHeight = this.regionQuadTree.getHeight() - 1;  // real height doesnt include root node
         double pixelCount = this.regionQuadTree.countLeaves(this.regionQuadTree);
         String compressionRate = Math.round((1 - pixelCount / (512.0 * 512.0)) * 100) + "%";
         infoLabel.setText("Tree height: " + treeHeight + ". Compression rate: " + compressionRate + " | " + end + " ms");

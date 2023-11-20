@@ -95,17 +95,12 @@ public class RegionQuadTree extends QuadTree<Pixel> {
 
     public int countLeaves(RegionQuadTree node) {
         if (node != null) {
-            if (node.isNodeLeaf()) {
-                return 1 + countLeaves((RegionQuadTree) node.northEast) +
-                        countLeaves((RegionQuadTree) node.northWest) +
-                        countLeaves((RegionQuadTree) node.southEast) +
-                        countLeaves((RegionQuadTree) node.southWest);
-            } else {
-                return countLeaves((RegionQuadTree) node.northEast) +
-                        countLeaves((RegionQuadTree) node.northWest) +
-                        countLeaves((RegionQuadTree) node.southEast) +
-                        countLeaves((RegionQuadTree) node.southWest);
-            }
+            int count = node.isNodeLeaf() ? 1 : 0;
+            return count + countLeaves((RegionQuadTree) node.northEast) +
+                    countLeaves((RegionQuadTree) node.northWest) +
+                    countLeaves((RegionQuadTree) node.southEast) +
+                    countLeaves((RegionQuadTree) node.southWest);
+
         }
         return 0;
     }
