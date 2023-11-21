@@ -15,6 +15,7 @@ public class PixelGenerator implements Runnable {
 
     public PixelGenerator(PixelWriter pw, List<RegionQuadTree> regionQuadTrees) {
         this.writer = Objects.requireNonNull(pw, "Writer cannot be null");
+        // Collections.shuffle(regionQuadTrees);
         this.regionQuadTrees = regionQuadTrees;
     }
 
@@ -30,9 +31,17 @@ public class PixelGenerator implements Runnable {
                         int finalY = y;
                         Platform.runLater(() -> writer.setColor(finalX, finalY, pixelColor));
                     }
+                    try {
+                        if (++cycle % 10 == 0) {
+                            Thread.sleep(1);  // Optional: to slow down the drawing for visualization.
+                        }
+                    } catch (InterruptedException e) {
+                        System.err.println("Interrupted, exiting.");
+                        return;
+                    }
                 }
                 try {
-                    if (++cycle % 2 == 0) {
+                    if (++cycle % 3 == 0) {
                         Thread.sleep(1);  // Optional: to slow down the drawing for visualization.
                     }
                 } catch (InterruptedException e) {

@@ -16,6 +16,10 @@ public record Area(double xMin, double xMax, double yMin, double yMax) {
         return new Area[]{nE, nW, sW, sE};
     }
 
+    public double getWidth() {
+        return this.xMax - this.xMin;
+    }
+
     public double xMid() {
         return (this.xMin + this.xMax) / 2.0;
     }

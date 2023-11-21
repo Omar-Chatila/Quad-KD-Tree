@@ -55,6 +55,17 @@ public class ImagePaneController {
     private PixelWriter pixelWriter;
     private Timeline timeline;
 
+    static Rectangle setSelectionRect(Rectangle selectionRect, AtomicInteger[] width, AtomicInteger[] height, AtomicInteger[] x, AtomicInteger[] y, Pane cropPane) {
+        width[0] = new AtomicInteger((int) selectionRect.getWidth());
+        height[0] = new AtomicInteger((int) selectionRect.getHeight());
+        x[0] = new AtomicInteger((int) selectionRect.getX());
+        y[0] = new AtomicInteger((int) selectionRect.getY());
+        Rectangle rectangle = new Rectangle(x[0].doubleValue(), y[0].doubleValue(), width[0].doubleValue(), height[0].doubleValue());
+        cropPane.getChildren().add(rectangle);
+        rectangle.setFill(Color.TRANSPARENT);
+        return rectangle;
+    }
+
     @FXML
     private void initialize() {
         qtImage = new WritableImage(IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -68,10 +79,11 @@ public class ImagePaneController {
     }
 
     private void crop() {
+        if (timeline != null) timeline.stop();
         compressedImageView.setImage(this.originalImageView.getImage());
         cropPane.getChildren().clear();
         final Rectangle selectionRect = new Rectangle(10, 10, Color.TRANSPARENT);
-        selectionRect.setStroke(Color.BLACK);
+        selectionRect.setStroke(Color.YELLOW);
         EventHandler<MouseEvent> mouseDragHandler = event -> cropPane.getChildren().removeIf(node -> node != selectionRect && (node instanceof Rectangle));
         final AtomicInteger[] width = {new AtomicInteger()};
         final AtomicInteger[] height = {new AtomicInteger()};
@@ -80,14 +92,9 @@ public class ImagePaneController {
 
         MouseControlUtil.addSelectionRectangleGesture(cropPane, selectionRect, mouseDragHandler, null, e -> {
 
-            width[0] = new AtomicInteger((int) selectionRect.getWidth());
-            height[0] = new AtomicInteger((int) selectionRect.getHeight());
-            x[0] = new AtomicInteger((int) selectionRect.getX());
-            y[0] = new AtomicInteger((int) selectionRect.getY());
-            Rectangle rectangle = new Rectangle(x[0].doubleValue(), y[0].doubleValue(), width[0].doubleValue(), height[0].doubleValue());
-            cropPane.getChildren().add(rectangle);
-            rectangle.setFill(Color.TRANSPARENT);
-            rectangle.setStroke(Color.BLUE);
+            Rectangle rectangle = setSelectionRect(selectionRect, width, height, x, y, cropPane);
+
+            rectangle.setStroke(Color.GREEN);
             rectangle.setId("query");
 
             Area cropArea = new Area(rectangle.getX(), rectangle.getX() + rectangle.getWidth(), rectangle.getY(), rectangle.getY() + rectangle.getHeight());
@@ -96,9 +103,6 @@ public class ImagePaneController {
             compressedImageView.setImage(image);
             List<RegionQuadTree> list = this.regionQuadTree.getCropped(cropArea);
             renderImageFromTree(list, pixelWriterI);
-
-            //performQuery(rectangle, selectionRect);
-
         });
     }
 
@@ -113,7 +117,7 @@ public class ImagePaneController {
         int treeHeight = this.regionQuadTree.getHeight() - 1;  // real height doesnt include root node
         double pixelCount = this.regionQuadTree.countLeaves(this.regionQuadTree);
         System.out.println(pixelCount);
-        String compressionRate = Math.round((1 - pixelCount / (512.0 * 512.0)) * 10000) / 100 + "%";
+        String compressionRate = Math.round((1 - pixelCount / (512.0 * 512.0)) * 100) + "%";
         infoLabel.setText("Tree height: " + treeHeight + ". Compression rate: " + compressionRate + " | " + end + " ms");
         decodeTree(this.regionQuadTree);
         decodeButton.setDisable(false);
@@ -142,11 +146,11 @@ public class ImagePaneController {
         }
     }
 
-    private void drawSplitLines(RegionQuadTree node) {
+    private void drawSquares(RegionQuadTree node) {
         Area square = node.getSquare();
-        double width = square.xMax() - square.xMin();
+        double width = square.getWidth();
         if (width >= 6) {
-            Rectangle rectangle = new Rectangle(square.xMin(), square.yMax(), width, width);
+            Rectangle rectangle = new Rectangle(square.xMin(), square.yMin(), width, width);
             rectangle.setFill(Color.TRANSPARENT);
             rectangle.setStroke(Color.LIMEGREEN);
             treepane.getChildren().add(rectangle);
@@ -192,7 +196,7 @@ public class ImagePaneController {
 
     public void decodeTree(RegionQuadTree node) {
         if (!node.isMixedNode()) {
-            drawSplitLines(node);
+            drawSquares(node);
         }
         if (node.getNorthEast() != null)
             decodeTree((RegionQuadTree) node.getNorthEast());
@@ -205,6 +209,7 @@ public class ImagePaneController {
     }
 
     private void decode() {
+        if (this.timeline != null) timeline.stop();
         List<RegionQuadTree> leaves = this.regionQuadTree.gatherLeaves();
         PixelGenerator generator = new PixelGenerator(this.pixelWriter, leaves);
         Thread th = new Thread(generator);

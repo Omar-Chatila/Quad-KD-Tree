@@ -397,13 +397,7 @@ public class TreeController {
 
         MouseControlUtil.addSelectionRectangleGesture(drawingPane, selectionRect, mouseDragHandler, null, e -> {
             if (!this.isDrawMode) {
-                width[0] = new AtomicInteger((int) selectionRect.getWidth());
-                height[0] = new AtomicInteger((int) selectionRect.getHeight());
-                x[0] = new AtomicInteger((int) selectionRect.getX());
-                y[0] = new AtomicInteger((int) selectionRect.getY());
-                Rectangle rectangle = new Rectangle(x[0].doubleValue(), y[0].doubleValue(), width[0].doubleValue(), height[0].doubleValue());
-                drawingPane.getChildren().add(rectangle);
-                rectangle.setFill(Color.TRANSPARENT);
+                Rectangle rectangle = ImagePaneController.setSelectionRect(selectionRect, width, height, x, y, drawingPane);
                 rectangle.setStroke(Color.BLUE);
                 rectangle.setId("query");
                 performQuery(rectangle, selectionRect);
