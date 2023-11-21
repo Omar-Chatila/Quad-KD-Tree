@@ -20,6 +20,10 @@ public record Area(double xMin, double xMax, double yMin, double yMax) {
         return this.xMax - this.xMin;
     }
 
+    public double getHeight() {
+        return this.yMax - this.yMin;
+    }
+
     public double xMid() {
         return (this.xMin + this.xMax) / 2.0;
     }
