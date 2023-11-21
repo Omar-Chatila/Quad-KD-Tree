@@ -258,8 +258,13 @@ public class ImagePaneController {
         if (this.timeline != null) timeline.stop();
         List<RegionQuadTree> leaves = this.regionQuadTree.gatherLeaves();
         PixelGenerator generator = new PixelGenerator(this.pixelWriter, leaves);
-        Thread th = new Thread(generator);
-        th.setDaemon(true);
-        th.start();
+        if (leaves.size() < 50000) {
+            Thread th = new Thread(generator);
+            th.setDaemon(true);
+            th.start();
+        } else {
+            renderImageFromTree(leaves, pixelWriter);
+        }
+
     }
 }
