@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ImagePaneController {
     public static int IMAGE_WIDTH = 512, IMAGE_HEIGHT = 512;
+    public static double ASPECT_RATIO;
     int index = 0;
     @FXML
     private ImageView compressedImageView;
@@ -71,7 +72,7 @@ public class ImagePaneController {
         blurredImages = new ArrayList<>();
         pickImageButton.setOnAction(event -> pickImage());
         encodeButton.setOnAction(actionEvent -> encode());
-        decodeButton.setOnAction(e -> showTreeSquares());
+        decodeButton.setOnAction(e -> decodeFromTree());
         blurButton.setOnAction(e -> blur());
         cropButton.setOnAction(e -> crop());
     }
@@ -119,8 +120,8 @@ public class ImagePaneController {
     private Area calculateCropArea(Rectangle selectionRectangle, double widthRatio, double heightRatio) {
         double xMin = selectionRectangle.getX() / widthRatio;
         double xMax = (selectionRectangle.getX() + selectionRectangle.getWidth()) / widthRatio;
-        double yMin = selectionRectangle.getY() / heightRatio;
-        double yMax = (selectionRectangle.getY() + selectionRectangle.getHeight()) / heightRatio;
+        double yMin = selectionRectangle.getY() / heightRatio * (ASPECT_RATIO);
+        double yMax = (selectionRectangle.getY() + selectionRectangle.getHeight()) / heightRatio * (ASPECT_RATIO);
 
         return new Area(xMin, xMax, yMin, yMax);
     }
@@ -147,11 +148,12 @@ public class ImagePaneController {
 
         // Compute pixel count and compression rate
         double pixelCount = this.regionQuadTree.countLeaves(this.regionQuadTree);
+        System.out.println("Pixelc: " + pixelCount);
         double compressionRatePercentage = (1 - pixelCount / (IMAGE_WIDTH * IMAGE_HEIGHT)) * 100;
 
         // Update info label with tree height, compression rate, and time taken
         infoLabel.setText(
-                String.format("Tree height: %s. Compression rate: %.0f%% | %s ms",
+                String.format("Tree height: %s. Compression rate: %.0f%% | Encode: %s ms",
                         treeHeight,
                         compressionRatePercentage,
                         elapsedTimeMillis)
@@ -180,10 +182,12 @@ public class ImagePaneController {
             Image loadedImage = new Image(file.toURI().toString());
             IMAGE_WIDTH = (int) loadedImage.getWidth();
             IMAGE_HEIGHT = (int) loadedImage.getHeight();
+            ASPECT_RATIO = loadedImage.getWidth() / loadedImage.getHeight();
+            infoLabel.setText("Resolution: " + IMAGE_WIDTH + " × " + IMAGE_HEIGHT + " = " + IMAGE_HEIGHT * IMAGE_WIDTH + "px");
             originalImageView.setImage(loadedImage);
             qtImage = new WritableImage(IMAGE_WIDTH, IMAGE_HEIGHT);
             pixelWriter = qtImage.getPixelWriter();
-            System.out.println("Original" + loadedImage.getHeight() * loadedImage.getWidth());
+            System.out.println("Original" + IMAGE_HEIGHT * IMAGE_WIDTH);
             encodeButton.setDisable(false);
             treepane.getChildren().clear();
         }
@@ -194,7 +198,7 @@ public class ImagePaneController {
         double width = square.getWidth();
         double height = square.getHeight();
         double widthRatio = 512.0 / IMAGE_WIDTH;
-        double heightRatio = 512.0 / IMAGE_HEIGHT;
+        double heightRatio = 512.0 / (IMAGE_HEIGHT * ASPECT_RATIO);
         if (width >= 6) {
             Rectangle rectangle = new Rectangle(square.xMin() * widthRatio, square.yMin() * heightRatio, width * widthRatio, height * heightRatio);
             rectangle.setFill(Color.TRANSPARENT);
@@ -254,11 +258,13 @@ public class ImagePaneController {
             showTreeSquares((RegionQuadTree) node.getSouthEast());
     }
 
-    private void showTreeSquares() {
+    private void decodeFromTree() {
         if (this.timeline != null) timeline.stop();
+        long start = System.nanoTime();
         List<RegionQuadTree> leaves = this.regionQuadTree.gatherLeaves();
+        long time = System.nanoTime() - start;
         PixelGenerator generator = new PixelGenerator(this.pixelWriter, leaves);
-        if (leaves.size() < 50000) {
+        if (IMAGE_WIDTH == 512 && IMAGE_HEIGHT == 512) {
             Thread th = new Thread(generator);
             th.setDaemon(true);
             th.start();
@@ -266,5 +272,6 @@ public class ImagePaneController {
             renderImageFromTree(leaves, pixelWriter);
         }
 
+        infoLabel.setText(infoLabel.getText() + " | Decode: " + (int) (time / 1E6) + "ms");
     }
 }

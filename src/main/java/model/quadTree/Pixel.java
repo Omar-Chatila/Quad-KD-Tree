@@ -17,6 +17,6 @@ public record Pixel(double x, double y, Color color) implements HasCoordinates {
         double blueDiff = Math.pow(a.getBlue() - b.getBlue(), 2);
         double alphaDiff = Math.pow(a.getOpacity() - b.getOpacity(), 2);
         double colorDistance = Math.sqrt(redDiff + greenDiff + blueDiff + alphaDiff);
-        return colorDistance < 0.045;
+        return colorDistance < 0.035;
     }
 }
