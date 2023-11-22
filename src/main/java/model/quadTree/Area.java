@@ -16,6 +16,11 @@ public record Area(double xMin, double xMax, double yMin, double yMax) {
         return new Area[]{nE, nW, sW, sE};
     }
 
+    public Area rotate90degrees() {
+
+        return new Area(yMin, yMax, xMin, xMax);
+    }
+
     public double getWidth() {
         return this.xMax - this.xMin;
     }

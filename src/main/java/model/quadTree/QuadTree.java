@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class QuadTree<T extends HasCoordinates> extends Tree<T> {
-    protected final Area square;
+    protected Area square;
     protected List<T> elements;
     protected QuadTree<T> northEast, northWest, southEast, southWest;
 

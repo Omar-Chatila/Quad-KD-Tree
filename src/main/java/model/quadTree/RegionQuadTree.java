@@ -81,6 +81,31 @@ public class RegionQuadTree extends QuadTree<Pixel> {
         return result;
     }
 
+    public void rotate(RegionQuadTree node) {
+        if (node != null) {
+            RegionQuadTree temp = (RegionQuadTree) node.northEast;
+            node.northEast = node.northWest;
+            node.northWest = node.southWest;
+            node.southWest = node.southEast;
+            node.southEast = temp;
+
+            if (node.northEast != null)
+                node.northEast.square = node.northEast.square.rotate90degrees();
+            if (node.northWest != null)
+                node.northWest.square = node.northWest.square.rotate90degrees();
+            if (node.southWest != null)
+                node.southWest.square = node.southWest.square.rotate90degrees();
+            if (node.southEast != null)
+                node.southEast.square = node.southEast.square.rotate90degrees();
+
+            rotate((RegionQuadTree) node.northEast);
+            rotate((RegionQuadTree) node.northWest);
+            rotate((RegionQuadTree) node.southWest);
+            rotate((RegionQuadTree) node.southEast);
+        }
+    }
+
+
     // sub Image contains more than one color ("grey node")
     public boolean isMixedNode() {
         for (Pixel element : elements) {

@@ -52,6 +52,8 @@ public class ImagePaneController {
     @FXML
     private JFXButton cropButton;
     @FXML
+    private JFXButton rotateButton;
+    @FXML
     private Pane cropPane;
     @FXML
     private JFXToggleButton animationsToggle;
@@ -85,6 +87,10 @@ public class ImagePaneController {
         decodeButton.setOnAction(e -> decodeFromTree());
         blurButton.setOnAction(e -> blur());
         cropButton.setOnAction(e -> crop());
+        rotateButton.setOnAction(e -> {
+            this.regionQuadTree.rotate(regionQuadTree);
+            renderImageFromTree(regionQuadTree.gatherLeaves(), this.pixelWriter);
+        });
     }
 
     private void crop() {
@@ -173,6 +179,7 @@ public class ImagePaneController {
         decodeButton.setDisable(false);
         blurButton.setDisable(false);
         cropButton.setDisable(false);
+        rotateButton.setDisable(false);
     }
 
     private void pickImage() {
@@ -249,7 +256,7 @@ public class ImagePaneController {
         double increment = 1.0 / rectangles.size();
         while (!rectangles.isEmpty()) {
             Rectangle rectangle = rectangles.pop();
-            KeyFrame keyFrame = new KeyFrame(Duration.millis(33 * (i++ + 1)),
+            KeyFrame keyFrame = new KeyFrame(Duration.millis(5 * (i++ + 1)),
                     event -> {
                         prograssBar.setProgress(prograssBar.getProgress() + increment);
                         treepane.getChildren().add(rectangle);
