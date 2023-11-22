@@ -2,11 +2,13 @@ package controller;
 
 import application.PixelGenerator;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXToggleButton;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
@@ -30,8 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ImagePaneController {
     public static int IMAGE_WIDTH = 512, IMAGE_HEIGHT = 512;
     public static double ASPECT_RATIO;
-    int index = 0;
-    Stack<Rectangle> rectangles = new Stack<>();
+    private final Stack<Rectangle> rectangles = new Stack<>();
     @FXML
     private ImageView compressedImageView;
     @FXML
@@ -52,12 +53,17 @@ public class ImagePaneController {
     private JFXButton cropButton;
     @FXML
     private Pane cropPane;
+    @FXML
+    private JFXToggleButton animationsToggle;
+    @FXML
+    private ProgressBar prograssBar;
+
+    private boolean isAnimated = true;
     private RegionQuadTree regionQuadTree;
     private WritableImage qtImage;
     private List<Image> blurredImages;
     private PixelWriter pixelWriter;
     private Timeline timeline;
-    private Timeline timeline2;
 
     static Rectangle setSelectionRect(Rectangle selectionRect, AtomicInteger[] width, AtomicInteger[] height, AtomicInteger[] x, AtomicInteger[] y, Pane cropPane) {
         width[0] = new AtomicInteger((int) selectionRect.getWidth());
@@ -72,6 +78,7 @@ public class ImagePaneController {
 
     @FXML
     private void initialize() {
+        animationsToggle.setOnAction(e -> this.isAnimated = !this.isAnimated);
         blurredImages = new ArrayList<>();
         pickImageButton.setOnAction(event -> pickImage());
         encodeButton.setOnAction(actionEvent -> encode());
@@ -81,7 +88,7 @@ public class ImagePaneController {
     }
 
     private void crop() {
-        showTreeSquares(this.regionQuadTree, 100, true, false);
+        showTreeSquares(this.regionQuadTree, 100, true, isAnimated);
         if (timeline != null) timeline.stop();
         compressedImageView.setImage(originalImageView.getImage());
         cropPane.getChildren().clear();
@@ -161,7 +168,7 @@ public class ImagePaneController {
         );
 
         // Show overlay of squares in tree in originalImagePane
-        showTreeSquares(this.regionQuadTree, 1000, true, true);
+        showTreeSquares(this.regionQuadTree, 1000, true, isAnimated);
         playSquaresAnimation();
         decodeButton.setDisable(false);
         blurButton.setDisable(false);
@@ -237,17 +244,24 @@ public class ImagePaneController {
     }
 
     private void playSquaresAnimation() {
-        this.timeline2 = new Timeline();
+        Timeline timeline2 = new Timeline();
         int i = 1;
+        double increment = 1.0 / rectangles.size();
         while (!rectangles.isEmpty()) {
             Rectangle rectangle = rectangles.pop();
             KeyFrame keyFrame = new KeyFrame(Duration.millis(33 * (i++ + 1)),
                     event -> {
+                        prograssBar.setProgress(prograssBar.getProgress() + increment);
                         treepane.getChildren().add(rectangle);
                     });
             timeline2.getKeyFrames().add(keyFrame);
         }
 
+        timeline2.setOnFinished(e -> {
+            decodeButton.setDisable(false);
+            blurButton.setDisable(false);
+            cropButton.setDisable(false);
+        });
         timeline2.setCycleCount(1);
         timeline2.play();
     }
@@ -255,7 +269,6 @@ public class ImagePaneController {
     private void playBlurredDiashow() {
         this.timeline = new Timeline();
         for (int i = 0; i < regionQuadTree.getHeight(); i++) {
-            System.out.println(i);
             int finalI = i;
             KeyFrame keyFrame = new KeyFrame(Duration.millis(1000 * (i + 1)),
                     event -> {
@@ -292,7 +305,8 @@ public class ImagePaneController {
         List<RegionQuadTree> leaves = this.regionQuadTree.gatherLeaves();
         long time = System.nanoTime() - start;
         PixelGenerator generator = new PixelGenerator(this.pixelWriter, leaves);
-        if (IMAGE_WIDTH == 512 && IMAGE_HEIGHT == 512) {
+
+        if (isAnimated && IMAGE_WIDTH == 512 && IMAGE_HEIGHT == 512) {
             Thread th = new Thread(generator);
             th.setDaemon(true);
             th.start();
