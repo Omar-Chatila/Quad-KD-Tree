@@ -161,7 +161,7 @@ public class ImagePaneController {
         );
 
         // Show overlay of squares in tree in originalImagePane
-        showTreeSquares(this.regionQuadTree, 1000);
+        showTreeSquares(this.regionQuadTree, 1000, true);
         decodeButton.setDisable(false);
         blurButton.setDisable(false);
         cropButton.setDisable(false);
@@ -194,16 +194,17 @@ public class ImagePaneController {
         }
     }
 
-    private void drawSquares(RegionQuadTree node) {
+    private void drawSquares(RegionQuadTree node, boolean encoding) {
         Area square = node.getSquare();
         double width = square.getWidth();
         double height = square.getHeight();
         double widthRatio = 512.0 / IMAGE_WIDTH;
         double heightRatio = 512.0 / (IMAGE_HEIGHT * ASPECT_RATIO);
-        if (width >= 6) {
+        if (!encoding || width >= 6) {
             Rectangle rectangle = new Rectangle(square.xMin() * widthRatio, square.yMin() * heightRatio, width * widthRatio, height * heightRatio);
             rectangle.setFill(Color.TRANSPARENT);
-            rectangle.setStroke(Color.LIMEGREEN);
+            rectangle.setStroke(Color.YELLOW);
+            rectangle.setStrokeWidth(0.7);
             treepane.getChildren().add(rectangle);
         }
     }
@@ -211,13 +212,11 @@ public class ImagePaneController {
     private void blur() {
         treepane.getChildren().clear();
         for (int i = 0; i < regionQuadTree.getHeight(); i++) {
-            treepane.getChildren().clear();
             WritableImage image = new WritableImage(IMAGE_WIDTH, IMAGE_HEIGHT);
             PixelWriter pixelWriterI = image.getPixelWriter();
             blurredImages.add(image);
             List<RegionQuadTree> list = this.regionQuadTree.getNodesAtLevel(i);
             renderImageFromTree(list, pixelWriterI);
-            showTreeSquares(this.regionQuadTree, i); // show corresponding tree squares
         }
         playBlurredDiashow();
     }
@@ -240,12 +239,12 @@ public class ImagePaneController {
         for (int i = 0; i < regionQuadTree.getHeight(); i++) {
             System.out.println(i);
             int finalI = i;
-            KeyFrame keyFrame = new KeyFrame(Duration.millis(300 * (i + 1)),
+            KeyFrame keyFrame = new KeyFrame(Duration.millis(1000 * (i + 1)),
                     event -> {
                         treepane.getChildren().clear();
                         WritableImage image = (WritableImage) blurredImages.get(finalI);
                         compressedImageView.setImage(image);
-                        showTreeSquares(regionQuadTree, finalI);
+                        showTreeSquares(regionQuadTree, finalI, false);
                     });
             timeline.getKeyFrames().add(keyFrame);
         }
@@ -253,19 +252,19 @@ public class ImagePaneController {
         timeline.play();
     }
 
-    public void showTreeSquares(RegionQuadTree node, int level) {
+    public void showTreeSquares(RegionQuadTree node, int level, boolean encoding) {
         if (!node.isMixedNode()) {
-            drawSquares(node);
+            drawSquares(node, encoding);
         }
         if (level > 0) {
             if (node.getNorthEast() != null)
-                showTreeSquares((RegionQuadTree) node.getNorthEast(), level - 1);
+                showTreeSquares((RegionQuadTree) node.getNorthEast(), level - 1, encoding);
             if (node.getNorthWest() != null)
-                showTreeSquares((RegionQuadTree) node.getNorthWest(), level - 1);
+                showTreeSquares((RegionQuadTree) node.getNorthWest(), level - 1, encoding);
             if (node.getSouthWest() != null)
-                showTreeSquares((RegionQuadTree) node.getSouthWest(), level - 1);
+                showTreeSquares((RegionQuadTree) node.getSouthWest(), level - 1, encoding);
             if (node.getSouthEast() != null)
-                showTreeSquares((RegionQuadTree) node.getSouthEast(), level - 1);
+                showTreeSquares((RegionQuadTree) node.getSouthEast(), level - 1, encoding);
         }
     }
 

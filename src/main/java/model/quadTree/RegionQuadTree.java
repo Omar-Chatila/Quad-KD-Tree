@@ -121,10 +121,10 @@ public class RegionQuadTree extends QuadTree<Pixel> {
             if (node.isNodeLeaf() && !node.getElements().isEmpty()) {
                 leaves.add(node);
             } else {
-                gatherLeavesHelper((RegionQuadTree) node.northEast, leaves);
-                gatherLeavesHelper((RegionQuadTree) node.northWest, leaves);
-                gatherLeavesHelper((RegionQuadTree) node.southWest, leaves);
                 gatherLeavesHelper((RegionQuadTree) node.southEast, leaves);
+                gatherLeavesHelper((RegionQuadTree) node.southWest, leaves);
+                gatherLeavesHelper((RegionQuadTree) node.northWest, leaves);
+                gatherLeavesHelper((RegionQuadTree) node.northEast, leaves);
             }
         }
     }

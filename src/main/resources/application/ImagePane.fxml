@@ -33,7 +33,7 @@
                 </HBox>
             <VBox style="-fx-background-color: #1E3050;">
                <children>
-                        <Label fx:id="infoLabel" prefHeight="54.0" prefWidth="902.0" textFill="WHITE">
+                        <Label fx:id="infoLabel" prefHeight="54.0" prefWidth="1020.0" textFill="WHITE">
                             <font>
                                 <Font size="24.0" />
                             </font>
