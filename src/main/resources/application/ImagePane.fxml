@@ -13,11 +13,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ImagePaneController">
+<AnchorPane maxWidth="1024.0" prefHeight="641.0" prefWidth="963.0" stylesheets="@../imageStyle.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ImagePaneController">
     <children>
         <VBox>
             <children>
-                <HBox>
+                <HBox prefHeight="512.0" prefWidth="1026.0" spacing="20.0">
                     <children>
                   <StackPane>
                      <children>
@@ -35,24 +35,27 @@
                 </HBox>
             <VBox style="-fx-background-color: #1E3050;">
                <children>
-                  <HBox alignment="CENTER">
+                  <HBox alignment="CENTER" prefWidth="1045.0" style="-fx-border-color: white; -fx-border-width: 1 0 0 0;">
                      <children>
                               <Label fx:id="infoLabel" prefHeight="54.0" prefWidth="779.0" textFill="WHITE">
                                   <font>
                                       <Font size="24.0" />
                                   </font>
+                           <padding>
+                              <Insets left="-5.0" />
+                           </padding>
                               </Label>
-                        <ProgressBar fx:id="prograssBar" prefHeight="18.0" prefWidth="238.0" progress="0.0">
+                        <ProgressBar fx:id="progressBar" prefHeight="18.0" prefWidth="223.0" progress="0.0" visible="false">
                            <HBox.margin>
-                              <Insets top="-10.0" />
+                              <Insets />
                            </HBox.margin>
                         </ProgressBar>
                      </children>
                      <VBox.margin>
-                        <Insets right="5.0" />
+                        <Insets />
                      </VBox.margin>
                   </HBox>
-                  <HBox alignment="CENTER" prefHeight="53.0" prefWidth="1024.0" spacing="15.0">
+                  <HBox alignment="CENTER" prefHeight="73.0" prefWidth="1021.0" spacing="15.0" style="-fx-border-width: 1 0 0 0; -fx-border-color: white;">
                      <children>
                         <JFXButton fx:id="rotateButton" disable="true" prefHeight="53.0" prefWidth="89.0" style="-fx-background-color: white;" text="Rotate">
                            <font>
@@ -84,7 +87,7 @@
                                       <Font size="17.0" />
                                   </font>
                               </JFXButton>
-                        <JFXToggleButton fx:id="animationsToggle" prefHeight="62.0" prefWidth="162.0" selected="true" text="Animations" textFill="WHITE">
+                        <JFXToggleButton fx:id="animationsToggle" prefHeight="62.0" prefWidth="210.0" selected="true" text="Animations" textFill="WHITE">
                            <font>
                               <Font size="16.0" />
                            </font>

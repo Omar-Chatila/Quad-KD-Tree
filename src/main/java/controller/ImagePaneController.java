@@ -58,7 +58,7 @@ public class ImagePaneController {
     @FXML
     private JFXToggleButton animationsToggle;
     @FXML
-    private ProgressBar prograssBar;
+    private ProgressBar progressBar;
 
     private boolean isAnimated = true;
     private RegionQuadTree regionQuadTree;
@@ -80,17 +80,17 @@ public class ImagePaneController {
 
     @FXML
     private void initialize() {
-        animationsToggle.setOnAction(e -> this.isAnimated = !this.isAnimated);
+        animationsToggle.setOnAction(e -> {
+            this.isAnimated = !this.isAnimated;
+            if (timeline != null) timeline.stop();
+        });
         blurredImages = new ArrayList<>();
         pickImageButton.setOnAction(event -> pickImage());
         encodeButton.setOnAction(actionEvent -> encode());
         decodeButton.setOnAction(e -> decodeFromTree());
         blurButton.setOnAction(e -> blur());
         cropButton.setOnAction(e -> crop());
-        rotateButton.setOnAction(e -> {
-            this.regionQuadTree.rotate(regionQuadTree);
-            renderImageFromTree(regionQuadTree.gatherLeaves(), this.pixelWriter);
-        });
+        rotateButton.setOnAction(e -> rotateImage());
     }
 
     private void crop() {
@@ -146,6 +146,7 @@ public class ImagePaneController {
     }
 
     private void encode() {
+        progressBar.setProgress(0);
         treepane.getChildren().clear();
         compressedImageView.setImage(this.qtImage);
         // Get image from original image view
@@ -153,7 +154,8 @@ public class ImagePaneController {
 
         // Measure time taken to build quad tree
         double startTime = System.nanoTime();
-        this.regionQuadTree = new RegionQuadTree(image);
+        if (this.regionQuadTree == null)
+            this.regionQuadTree = new RegionQuadTree(image);
         this.regionQuadTree.buildTree();
         long elapsedTimeMillis = (long) ((System.nanoTime() - startTime) / 1E6);
 
@@ -162,12 +164,11 @@ public class ImagePaneController {
 
         // Compute pixel count and compression rate
         double pixelCount = this.regionQuadTree.countLeaves(this.regionQuadTree);
-        System.out.println("Pixelc: " + pixelCount);
         double compressionRatePercentage = (1 - pixelCount / (IMAGE_WIDTH * IMAGE_HEIGHT)) * 100;
 
         // Update info label with tree height, compression rate, and time taken
         infoLabel.setText(
-                String.format("Tree height: %s. Compression rate: %.0f%% | Encode: %s ms",
+                String.format("RQT-Height: %s. Compr. rate: %.0f%% | Encode: %s ms",
                         treeHeight,
                         compressionRatePercentage,
                         elapsedTimeMillis)
@@ -253,12 +254,13 @@ public class ImagePaneController {
     private void playSquaresAnimation() {
         Timeline timeline2 = new Timeline();
         int i = 1;
+        progressBar.setVisible(true);
         double increment = 1.0 / rectangles.size();
         while (!rectangles.isEmpty()) {
             Rectangle rectangle = rectangles.pop();
             KeyFrame keyFrame = new KeyFrame(Duration.millis(5 * (i++ + 1)),
                     event -> {
-                        prograssBar.setProgress(prograssBar.getProgress() + increment);
+                        progressBar.setProgress(progressBar.getProgress() + increment);
                         treepane.getChildren().add(rectangle);
                     });
             timeline2.getKeyFrames().add(keyFrame);
@@ -268,6 +270,7 @@ public class ImagePaneController {
             decodeButton.setDisable(false);
             blurButton.setDisable(false);
             cropButton.setDisable(false);
+            progressBar.setVisible(false);
         });
         timeline2.setCycleCount(1);
         timeline2.play();
@@ -322,5 +325,13 @@ public class ImagePaneController {
         }
 
         infoLabel.setText(infoLabel.getText() + " | Decode: " + (int) (time / 1E6) + "ms");
+    }
+
+    private void rotateImage() {
+        treepane.getChildren().clear();
+        this.regionQuadTree.rotate(regionQuadTree);
+        renderImageFromTree(regionQuadTree.gatherLeaves(), this.pixelWriter);
+        originalImageView.setImage(null);
+        showTreeSquares(this.regionQuadTree, 1000, true, false);
     }
 }
