@@ -24,12 +24,14 @@ import model.quadTree.RegionQuadTree;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ImagePaneController {
     public static int IMAGE_WIDTH = 512, IMAGE_HEIGHT = 512;
     public static double ASPECT_RATIO;
     int index = 0;
+    Stack<Rectangle> rectangles = new Stack<>();
     @FXML
     private ImageView compressedImageView;
     @FXML
@@ -55,6 +57,7 @@ public class ImagePaneController {
     private List<Image> blurredImages;
     private PixelWriter pixelWriter;
     private Timeline timeline;
+    private Timeline timeline2;
 
     static Rectangle setSelectionRect(Rectangle selectionRect, AtomicInteger[] width, AtomicInteger[] height, AtomicInteger[] x, AtomicInteger[] y, Pane cropPane) {
         width[0] = new AtomicInteger((int) selectionRect.getWidth());
@@ -78,12 +81,9 @@ public class ImagePaneController {
     }
 
     private void crop() {
-        treepane.getChildren().clear();
+        showTreeSquares(this.regionQuadTree, 100, true, false);
         if (timeline != null) timeline.stop();
-        if (qtImage != null)
-            compressedImageView.setImage(qtImage);
-        else
-            compressedImageView.setImage(originalImageView.getImage());
+        compressedImageView.setImage(originalImageView.getImage());
         cropPane.getChildren().clear();
         final Rectangle selectionRect = new Rectangle(10, 10, Color.TRANSPARENT);
         selectionRect.setStroke(Color.YELLOW);
@@ -161,7 +161,8 @@ public class ImagePaneController {
         );
 
         // Show overlay of squares in tree in originalImagePane
-        showTreeSquares(this.regionQuadTree, 1000, true);
+        showTreeSquares(this.regionQuadTree, 1000, true, true);
+        playSquaresAnimation();
         decodeButton.setDisable(false);
         blurButton.setDisable(false);
         cropButton.setDisable(false);
@@ -194,7 +195,7 @@ public class ImagePaneController {
         }
     }
 
-    private void drawSquares(RegionQuadTree node, boolean encoding) {
+    private void drawSquares(RegionQuadTree node, boolean encoding, boolean isAnimated) {
         Area square = node.getSquare();
         double width = square.getWidth();
         double height = square.getHeight();
@@ -204,8 +205,9 @@ public class ImagePaneController {
             Rectangle rectangle = new Rectangle(square.xMin() * widthRatio, square.yMin() * heightRatio, width * widthRatio, height * heightRatio);
             rectangle.setFill(Color.TRANSPARENT);
             rectangle.setStroke(Color.YELLOW);
-            rectangle.setStrokeWidth(0.7);
-            treepane.getChildren().add(rectangle);
+            rectangle.setStrokeWidth(encoding ? 1 : 0.7);
+            if (!isAnimated) treepane.getChildren().add(rectangle);
+            else rectangles.push(rectangle);
         }
     }
 
@@ -234,6 +236,22 @@ public class ImagePaneController {
         }
     }
 
+    private void playSquaresAnimation() {
+        this.timeline2 = new Timeline();
+        int i = 1;
+        while (!rectangles.isEmpty()) {
+            Rectangle rectangle = rectangles.pop();
+            KeyFrame keyFrame = new KeyFrame(Duration.millis(33 * (i++ + 1)),
+                    event -> {
+                        treepane.getChildren().add(rectangle);
+                    });
+            timeline2.getKeyFrames().add(keyFrame);
+        }
+
+        timeline2.setCycleCount(1);
+        timeline2.play();
+    }
+
     private void playBlurredDiashow() {
         this.timeline = new Timeline();
         for (int i = 0; i < regionQuadTree.getHeight(); i++) {
@@ -244,7 +262,7 @@ public class ImagePaneController {
                         treepane.getChildren().clear();
                         WritableImage image = (WritableImage) blurredImages.get(finalI);
                         compressedImageView.setImage(image);
-                        showTreeSquares(regionQuadTree, finalI, false);
+                        showTreeSquares(regionQuadTree, finalI, false, false);
                     });
             timeline.getKeyFrames().add(keyFrame);
         }
@@ -252,19 +270,19 @@ public class ImagePaneController {
         timeline.play();
     }
 
-    public void showTreeSquares(RegionQuadTree node, int level, boolean encoding) {
+    public void showTreeSquares(RegionQuadTree node, int level, boolean encoding, boolean isAnimated) {
         if (!node.isMixedNode()) {
-            drawSquares(node, encoding);
+            drawSquares(node, encoding, isAnimated);
         }
         if (level > 0) {
             if (node.getNorthEast() != null)
-                showTreeSquares((RegionQuadTree) node.getNorthEast(), level - 1, encoding);
+                showTreeSquares((RegionQuadTree) node.getNorthEast(), level - 1, encoding, isAnimated);
             if (node.getNorthWest() != null)
-                showTreeSquares((RegionQuadTree) node.getNorthWest(), level - 1, encoding);
+                showTreeSquares((RegionQuadTree) node.getNorthWest(), level - 1, encoding, isAnimated);
             if (node.getSouthWest() != null)
-                showTreeSquares((RegionQuadTree) node.getSouthWest(), level - 1, encoding);
+                showTreeSquares((RegionQuadTree) node.getSouthWest(), level - 1, encoding, isAnimated);
             if (node.getSouthEast() != null)
-                showTreeSquares((RegionQuadTree) node.getSouthEast(), level - 1, encoding);
+                showTreeSquares((RegionQuadTree) node.getSouthEast(), level - 1, encoding, isAnimated);
         }
     }
 
