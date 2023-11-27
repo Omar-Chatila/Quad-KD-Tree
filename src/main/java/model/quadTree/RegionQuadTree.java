@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 
 public class RegionQuadTree extends QuadTree<Pixel> {
-    private Color blendedColor;
 
     public RegionQuadTree(Area square, List<Pixel> elements) {
         super(square, elements);
@@ -104,7 +103,6 @@ public class RegionQuadTree extends QuadTree<Pixel> {
             rotate((RegionQuadTree) node.southEast);
         }
     }
-
 
     // sub Image contains more than one color ("grey node")
     public boolean isMixedNode() {

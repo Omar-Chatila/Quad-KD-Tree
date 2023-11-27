@@ -5,6 +5,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXToggleButton;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -151,36 +152,51 @@ public class ImagePaneController {
         compressedImageView.setImage(this.qtImage);
         // Get image from original image view
         Image image = originalImageView.getImage();
+        if (originalImageView.getImage().getHeight() * originalImageView.getImage().getWidth() > 500000) {
+            animationsToggle.fire();
+            animationsToggle.setDisable(true);
+        }
 
-        // Measure time taken to build quad tree
-        double startTime = System.nanoTime();
-        if (this.regionQuadTree == null)
-            this.regionQuadTree = new RegionQuadTree(image);
-        this.regionQuadTree.buildTree();
-        long elapsedTimeMillis = (long) ((System.nanoTime() - startTime) / 1E6);
+        Thread encodingThread = new Thread(() -> {
+            // Measure time taken to build quad tree
+            double startTime = System.nanoTime();
+            regionQuadTree = new RegionQuadTree(image);
+            regionQuadTree.buildTree();
+            long elapsedTimeMillis = (long) ((System.nanoTime() - startTime) / 1E6);
 
-        // Compute tree height (exclude root node)
-        int treeHeight = this.regionQuadTree.getHeight() - 1;
+            // Compute tree height (exclude root node)
+            int treeHeight = regionQuadTree.getHeight() - 1;
 
-        // Compute pixel count and compression rate
-        double pixelCount = this.regionQuadTree.countLeaves(this.regionQuadTree);
-        double compressionRatePercentage = (1 - pixelCount / (IMAGE_WIDTH * IMAGE_HEIGHT)) * 100;
+            // Compute pixel count and compression rate
+            double pixelCount = regionQuadTree.countLeaves(regionQuadTree);
+            double compressionRatePercentage = (1 - pixelCount / (IMAGE_WIDTH * IMAGE_HEIGHT)) * 100;
 
-        // Update info label with tree height, compression rate, and time taken
-        infoLabel.setText(
-                String.format("RQT-Height: %s. Compr. rate: %.0f%% | Encode: %s ms",
-                        treeHeight,
-                        compressionRatePercentage,
-                        elapsedTimeMillis)
-        );
+            // Update info labels and UI components in JavaFX application thread to avoid thread access issues.
+            Platform.runLater(() -> {
+                // Update info label with tree height, compression rate, and time taken
+                infoLabel.setText(
+                        String.format("RQT-Height: %s. Compr. rate: %.0f%% | Encode: %s ms",
+                                treeHeight,
+                                compressionRatePercentage,
+                                elapsedTimeMillis)
+                );
 
-        // Show overlay of squares in tree in originalImagePane
-        showTreeSquares(this.regionQuadTree, 1000, true, isAnimated);
-        playSquaresAnimation();
-        decodeButton.setDisable(false);
-        blurButton.setDisable(false);
-        cropButton.setDisable(false);
-        rotateButton.setDisable(false);
+                // Show overlay of squares in tree in originalImagePane
+                showTreeSquares(regionQuadTree, 1000, true, isAnimated);
+                playSquaresAnimation();
+
+                // Enable previously disabled buttons
+            });
+            decodeButton.setDisable(false);
+            blurButton.setDisable(false);
+            cropButton.setDisable(false);
+            rotateButton.setDisable(false);
+            animationsToggle.setDisable(false);
+        });
+        encodingThread.setDaemon(true);
+        encodingThread.start();
+        double aspect = 512 * image.getWidth() / image.getHeight();
+        System.out.println(512 * aspect);
     }
 
     private void pickImage() {
@@ -214,8 +230,9 @@ public class ImagePaneController {
         Area square = node.getSquare();
         double width = square.getWidth();
         double height = square.getHeight();
-        double widthRatio = 512.0 / IMAGE_WIDTH;
-        double heightRatio = 512.0 / (IMAGE_HEIGHT * ASPECT_RATIO);
+        double aspect = (double) (512 * IMAGE_WIDTH) / IMAGE_HEIGHT;
+        double widthRatio = (512.0 / IMAGE_WIDTH) * (aspect / 512.0);
+        double heightRatio = 512.0 / (IMAGE_HEIGHT);
         if (!encoding || width >= 6) {
             Rectangle rectangle = new Rectangle(square.xMin() * widthRatio, square.yMin() * heightRatio, width * widthRatio, height * heightRatio);
             rectangle.setFill(Color.TRANSPARENT);
@@ -329,9 +346,10 @@ public class ImagePaneController {
 
     private void rotateImage() {
         treepane.getChildren().clear();
-        this.regionQuadTree.rotate(regionQuadTree);
+        regionQuadTree.rotate(this.regionQuadTree);
+        System.out.println(regionQuadTree.getHeight());
         renderImageFromTree(regionQuadTree.gatherLeaves(), this.pixelWriter);
         originalImageView.setImage(null);
-        showTreeSquares(this.regionQuadTree, 1000, true, false);
+        showTreeSquares(regionQuadTree, 10000, true, false);
     }
 }

@@ -1,5 +1,6 @@
 package model.quadTree;
 
+import javafx.scene.paint.Color;
 import model.Tree;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ public abstract class QuadTree<T extends HasCoordinates> extends Tree<T> {
     protected Area square;
     protected List<T> elements;
     protected QuadTree<T> northEast, northWest, southEast, southWest;
+    protected Color blendedColor;
 
     public QuadTree(Area square, List<T> elements) {
         this.square = square;
