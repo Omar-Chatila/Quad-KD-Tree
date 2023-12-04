@@ -32,7 +32,7 @@ public class PointQuadTree extends QuadTree<Point> { //TODO: Query range, insert
 
     public void buildTree() {
         if (this.elements.size() > 1 && isDistinct(this.elements)) {
-            super.partition();
+            super.partition(false);
             this.northEast.buildTree();
             this.northWest.buildTree();
             this.southWest.buildTree();

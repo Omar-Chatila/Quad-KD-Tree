@@ -38,7 +38,7 @@ public class RegionQuadTree extends QuadTree<Pixel> {
     public void buildTree() {
         if (this.isMixedNode()) {
             this.blendedColor = getBlendedColor(this.elements);
-            super.partition();
+            super.partition(true);
             if (this.northEast != null)
                 this.northEast.buildTree();
             if (this.northWest != null)
