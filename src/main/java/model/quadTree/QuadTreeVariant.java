@@ -47,7 +47,7 @@ public abstract class QuadTreeVariant<G extends QuadTreeVariant.XYPoint> {
     };
 
     public static void main(String[] args) {
-        Point[] points = new Point[10000000];
+        Point[] points = new Point[2000000];
         PointRegionQuadTree<XYPoint> tree = new PointRegionQuadTree<>(0, 0, 10000, 10000);
         for (int i = 0; i < points.length; i++) {
             double x = Math.random() * 10000;
@@ -83,7 +83,7 @@ public abstract class QuadTreeVariant<G extends QuadTreeVariant.XYPoint> {
         System.out.println("time 2: " + time2);
 
         long time5 = System.nanoTime();
-        System.out.println(new HashSet<>(tree2.query(new Area(200, 2200, 200, 2200))).size());
+        tree2.query(new Area(200, 2200, 200, 2200));
         long time6 = (long) ((System.nanoTime() - time5) / 1E6);
 
         long time3 = System.nanoTime();

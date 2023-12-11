@@ -6,7 +6,6 @@ import model.quadTree.Area;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 
 import static util.ArrayListHelper.getMedian;
@@ -152,8 +151,8 @@ public class MyKDTree extends Tree<Point> {
     }
 
     // Returns all points contained by the Area queryRectangle
-    public HashSet<Point> query(Area queryRectangle) {
-        HashSet<Point> result = new HashSet<>();
+    public List<Point> query(Area queryRectangle) {
+        List<Point> result = new ArrayList<>();
         if (this.isLeaf()) {
             if (queryRectangle.containsPoint(this.points.get(0))) {
                 result.add(this.points.get(0));

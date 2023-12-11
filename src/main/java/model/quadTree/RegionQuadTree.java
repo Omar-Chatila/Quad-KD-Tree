@@ -5,7 +5,6 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 public class RegionQuadTree extends QuadTree<Pixel> {
@@ -30,7 +29,7 @@ public class RegionQuadTree extends QuadTree<Pixel> {
     }
 
     @Override
-    public HashSet<Pixel> query(Area queryRectangle) {
+    public List<Pixel> query(Area queryRectangle) {
         return null;
     }
 

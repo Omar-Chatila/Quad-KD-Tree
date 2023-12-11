@@ -2,31 +2,48 @@ package model.quadTree;
 
 import model.Point;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 
-public class PointQuadTree extends QuadTree<Point> { //TODO: Query range, insertion
+public class PointQuadTree extends QuadTree<Point> {
 
     private int capacity;
+    private boolean clearList;
 
     public PointQuadTree(List<Point> points, Area square) {
         super(square, points);
         this.capacity = 1;
+        this.clearList = true;
     }
 
     public PointQuadTree(Area square) {
         super(square);
         this.capacity = 1;
+        this.clearList = true;
     }
 
     public PointQuadTree(List<Point> points, Area square, int capacity) {
         this(points, square);
         this.capacity = capacity;
+        this.clearList = true;
     }
 
     public PointQuadTree(Area square, int capacity) {
         super(square);
         this.capacity = capacity;
+        this.clearList = true;
+    }
+
+    public PointQuadTree(List<Point> points, Area square, int capacity, boolean clearList) {
+        this(points, square);
+        this.capacity = capacity;
+        this.clearList = clearList;
+    }
+
+    public PointQuadTree(Area square, int capacity, boolean clearList) {
+        super(square);
+        this.capacity = capacity;
+        this.clearList = clearList;
     }
 
 
@@ -46,7 +63,7 @@ public class PointQuadTree extends QuadTree<Point> { //TODO: Query range, insert
 
     public void buildTree() {
         if (this.elements.size() > capacity) {
-            super.partition(false);
+            super.partition(this.clearList);
             this.northEast.buildTree();
             this.northWest.buildTree();
             this.southWest.buildTree();
@@ -55,15 +72,17 @@ public class PointQuadTree extends QuadTree<Point> { //TODO: Query range, insert
     }
 
     // Returns all points contained by the Area queryRectangle
-    public HashSet<Point> query(Area queryRectangle) {
-        HashSet<Point> result = new HashSet<>();
+    public List<Point> query(Area queryRectangle) {
+        if (!this.square.intersects(queryRectangle)) {
+            return new ArrayList<>();
+        }
+        List<Point> result = new ArrayList<>();
         if (this.isPointLeaf()) {
             for (Point p : this.elements) {
                 if (queryRectangle.containsPoint(p)) {
                     result.add(p);
                 }
             }
-
         } else if (queryRectangle.containsArea(this.square)) {
             result.addAll(this.reportSubTree());
         }

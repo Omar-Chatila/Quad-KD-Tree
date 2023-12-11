@@ -2,6 +2,8 @@ package benchmarks;
 
 import model.Point;
 import model.Tree;
+import model.kdTree.KDTreeEfficient;
+import model.kdTree.MyKDTree;
 import model.quadTree.Area;
 import model.quadTree.PointQuadTree;
 
@@ -14,6 +16,8 @@ public class QuadBenchMarks {
     static final Area benchArea = new Area(0, 1E5, 0, 1E5);
     static PointQuadTree pointQT;
     static PointQuadTree pointRegionQT;
+    static MyKDTree slowKD;
+    static KDTreeEfficient fastKD;
     static int testCycles = 10;
     static List<long[]> timesEach = new ArrayList<>();
     static List<Integer> pqtHeights = new ArrayList<>();
@@ -50,7 +54,10 @@ public class QuadBenchMarks {
 
             for (Area area : queryAreas) {
                 tree.query(area);
+                tree2.query(area);
+
                 tree.query(area);
+                tree2.query(area);
 
                 double average = 0;
                 double average2 = 0;
@@ -77,6 +84,62 @@ public class QuadBenchMarks {
             number = number * 10;
             System.out.println(step++ + "/" + 4);
         }
+        return setPlotData(record, record2);
+    }
+
+    static String KDbenchQuery() {
+        int number = 1000;
+        String[] record = new String[4];
+        String[] record2 = new String[4];
+        List<Area> queryAreas = queryAreas();
+        int step = 1;
+        for (int j = 0; j <= 3; j++) {
+            testCycles = 1;
+            Point[] data = setTestData(number);
+            MyKDTree slowtree = new MyKDTree(List.of(data), benchArea, 0);
+            KDTreeEfficient fasttree = new KDTreeEfficient(data, benchArea);
+
+
+            slowtree.buildTree();
+            fasttree.buildTree();
+
+
+            double timePerArea = 0;
+            double timePerArea2 = 0;
+
+            for (Area area : queryAreas) {
+                slowtree.query(area);
+                fasttree.query(area);
+
+                double average = 0;
+                double average2 = 0;
+
+                for (int i = 0; i < testCycles; i++) {
+                    long start = System.nanoTime();
+                    slowtree.query(area);
+                    double time = Math.round((System.nanoTime() - start) / 1E5);
+                    average += time;
+
+                    long start2 = System.nanoTime();
+                    fasttree.query(area);
+                    double time2 = Math.round((System.nanoTime() - start2) / 1E5);
+                    average2 += time2;
+                }
+                average = average / testCycles;
+                average2 = average2 / testCycles;
+
+                timePerArea += average;
+                timePerArea2 += average2;
+            }
+            record[j] = "(" + (2 + j) + "," + timePerArea + ")";
+            record2[j] = "(" + (2 + j) + "," + timePerArea2 + ")";
+            number = number * 10;
+            System.out.println(step++ + "/" + 5);
+        }
+        return setPlotData(record, record2);
+    }
+
+    private static String setPlotData(String[] record, String[] record2) {
         StringBuilder toPaste = new StringBuilder();
         for (String s : record) {
             toPaste.append(s);
@@ -90,16 +153,18 @@ public class QuadBenchMarks {
 
     private static List<Area> queryAreas() {
         List<Area> queryAreas = new ArrayList<>();
-        queryAreas.add(new Area(2000, 2050, 5000, 5050)); // Extremely tiny area
-        queryAreas.add(new Area(0, 500, 0, 500)); // Very small area
-        queryAreas.add(new Area(25000, 25500, 90000, 90200)); // Very small rectangular area
+        //queryAreas.add(new Area(2000, 2050, 5000, 5050)); // Extremely tiny area
+        // queryAreas.add(new Area(0, 500, 0, 500)); // Very small area
+        // queryAreas.add(new Area(25000, 25500, 90000, 90200)); // Very small rectangular area
         queryAreas.add(new Area(10000, 30000, 20000, 40000)); // Medium area
-        queryAreas.add(new Area(50000, 100000, 35000, 100000)); // Large area
+       /* queryAreas.add(new Area(50000, 100000, 35000, 100000)); // Large area
         queryAreas.add(new Area(8000, 50000, 12000, 70000)); // Rectangular area
         queryAreas.add(new Area(40000, 95000, 40000, 55000)); // Wide area
         queryAreas.add(new Area(80000, 82000, 2800, 90000)); // Tall area
         queryAreas.add(new Area(6000, 60000, 30000, 32000)); // Wide medium area
         queryAreas.add(new Area(60000, 60100, 500, 1000)); // Very small area
+
+        */
         return queryAreas;
     }
 
@@ -128,7 +193,48 @@ public class QuadBenchMarks {
         for (double entry : times) {
             result += entry;
         }
+        return (result / times.length);
+    }
 
+    static double slowKDBuildTimes(Point[] pointSet) {
+        // exclude first 3 results bcs of caching
+        slowKD = new MyKDTree(List.of(pointSet), benchArea, 0);
+        benchBuildTime(slowKD);
+        slowKD = new MyKDTree(List.of(pointSet), benchArea, 0);
+        benchBuildTime(slowKD);
+        slowKD = new MyKDTree(List.of(pointSet), benchArea, 0);
+        benchBuildTime(slowKD);
+        slowKD = new MyKDTree(List.of(pointSet), benchArea, 0);
+        double[] times = new double[testCycles];
+        for (int i = 0; i < times.length; i++) {
+            times[i] = benchBuildTime(slowKD);
+            slowKD = new MyKDTree(List.of(pointSet), benchArea, 0);
+        }
+        double result = 0;
+        for (double entry : times) {
+            result += entry;
+        }
+        return (result / times.length);
+    }
+
+    static double fastKDBuildTimes(Point[] pointSet) {
+        // exclude first 3 results bcs of caching
+        fastKD = new KDTreeEfficient(pointSet, benchArea);
+        benchBuildTime(fastKD);
+        fastKD = new KDTreeEfficient(pointSet, benchArea);
+        benchBuildTime(fastKD);
+        fastKD = new KDTreeEfficient(pointSet, benchArea);
+        benchBuildTime(fastKD);
+        fastKD = new KDTreeEfficient(pointSet, benchArea);
+        double[] times = new double[testCycles];
+        for (int i = 0; i < times.length; i++) {
+            times[i] = benchBuildTime(fastKD);
+            fastKD = new KDTreeEfficient(pointSet, benchArea);
+        }
+        double result = 0;
+        for (double entry : times) {
+            result += entry;
+        }
         return (result / times.length);
     }
 
@@ -160,11 +266,11 @@ public class QuadBenchMarks {
 
     public static void main(String[] args) throws IOException {
         byte[] bytes = new byte[32000];
-        /*System.out.println(getPRQTResults());
-        System.out.println(pqtHeights);
-        System.out.println(prqtHeights);
+        // System.out.println(getPRQTResults());
+        // System.out.println(pqtHeights);
+        //System.out.println(prqtHeights);
 
-         */
+        //System.out.println(KDbenchQuery());
         System.out.println(benchQuery());
     }
 
@@ -177,14 +283,27 @@ public class QuadBenchMarks {
             Point[] currentSet = (setTestData(number));
             pqttimes.add(pQTBuildTimes(currentSet));
             pqrttimes.add(prQTBuildTimes(currentSet));
-            System.out.println(pqttimes);
-            System.out.println(pqrttimes);
             number *= 10;
             System.out.println("(" + i + "/6)");
             //System.gc();
         }
-
         return getRecords(pqttimes, pqrttimes);
+    }
+
+    static String getKDResults() {
+        // Set pointSets
+        List<Double> kDtimes = new ArrayList<>();
+        List<Double> fastKDtimes = new ArrayList<>();
+        int number = 1000;
+        for (int i = 1; i <= 4; i++) {
+            Point[] currentSet = (setTestData(number));
+            kDtimes.add(slowKDBuildTimes(currentSet));
+            fastKDtimes.add(fastKDBuildTimes(currentSet));
+            number *= 10;
+            System.out.println("(" + i + "/4)");
+            //System.gc();
+        }
+        return getRecords(kDtimes, fastKDtimes);
     }
 
     private static String getRecords(List<Double> times, List<Double> times2) {
@@ -195,14 +314,6 @@ public class QuadBenchMarks {
             records2[i] = "(" + (3 + i) + ", " + times2.get(i) + ")";
         }
 
-        StringBuilder toPaste = new StringBuilder();
-        for (String s : records) {
-            toPaste.append(s);
-        }
-        toPaste.append("\n");
-        for (String s : records2) {
-            toPaste.append(s);
-        }
-        return toPaste.toString();
+        return setPlotData(records, records2);
     }
 }

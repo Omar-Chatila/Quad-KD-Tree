@@ -4,8 +4,8 @@ import model.Point;
 import model.Tree;
 import model.quadTree.Area;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 import static util.ArrayListHelper.median;
@@ -38,8 +38,8 @@ public class KDTreeEfficient extends Tree<Point> {
         this.xMedian = getXMedian();
     }
 
-    public HashSet<Point> query(Area queryRectangle) {
-        HashSet<Point> result = new HashSet<>();
+    public List<Point> query(Area queryRectangle) {
+        List<Point> result = new ArrayList<>();
         if (this.isLeaf()) {
             Point leafPoint = this.points[from];
             if (queryRectangle.containsPoint(leafPoint)) {

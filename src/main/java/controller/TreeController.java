@@ -29,7 +29,6 @@ import model.quadTree.Area;
 import model.quadTree.PointQuadTree;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -42,8 +41,9 @@ public class TreeController {
     private final List<Shape> selected = new ArrayList<>();
     public ScrollPane scrollPane;
     TreeMode mode = TreeMode.QUAD_TREE;
-    boolean colorized = false;
-    private PointQuadTree dynamicPointQuadTree = new PointQuadTree(rootArea, 4);
+    private boolean colorized = false;
+    private int leafCapacity = 1;
+    private PointQuadTree dynamicPointQuadTree = new PointQuadTree(rootArea, leafCapacity, false);
     private MyKDTree dynamicKDTree = new MyKDTree(rootArea);
     @FXML
     private JFXButton clearButton;
@@ -92,7 +92,7 @@ public class TreeController {
 
     private void benchQT() {
         long start1 = System.nanoTime();
-        dynamicPointQuadTree = new PointQuadTree(pointSet, rootArea, 4);
+        dynamicPointQuadTree = new PointQuadTree(pointSet, rootArea, leafCapacity, false);
         dynamicPointQuadTree.buildTree();
         long end = (System.nanoTime() - start1) / 1000;
         updateLabel(dynamicPointQuadTree.getElements().size(), dynamicPointQuadTree.getHeight(), dynamicPointQuadTree.size(dynamicPointQuadTree), end, "µs", TreeMode.QUAD_TREE);
@@ -182,7 +182,7 @@ public class TreeController {
         long start = System.nanoTime();
         Area testArea = new Area(0, 4000, 0, 4000);
         if (mode == TreeMode.QUAD_TREE) {
-            PointQuadTree pointQuadTree = new PointQuadTree(testList, testArea);
+            PointQuadTree pointQuadTree = new PointQuadTree(testList, testArea, leafCapacity, false);
             pointQuadTree.buildTree();
             long time = (System.nanoTime() - start) / 1000000;
             int height = pointQuadTree.getHeight();
@@ -210,7 +210,7 @@ public class TreeController {
         drawingPane.getChildren().clear();
         pointsLabel.clear();
         treePane.getChildren().clear();
-        dynamicPointQuadTree = new PointQuadTree(rootArea, 4);
+        dynamicPointQuadTree = new PointQuadTree(rootArea, leafCapacity, false);
         dynamicKDTree = new MyKDTree(rootArea);
         statsLabel.setText("");
         removeRectangles();
@@ -253,6 +253,7 @@ public class TreeController {
     }
 
     public void displayQuadTree(double x1, double y1, double x, double y, PointQuadTree node, int height, Color color, int level) {
+        if (node == null) node = new PointQuadTree(pointSet, rootArea, 1, false);
         Line line = new Line(x1, y1 + 5, x, y);
         treePane.getChildren().add(line);
         if (node.isPointLeaf()) {
@@ -422,7 +423,7 @@ public class TreeController {
 
     private void performQuery(Rectangle rectangle, Rectangle selectionRect) {
         Area queryArea = new Area(rectangle.getX(), rectangle.getX() + rectangle.getWidth(), PANE_HEIGHT - rectangle.getY() - rectangle.getHeight(), PANE_HEIGHT - rectangle.getY());
-        HashSet<Point> queried;
+        List<Point> queried;
         if (mode == TreeMode.KD_TREE) {
             queried = dynamicKDTree.query(queryArea);
         } else {

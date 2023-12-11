@@ -17,7 +17,6 @@ public record Area(double xMin, double xMax, double yMin, double yMax) {
     }
 
     public Area rotate90degrees() {
-
         return new Area(yMin, yMax, xMin, xMax);
     }
 
@@ -38,7 +37,7 @@ public record Area(double xMin, double xMax, double yMin, double yMax) {
     }
 
     public boolean intersects(Area other) {
-        return other != null && this.xMin < other.xMax && this.xMax > other.xMin && this.yMax > other.yMin && this.yMin < other.yMax;
+        return this.xMin < other.xMax && this.xMax > other.xMin && this.yMax > other.yMin && this.yMin < other.yMax;
     }
 
     public boolean containsArea(Area other) {
