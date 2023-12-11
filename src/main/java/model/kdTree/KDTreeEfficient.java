@@ -10,7 +10,7 @@ import java.util.List;
 
 import static util.ArrayListHelper.median;
 
-public class KDTreeEfficient extends Tree {
+public class KDTreeEfficient extends Tree<Point> {
     private final Point[] points;
     private final Area area;
     private final int from;

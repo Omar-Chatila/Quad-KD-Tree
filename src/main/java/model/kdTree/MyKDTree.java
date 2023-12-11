@@ -12,7 +12,7 @@ import java.util.List;
 import static util.ArrayListHelper.getMedian;
 import static util.ArrayListHelper.splitArrayList;
 
-public class MyKDTree extends Tree {
+public class MyKDTree extends Tree<Point> {
     private final List<MyKDTree> nodeList = new ArrayList<>();
     private final Area area;
     private final int level;

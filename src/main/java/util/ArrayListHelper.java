@@ -7,7 +7,7 @@ import java.util.List;
 
 public class ArrayListHelper {
     public static <Point> List<ArrayList<Point>> splitArrayList(List<Point> originalList) {
-        int midIndex = originalList.size() / 2;
+        int midIndex = (originalList.size() + 1) / 2;
         ArrayList<Point> sublist1 = new ArrayList<>(originalList.subList(0, midIndex));
         ArrayList<Point> sublist2 = new ArrayList<>(originalList.subList(midIndex, originalList.size()));
         ArrayList<ArrayList<Point>> result = new ArrayList<>();

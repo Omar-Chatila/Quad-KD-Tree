@@ -5,20 +5,34 @@ import model.Point;
 import java.util.HashSet;
 import java.util.List;
 
-import static util.ArrayListHelper.isDistinct;
-
 public class PointQuadTree extends QuadTree<Point> { //TODO: Query range, insertion
+
+    private int capacity;
+
     public PointQuadTree(List<Point> points, Area square) {
         super(square, points);
+        this.capacity = 1;
     }
 
     public PointQuadTree(Area square) {
         super(square);
+        this.capacity = 1;
     }
+
+    public PointQuadTree(List<Point> points, Area square, int capacity) {
+        this(points, square);
+        this.capacity = capacity;
+    }
+
+    public PointQuadTree(Area square, int capacity) {
+        super(square);
+        this.capacity = capacity;
+    }
+
 
     @Override
     protected QuadTree<Point> createSubtree(List<Point> elements, Area quadrant) {
-        return new PointQuadTree(elements, quadrant);
+        return new PointQuadTree(elements, quadrant, capacity);
     }
 
     @Override
@@ -27,11 +41,11 @@ public class PointQuadTree extends QuadTree<Point> { //TODO: Query range, insert
     }
 
     public boolean isPointLeaf() {
-        return this.elements.size() == 1;
+        return this.elements.size() <= capacity && !this.elements.isEmpty();
     }
 
     public void buildTree() {
-        if (this.elements.size() > 1 && isDistinct(this.elements)) {
+        if (this.elements.size() > capacity) {
             super.partition(false);
             this.northEast.buildTree();
             this.northWest.buildTree();
@@ -44,9 +58,12 @@ public class PointQuadTree extends QuadTree<Point> { //TODO: Query range, insert
     public HashSet<Point> query(Area queryRectangle) {
         HashSet<Point> result = new HashSet<>();
         if (this.isPointLeaf()) {
-            if (queryRectangle.containsPoint(this.elements.get(0))) {
-                result.addAll(this.elements);
+            for (Point p : this.elements) {
+                if (queryRectangle.containsPoint(p)) {
+                    result.add(p);
+                }
             }
+
         } else if (queryRectangle.containsArea(this.square)) {
             result.addAll(this.reportSubTree());
         }

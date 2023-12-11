@@ -77,7 +77,7 @@ public class QueryBenchmark {
     }
 
     // Creates 3 Query threads based on tree type
-    private static Runnable runQuery(Tree tree, Area queryArea, CountDownLatch latch) {
+    private static Runnable runQuery(Tree<Point> tree, Area queryArea, CountDownLatch latch) {
         String type = tree.getClass().toString().substring(tree.getClass().toString().lastIndexOf('.') + 1);
         return () -> {
             double average = 0;
