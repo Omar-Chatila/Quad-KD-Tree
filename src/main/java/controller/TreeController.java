@@ -262,13 +262,16 @@ public class TreeController {
             treePane.getChildren().add(rectangle);
         } else {
             Circle circle = new Circle(x, y, 10, color);
-            if (!node.isNodeLeaf()) {
+            if (!node.isNodeLeaf() && !stepByStep.isSelected()) {
                 drawSplitLines(node);
+            } else {
+                drawQuadrants(node);
             }
             treePane.getChildren().add(circle);
         }
         if (node.getHeight() == 1) {
             Rectangle rectangle2 = generateRectangle(node, color);
+            drawQuadrants(node);
             rectanglePane.getChildren().add(rectangle2);
         }
         int h = node.getHeight();
@@ -307,12 +310,21 @@ public class TreeController {
         return rectangle;
     }
 
+    private void drawQuadrants(PointQuadTree node) {
+        Area area = node.getSquare();
+        Rectangle rectangle = new Rectangle(area.xMin(), PANE_HEIGHT - area.yMax(), area.getWidth(), area.getHeight());
+        rectangle.setStroke(Color.BLACK);
+        rectangle.setFill(Color.TRANSPARENT);
+        drawingPane.getChildren().add(rectangle);
+    }
+
 
     private void drawSplitLines(PointQuadTree node) {
         Area area = node.getSquare();
         Line horizontalSplit = new Line(area.xMin(), PANE_HEIGHT - area.yMid(), area.xMax(), PANE_HEIGHT - area.yMid());
         Line verticalSplit = new Line(area.xMid(), PANE_HEIGHT - area.yMin(), area.xMid(), PANE_HEIGHT - area.yMax());
         drawingPane.getChildren().addAll(horizontalSplit, verticalSplit);
+
     }
 
     private void addPointToGui(double x, double y, Point p) {
