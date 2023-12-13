@@ -236,7 +236,7 @@ public class ImagePaneController {
         if (!encoding || width >= 6) {
             Rectangle rectangle = new Rectangle(square.xMin() * widthRatio, square.yMin() * heightRatio, width * widthRatio, height * heightRatio);
             rectangle.setFill(Color.TRANSPARENT);
-            rectangle.setStroke(Color.YELLOW);
+            rectangle.setStroke(Color.DARKVIOLET);
             rectangle.setStrokeWidth(encoding ? 1 : 0.7);
             if (!isAnimated) treepane.getChildren().add(rectangle);
             else rectangles.push(rectangle);

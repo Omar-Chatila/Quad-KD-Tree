@@ -23,6 +23,7 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 import jfxtras.labs.util.event.MouseControlUtil;
 import model.Point;
+import model.kdTree.KDTreeEfficient;
 import model.kdTree.MyKDTree;
 import model.kdTree.SplitLine;
 import model.quadTree.Area;
@@ -102,6 +103,7 @@ public class TreeController {
     void toggleMode() {
         if (stepByStep.isSelected()) level = 0;
         removeLines();
+        removeSquares();
         treePane.getChildren().clear();
         if (mode == TreeMode.KD_TREE) {
             toggleButton.setText("QuadTree");
@@ -178,10 +180,11 @@ public class TreeController {
         int pointsCount = (int) 1E6;
         List<Point> testList = new ArrayList<>();
         for (int i = 0; i < pointsCount; i++) {
-            testList.add(new Point(Math.random() * 4000, Math.random() * 4000));
+            testList.add(new Point(Math.random() * 400000, Math.random() * 400000));
         }
+        Point[] points = testList.toArray(new Point[0]);
         long start = System.nanoTime();
-        Area testArea = new Area(0, 4000, 0, 4000);
+        Area testArea = new Area(0, 400000, 0, 400000);
         if (mode == TreeMode.QUAD_TREE) {
             PointQuadTree pointQuadTree = new PointQuadTree(testList, testArea, leafCapacity, false);
             pointQuadTree.buildTree();
@@ -190,7 +193,7 @@ public class TreeController {
             int number = pointQuadTree.size(pointQuadTree);
             updateLabel(pointsCount, height, number, time, "ms", mode);
         } else {
-            MyKDTree kdTree = new MyKDTree(testList, testArea, 0);
+            KDTreeEfficient kdTree = new KDTreeEfficient(points, testArea);
             kdTree.buildTree();
             long time = (System.nanoTime() - start) / 1000000;
             int height = kdTree.getHeight();
@@ -328,10 +331,10 @@ public class TreeController {
     }
 
     private void addPointToGui(double x, double y, Point p) {
-        Circle circle = new Circle(x, y, 2, Color.BLACK);
+        Circle circle = new Circle(x, y, 4, Color.BLACK);
         circle.setId("(" + (int) x + ", " + (int) (PANE_HEIGHT - y) + ")");
         circle.setOnMouseEntered(mouseEvent -> drawingPane.getChildren().add(new Text(x + 5, y - 5, circle.getId())));
-        circle.setOnMouseExited(mouseEvent -> drawingPane.getChildren().removeIf((node) -> node instanceof Text));
+        //circle.setOnMouseExited(mouseEvent -> drawingPane.getChildren().removeIf((node) -> node instanceof Text));
         grid[(int) x][(int) (PANE_HEIGHT - y)] = circle;
         drawingPane.getChildren().add(circle);
         if (!pointSet.contains(p)) {
@@ -349,7 +352,7 @@ public class TreeController {
             createLeaf(x, y, node);
         }
         int h = node.getHeight();
-        double delta = (Math.pow(Math.E, h / 1.9 - 1) * 20 + 20);
+        double delta = (Math.pow(Math.E, h / 1.8 - 1) * 20 + 30);
         if (node.getLeftChild() != null && level > 0)
             drawKDRecursive(x, y, x - delta, y + (1 + h / 8.0) * 60, node.getLeftChild(), height - 1, level - 1);
         if (node.getRightChild() != null && level > 0)
@@ -387,6 +390,10 @@ public class TreeController {
 
     private void removeLines() {
         drawingPane.getChildren().removeIf(node -> node instanceof Line);
+    }
+
+    private void removeSquares() {
+        drawingPane.getChildren().removeIf(node -> node instanceof Rectangle);
     }
 
     private void removeRectangles() {
