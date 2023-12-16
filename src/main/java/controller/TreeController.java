@@ -23,6 +23,7 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 import jfxtras.labs.util.event.MouseControlUtil;
 import model.Point;
+import model.Tree;
 import model.kdTree.KDTreeEfficient;
 import model.kdTree.MyKDTree;
 import model.kdTree.SplitLine;
@@ -53,6 +54,8 @@ public class TreeController {
     @FXML
     private JFXTextArea pointsLabel;
     @FXML
+    private JFXCheckBox isDemo;
+    @FXML
     private Pane rectanglePane;
     @FXML
     private Label statsLabel;
@@ -64,6 +67,7 @@ public class TreeController {
     private JFXCheckBox stepByStep;
     private boolean isDrawMode = true;
     private String KDBench, QTBench;
+    private boolean isDemoMode;
 
     @FXML
     private void initialize() {
@@ -72,6 +76,7 @@ public class TreeController {
         rectanglePane.toBack();
         drawingPane.setStyle("-fx-background-color: transparent");
         rectanglePane.setStyle("-fx-background-color: white");
+        isDemo.setOnAction(e -> isDemoMode = !isDemoMode);
         initQuery();
     }
 
@@ -96,7 +101,7 @@ public class TreeController {
         dynamicPointQuadTree = new PointQuadTree(pointSet, rootArea, leafCapacity, false);
         dynamicPointQuadTree.buildTree();
         long end = (System.nanoTime() - start1) / 1000;
-        updateLabel(dynamicPointQuadTree.getElements().size(), dynamicPointQuadTree.getHeight(), dynamicPointQuadTree.size(dynamicPointQuadTree), end, "µs", TreeMode.QUAD_TREE);
+        updateLabel(dynamicPointQuadTree.getElements().size(), dynamicPointQuadTree.getHeight() - 1, dynamicPointQuadTree.size(dynamicPointQuadTree), end, "µs", TreeMode.QUAD_TREE);
     }
 
     @FXML
@@ -137,11 +142,12 @@ public class TreeController {
         dynamicKDTree.buildTree();
         System.out.println(dynamicKDTree.getHeight());
         long end = (System.nanoTime() - start1) / 1000;
-        updateLabel(dynamicKDTree.getPoints().size(), dynamicKDTree.getHeight(), dynamicKDTree.size(dynamicKDTree), end, "µs", TreeMode.KD_TREE);
+        updateLabel(dynamicKDTree.getPoints().size(), dynamicKDTree.getHeight() - 1, dynamicKDTree.size(dynamicKDTree), end, "µs", TreeMode.KD_TREE);
     }
 
     @FXML
     void drawPoint(MouseEvent event) {
+        if (isDemoMode) removeSquares();
         if (this.isDrawMode) {
             double x = event.getX();
             double y = event.getY();
@@ -152,10 +158,19 @@ public class TreeController {
     @FXML
     void randomize() {
         clearPane();
-        for (int i = 0; i < 100; i++) {
-            double x = Math.random() * PANE_WIDTH;
-            double y = Math.random() * PANE_HEIGHT;
-            addPointToGui(x, y, new Point(x, y));
+        if (isDemoMode) {
+            Point[] demoPoints = {new Point(61.2, 280.4), new Point(182, 366.8), new Point(198.8, 356.4),
+                    new Point(340.4, 202), new Point(206.8, 253.2), new Point(109.2, 218.8), new Point(54.8, 103.6),
+                    new Point(261.2, 40.4)};
+            for (Point p : demoPoints) {
+                addPointToGui(p.x(), p.y(), p);
+            }
+        } else {
+            for (int i = 0; i < 100; i++) {
+                double x = Math.random() * PANE_WIDTH;
+                double y = Math.random() * PANE_HEIGHT;
+                addPointToGui(x, y, new Point(x, y));
+            }
         }
     }
 
@@ -191,14 +206,14 @@ public class TreeController {
             long time = (System.nanoTime() - start) / 1000000;
             int height = pointQuadTree.getHeight();
             int number = pointQuadTree.size(pointQuadTree);
-            updateLabel(pointsCount, height, number, time, "ms", mode);
+            updateLabel(pointsCount, height - 1, number, time, "ms", mode);
         } else {
             KDTreeEfficient kdTree = new KDTreeEfficient(points, testArea);
             kdTree.buildTree();
             long time = (System.nanoTime() - start) / 1000000;
             int height = kdTree.getHeight();
             int number = kdTree.size(kdTree);
-            updateLabel(pointsCount, height, number, time, "ms", mode);
+            updateLabel(pointsCount, height - 1, number, time, "ms", mode);
         }
     }
 
@@ -278,7 +293,7 @@ public class TreeController {
             rectanglePane.getChildren().add(rectangle2);
         }
         int h = node.getHeight();
-        double delta = (Math.pow(2.9, h) * 1.2 + 20);
+        double delta = (Math.pow(1.9, h) * 3 + 30);
         if (node.getNorthEast() != null && level > 0)
             displayQuadTree(x, y, x - 1.5 * delta, y + (1 + h / 8.0) * 60, (PointQuadTree) node.getNorthEast(), height - 1, Color.ORANGE, level - 1);
         if (node.getNorthWest() != null && level > 0)
@@ -333,7 +348,10 @@ public class TreeController {
     private void addPointToGui(double x, double y, Point p) {
         Circle circle = new Circle(x, y, 4, Color.BLACK);
         circle.setId("(" + (int) x + ", " + (int) (PANE_HEIGHT - y) + ")");
-        circle.setOnMouseEntered(mouseEvent -> drawingPane.getChildren().add(new Text(x + 5, y - 5, circle.getId())));
+        if (isDemoMode)
+            drawingPane.getChildren().add(new Text(x + 3, y, circle.getId()));
+        else
+            circle.setOnMouseEntered(mouseEvent -> drawingPane.getChildren().add(new Text(x + 5, y - 5, circle.getId())));
         //circle.setOnMouseExited(mouseEvent -> drawingPane.getChildren().removeIf((node) -> node instanceof Text));
         grid[(int) x][(int) (PANE_HEIGHT - y)] = circle;
         drawingPane.getChildren().add(circle);
@@ -349,10 +367,15 @@ public class TreeController {
         if (!node.isLeaf()) {
             createInnerNode(x, y, node);
         } else {
+            Rectangle rectangle = generateRectangle(node, Color.TRANSPARENT);
+            rectangle.setStroke(Color.BLACK);
+            rectangle.setStrokeWidth(1.5);
+            drawingPane.getChildren().add(rectangle);
             createLeaf(x, y, node);
         }
         int h = node.getHeight();
-        double delta = (Math.pow(Math.E, h / 1.8 - 1) * 20 + 30);
+        double delta = (Math.pow(2.8, h - 1) * 5 + 50);
+        if (h == 1) delta = 30;
         if (node.getLeftChild() != null && level > 0)
             drawKDRecursive(x, y, x - delta, y + (1 + h / 8.0) * 60, node.getLeftChild(), height - 1, level - 1);
         if (node.getRightChild() != null && level > 0)
@@ -361,11 +384,15 @@ public class TreeController {
 
     private void createInnerNode(double x, double y, MyKDTree node) {
         Circle circle = new Circle(x, y, 10);
-        circle.setFill(node.getLevel() % 2 == 0 ? Color.FORESTGREEN : Color.BLUEVIOLET);
+        Color c = node.getLevel() % 2 == 0 ? Color.FORESTGREEN : Color.BLUEVIOLET;
+        circle.setFill(c);
         SplitLine sp = node.getSplitLine();
         Line splitline = new Line(sp.fromX(), PANE_HEIGHT - sp.fromY(), sp.toX(), PANE_HEIGHT - sp.toY());
         Text text = new Text(x + 20, y, (node.getLevel() % 2 == 0 ? "x = " + Math.round(sp.fromX() * 10) / 10.0 : "y = " + Math.round(sp.fromY() * 10.0) / 10.0));
-        drawingPane.getChildren().add(splitline);
+        Rectangle rectangle = generateRectangle(node, Color.TRANSPARENT);
+        rectangle.setStroke(Color.BLACK);
+        rectangle.setStrokeWidth(1.5);
+        drawingPane.getChildren().add(rectangle);
         treePane.getChildren().addAll(circle, text);
     }
 
@@ -378,10 +405,13 @@ public class TreeController {
         treePane.getChildren().add(text);
     }
 
-    private Rectangle generateRectangle(PointQuadTree node, Color color) {
-        Area square = node.getSquare();
-        double size = square.xMax() - square.xMin();
-        Rectangle rectangle2 = new Rectangle(square.xMin(), 400 - square.yMax(), size, size);
+    private Rectangle generateRectangle(Tree<Point> node, Color color) {
+        Area square;
+        if (mode == TreeMode.QUAD_TREE) square = ((PointQuadTree) node).getSquare();
+        else square = ((MyKDTree) node).getArea();
+        double width = square.xMax() - square.xMin();
+        double height = square.yMax() - square.yMin();
+        Rectangle rectangle2 = new Rectangle(square.xMin(), 400 - square.yMax(), width, height);
         rectangle2.setOpacity(0.5);
         rectangle2.setFill(color);
         rectangle2.toBack();

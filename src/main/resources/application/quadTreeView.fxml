@@ -73,9 +73,14 @@
                     <Font size="14.0" />
                 </font>
             </JFXRadioButton>
+         <JFXCheckBox fx:id="isDemo" onAction="#setSteps" text="Demo" textFill="WHITE" unCheckedColor="#cdcdcd">
+            <HBox.margin>
+               <Insets />
+            </HBox.margin>
+         </JFXCheckBox>
          <JFXCheckBox fx:id="stepByStep" onAction="#setSteps" text="Step-by-step" textFill="WHITE" unCheckedColor="#cdcdcd">
             <HBox.margin>
-               <Insets left="90.0" />
+               <Insets />
             </HBox.margin>
          </JFXCheckBox>
         </HBox>

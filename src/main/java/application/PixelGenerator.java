@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import model.quadTree.Pixel;
 import model.quadTree.RegionQuadTree;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,7 +16,7 @@ public class PixelGenerator implements Runnable {
 
     public PixelGenerator(PixelWriter pw, List<RegionQuadTree> regionQuadTrees) {
         this.writer = Objects.requireNonNull(pw, "Writer cannot be null");
-        // Collections.shuffle(regionQuadTrees);
+        Collections.shuffle(regionQuadTrees);
         this.regionQuadTrees = regionQuadTrees;
     }
 

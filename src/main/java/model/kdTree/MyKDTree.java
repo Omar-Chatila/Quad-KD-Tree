@@ -150,6 +150,10 @@ public class MyKDTree extends Tree<Point> {
         setSplitLines();
     }
 
+    public Area getArea() {
+        return area;
+    }
+
     // Returns all points contained by the Area queryRectangle
     public List<Point> query(Area queryRectangle) {
         List<Point> result = new ArrayList<>();
