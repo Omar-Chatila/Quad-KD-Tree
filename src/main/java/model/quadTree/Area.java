@@ -60,6 +60,10 @@ public record Area(double xMin, double xMax, double yMin, double yMax) {
         return (point.x() >= xMin && point.y() >= yMin && point.x() <= xMax && point.y() <= yMax);
     }
 
+    public Point center() {
+        return new Point(xMid(), yMid());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -76,5 +80,11 @@ public record Area(double xMin, double xMax, double yMin, double yMax) {
     @Override
     public String toString() {
         return "[" + (int) xMin + ":" + (int) xMax + "] ⨯ [" + (int) yMin + ":" + (int) yMax + ']';
+    }
+
+    public double sqDistanceFrom(HasCoordinates point) {
+        double dx = Math.max(Math.max(xMin - point.x(), 0), point.x() - xMax);
+        double dy = Math.max(Math.max(yMin - point.y(), 0), point.y() - yMax);
+        return dx * dx + dy * dy;
     }
 }

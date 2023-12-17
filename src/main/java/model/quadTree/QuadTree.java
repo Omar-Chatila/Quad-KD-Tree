@@ -4,13 +4,15 @@ import javafx.scene.paint.Color;
 import model.Tree;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.PriorityQueue;
 
 public abstract class QuadTree<T extends HasCoordinates> extends Tree<T> {
     protected Area square;
     protected List<T> elements;
     protected QuadTree<T> northEast, northWest, southEast, southWest;
-    protected Color blendedColor;
+    protected Color blendedColor;   // for region QT only
 
     public QuadTree(Area square, List<T> elements) {
         this.square = square;
@@ -46,6 +48,44 @@ public abstract class QuadTree<T extends HasCoordinates> extends Tree<T> {
         return square;
     }
 
+    public boolean isNodeLeaf() {
+        return this.southEast == null && this.southWest == null && this.northEast == null && this.northWest == null;
+    }
+
+    public List<T> kNearestNeighbors(T queryPoint, int k) {
+        PriorityQueue<QuadTree<T>> queue = new PriorityQueue<>(Comparator.comparingDouble(qt -> qt.square.sqDistanceFrom(queryPoint)));
+        List<T> result = new ArrayList<>();
+        kNearestNeighborsHelper(this, queryPoint, k, queue, result);
+        return result;
+    }
+
+    private void kNearestNeighborsHelper(QuadTree<T> node, T queryPoint, int k, PriorityQueue<QuadTree<T>> queue, List<T> result) {
+        if (node == null) {
+            return;
+        }
+
+        if (node.isNodeLeaf()) {
+            for (T element : node.getElements()) {
+                element.distance(queryPoint);
+                queue.offer(node);
+            }
+        } else {
+            queue.offer(node.getNorthEast());
+            queue.offer(node.getNorthWest());
+            queue.offer(node.getSouthEast());
+            queue.offer(node.getSouthWest());
+        }
+
+        while (!queue.isEmpty() && result.size() < k) {
+            QuadTree<T> current = queue.poll();
+            if (current.isNodeLeaf()) {
+                result.addAll(current.getElements());
+            } else {
+                kNearestNeighborsHelper(current, queryPoint, k, queue, result);
+            }
+        }
+    }
+
     public int getHeight() {
         if (isNodeLeaf()) {
             return 1;
@@ -56,10 +96,6 @@ public abstract class QuadTree<T extends HasCoordinates> extends Tree<T> {
         int h4 = this.southEast.getHeight();
         int maxHeight = Math.max(Math.max(h1, h2), Math.max(h3, h4));
         return maxHeight + 1;
-    }
-
-    public boolean isNodeLeaf() {
-        return this.southEast == null && this.southWest == null && this.northEast == null && this.northWest == null;
     }
 
     protected abstract QuadTree<T> createSubtree(List<T> elements, Area quadrant);
@@ -100,5 +136,36 @@ public abstract class QuadTree<T extends HasCoordinates> extends Tree<T> {
             return 1 + size(node.northEast) + size(node.northWest) + size(node.southEast) + size(node.southWest);
         }
         return 0;
+    }
+
+    @Override
+    public String toString() {
+        return "QuadTree{" +
+                "square=" + square.toString() +
+                ", elements=" + elements +
+                '}';
+    }
+
+    public class KNearestResult {
+        List<T> found;
+        double furthestDistance;
+
+        public KNearestResult(List<T> found, double furthestDistance) {
+            this.found = found;
+            this.furthestDistance = furthestDistance;
+        }
+
+        public List<T> getFound() {
+            return found;
+        }
+
+        public double getFurthestDistance() {
+            return furthestDistance;
+        }
+
+        @Override
+        public String toString() {
+            return furthestDistance + ": " + found;
+        }
     }
 }

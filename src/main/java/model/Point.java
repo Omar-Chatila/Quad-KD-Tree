@@ -31,4 +31,11 @@ public record Point(String id, double x, double y) implements HasCoordinates {
         Point point = (Point) o;
         return Double.compare(x, point.x) == 0 && Double.compare(y, point.y) == 0;
     }
+
+    @Override
+    public double distance(HasCoordinates searchPoint) {
+        double dx = searchPoint.x() - x;
+        double dy = searchPoint.y() - y;
+        return dx * dx + dy * dy;
+    }
 }

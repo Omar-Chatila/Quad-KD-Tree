@@ -71,6 +71,7 @@ public class PointQuadTree extends QuadTree<Point> {
         }
     }
 
+
     // Returns all points contained by the Area queryRectangle
     public List<Point> query(Area queryRectangle) {
         if (!this.square.intersects(queryRectangle)) {

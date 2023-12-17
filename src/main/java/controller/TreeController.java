@@ -35,7 +35,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TreeController {
-    public static final double PANE_WIDTH = 400, PANE_HEIGHT = 400;
+    public static final double PANE_WIDTH = 400;
+    public static final double PANE_HEIGHT = 400;
     static int level = 100;
     private final List<Point> pointSet = new ArrayList<>();
     private final Area rootArea = new Area(0, PANE_WIDTH, 0, PANE_HEIGHT);
@@ -65,6 +66,8 @@ public class TreeController {
     private Pane treePane;
     @FXML
     private JFXCheckBox stepByStep;
+    @FXML
+    private JFXButton nnsButton;
     private boolean isDrawMode = true;
     private String KDBench, QTBench;
     private boolean isDemoMode;
@@ -78,6 +81,33 @@ public class TreeController {
         rectanglePane.setStyle("-fx-background-color: white");
         isDemo.setOnAction(e -> isDemoMode = !isDemoMode);
         initQuery();
+    }
+
+    @FXML
+    void nearestNeighbor() {
+        statsLabel.setText("");
+        for (Node circle : drawingPane.getChildren()) {
+            if (circle instanceof Circle) {
+                circle.setScaleX(1);
+                circle.setScaleY(1);
+                circle.setScaleZ(1);
+                ((Circle) circle).setFill(Color.BLACK);
+            }
+        }
+        drawingPane.getChildren().removeIf(node -> node != null && (node.getId() != null && node.getId().equals("NN")));
+        double x = Math.random() * 400;
+        double y = Math.random() * 400;
+        Circle circle = new Circle(x, y, 5);
+        drawingPane.getChildren().add(circle);
+        circle.setFill(Color.DARKVIOLET);
+        circle.setId("NN");
+        System.out.println(x + " : " + y);
+        List<Point> results = this.dynamicPointQuadTree.kNearestNeighbors(new Point(x, y), 1);
+        System.out.println(results);
+        for (Point p : results) {
+            statsLabel.setText(statsLabel.getText() + p.x() + ":" + (PANE_HEIGHT - p.y()));
+            highlightCircle(p, Color.RED);
+        }
     }
 
     @FXML
@@ -176,6 +206,8 @@ public class TreeController {
 
     @FXML
     void generate() {
+        if (!isDemoMode)
+            removeSquares();
         if (mode == TreeMode.QUAD_TREE) {
             generateQuadTree();
             displayQuadTree(500, 20, 500, 20, dynamicPointQuadTree, dynamicPointQuadTree.getHeight(), Color.YELLOW, level++);
@@ -236,7 +268,7 @@ public class TreeController {
     }
 
     private void addPoint(double x, double y) {
-        Point point = new Point(x, PANE_HEIGHT - y);
+        Point point = new Point(x, y);
         if (!pointSet.contains(point)) {
             treePane.getChildren().clear();
             addPointToGui(x, y, point);
@@ -304,25 +336,33 @@ public class TreeController {
             displayQuadTree(x, y, x + 1.5 * delta, y + (1 + h / 8.0) * 60, (PointQuadTree) node.getSouthEast(), height - 1, Color.RED, level - 1);
     }
 
+    private void highlightCircle(Point p, Color color) {
+        Circle corresponding = (Circle) grid[(int) p.x()][(int) p.y()];
+        corresponding.setScaleX(2.5);
+        corresponding.setScaleY(2.5);
+        corresponding.setFill(color);
+        corresponding.setEffect(new Glow(0.8));
+    }
+
+    private void unhighlightCircle(Point p) {
+        Circle corresponding = (Circle) grid[(int) p.x()][(int) p.y()];
+        corresponding.setScaleX(1);
+        corresponding.setScaleY(1);
+        corresponding.setFill(Color.BLACK);
+        corresponding.setEffect(null);
+    }
+
     private Rectangle getRectangle(double x, double y, PointQuadTree node) {
         Rectangle rectangle = new Rectangle(x, y, 10, 10);
         rectangle.setOnMouseEntered(e -> {
             for (Point p : node.getElements()) {
-                Circle corresponding = (Circle) grid[(int) p.x()][(int) p.y()];
-                corresponding.setScaleX(2.5);
-                corresponding.setScaleY(2.5);
-                corresponding.setFill(Color.RED);
-                corresponding.setEffect(new Glow(0.8));
+                highlightCircle(p, Color.RED);
             }
         });
 
         rectangle.setOnMouseExited(e -> {
             for (Point p : node.getElements()) {
-                Circle corresponding = (Circle) grid[(int) p.x()][(int) p.y()];
-                corresponding.setScaleX(1);
-                corresponding.setScaleY(1);
-                corresponding.setFill(Color.BLACK);
-                corresponding.setEffect(null);
+                unhighlightCircle(p);
             }
         });
         return rectangle;
@@ -330,7 +370,7 @@ public class TreeController {
 
     private void drawQuadrants(PointQuadTree node) {
         Area area = node.getSquare();
-        Rectangle rectangle = new Rectangle(area.xMin(), PANE_HEIGHT - area.yMax(), area.getWidth(), area.getHeight());
+        Rectangle rectangle = new Rectangle(area.xMin(), area.yMin(), area.getWidth(), area.getHeight());
         rectangle.setStroke(Color.BLACK);
         rectangle.setFill(Color.TRANSPARENT);
         drawingPane.getChildren().add(rectangle);
@@ -339,8 +379,8 @@ public class TreeController {
 
     private void drawSplitLines(PointQuadTree node) {
         Area area = node.getSquare();
-        Line horizontalSplit = new Line(area.xMin(), PANE_HEIGHT - area.yMid(), area.xMax(), PANE_HEIGHT - area.yMid());
-        Line verticalSplit = new Line(area.xMid(), PANE_HEIGHT - area.yMin(), area.xMid(), PANE_HEIGHT - area.yMax());
+        Line horizontalSplit = new Line(area.xMin(), area.yMid(), area.xMax(), area.yMid());
+        Line verticalSplit = new Line(area.xMid(), area.yMin(), area.xMid(), area.yMax());
         drawingPane.getChildren().addAll(horizontalSplit, verticalSplit);
 
     }
@@ -348,15 +388,22 @@ public class TreeController {
     private void addPointToGui(double x, double y, Point p) {
         Circle circle = new Circle(x, y, 4, Color.BLACK);
         circle.setId("(" + (int) x + ", " + (int) (PANE_HEIGHT - y) + ")");
-        if (isDemoMode)
+        if (!isDemoMode) {
             drawingPane.getChildren().add(new Text(x + 3, y, circle.getId()));
-        else
-            circle.setOnMouseEntered(mouseEvent -> drawingPane.getChildren().add(new Text(x + 5, y - 5, circle.getId())));
-        //circle.setOnMouseExited(mouseEvent -> drawingPane.getChildren().removeIf((node) -> node instanceof Text));
-        grid[(int) x][(int) (PANE_HEIGHT - y)] = circle;
+            circle.setOnMouseExited(mouseEvent -> drawingPane.getChildren().removeIf((node) -> node instanceof Text));
+
+        } else {
+            circle.setOnMouseEntered(mouseEvent -> {
+                System.out.println("dksjhf");
+                System.out.println(circle.getId());
+                drawingPane.getChildren().add(new Text(x + 3, y, circle.getId()));
+            });
+        }
+
+        grid[(int) x][(int) y] = circle;
         drawingPane.getChildren().add(circle);
         if (!pointSet.contains(p)) {
-            pointSet.add(new Point(x, PANE_HEIGHT - y));
+            pointSet.add(new Point(x, y));
         }
         pointsLabel.setText("P = { " + pointSet.toString().substring(1, pointSet.toString().length() - 1) + " }");
     }
@@ -411,7 +458,7 @@ public class TreeController {
         else square = ((MyKDTree) node).getArea();
         double width = square.xMax() - square.xMin();
         double height = square.yMax() - square.yMin();
-        Rectangle rectangle2 = new Rectangle(square.xMin(), 400 - square.yMax(), width, height);
+        Rectangle rectangle2 = new Rectangle(square.xMin(), square.yMin(), width, height);
         rectangle2.setOpacity(0.5);
         rectangle2.setFill(color);
         rectangle2.toBack();

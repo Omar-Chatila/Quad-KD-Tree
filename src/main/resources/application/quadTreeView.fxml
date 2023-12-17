@@ -44,8 +44,9 @@
         <HBox alignment="CENTER" prefHeight="35.0" prefWidth="400.0" spacing="10.0">
             <JFXButton fx:id="clearButton" style="-fx-background-color: white;" text="Clear" />
             <JFXButton onAction="#randomize" style="-fx-background-color: white;" text="Randomize" />
-            <JFXButton onAction="#generate" text="Generate" />
-            <JFXButton onAction="#stressTest" text="Stress Test" />
+            <JFXButton onAction="#generate" text="Build" />
+         <JFXButton fx:id="nnsButton" onAction="#nearestNeighbor" text="NNS" />
+            <JFXButton onAction="#stressTest" text="Bench" />
             <JFXToggleButton alignment="CENTER_LEFT" onAction="#colorize" prefHeight="43.0" prefWidth="98.0" size="7.0" text="Color" textFill="WHITE" />
         </HBox>
         <HBox alignment="CENTER_LEFT" prefHeight="35.0" prefWidth="400.0" spacing="10.0">

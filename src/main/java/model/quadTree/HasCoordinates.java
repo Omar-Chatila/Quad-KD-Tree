@@ -4,4 +4,6 @@ public interface HasCoordinates {
     double x();
 
     double y();
+
+    double distance(HasCoordinates searchPoint);
 }
