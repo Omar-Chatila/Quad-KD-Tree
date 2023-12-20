@@ -389,14 +389,14 @@ public class TreeController {
         Circle circle = new Circle(x, y, 4, Color.BLACK);
         circle.setId("(" + (int) x + ", " + (int) (PANE_HEIGHT - y) + ")");
         if (!isDemoMode) {
-            drawingPane.getChildren().add(new Text(x + 3, y, circle.getId()));
+            //drawingPane.getChildren().add(new Text(x + 3, y, circle.getId()));
             circle.setOnMouseExited(mouseEvent -> drawingPane.getChildren().removeIf((node) -> node instanceof Text));
 
         } else {
             circle.setOnMouseEntered(mouseEvent -> {
                 System.out.println("dksjhf");
                 System.out.println(circle.getId());
-                drawingPane.getChildren().add(new Text(x + 3, y, circle.getId()));
+                //drawingPane.getChildren().add(new Text(x + 3, y, circle.getId()));
             });
         }
 

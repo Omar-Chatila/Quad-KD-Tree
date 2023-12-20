@@ -12,23 +12,21 @@ public record Pixel(double x, double y, Color color) implements HasCoordinates {
     }
 
     private boolean areColorsClose(Color a, Color b) {
+        double colorDistance = getColorDistance(a, b);
+        return colorDistance < 0.035;
+    }
+
+    private double getColorDistance(Color a, Color b) {
         double redDiff = Math.pow(a.getRed() - b.getRed(), 2);
         double greenDiff = Math.pow(a.getGreen() - b.getGreen(), 2);
         double blueDiff = Math.pow(a.getBlue() - b.getBlue(), 2);
         double alphaDiff = Math.pow(a.getOpacity() - b.getOpacity(), 2);
-        double colorDistance = Math.sqrt(redDiff + greenDiff + blueDiff + alphaDiff);
-        return colorDistance < 0.035;
+        return Math.sqrt(redDiff + greenDiff + blueDiff + alphaDiff);
     }
 
     @Override
     public double distance(HasCoordinates searchPoint) {
-        Color a = this.color;
         Color b = ((Pixel) searchPoint).color;
-        double redDiff = Math.pow(a.getRed() - b.getRed(), 2);
-        double greenDiff = Math.pow(a.getGreen() - b.getGreen(), 2);
-        double blueDiff = Math.pow(a.getBlue() - b.getBlue(), 2);
-        double alphaDiff = Math.pow(a.getOpacity() - b.getOpacity(), 2);
-        double colorDistance = Math.sqrt(redDiff + greenDiff + blueDiff + alphaDiff);
-        return colorDistance;
+        return getColorDistance(this.color, b);
     }
 }

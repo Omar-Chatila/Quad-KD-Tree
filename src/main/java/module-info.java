@@ -1,6 +1,7 @@
 module application.quadkdtrees {
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.swing;
     requires com.jfoenix;
     requires jfxtras.common;
     requires jfxtras.labs;

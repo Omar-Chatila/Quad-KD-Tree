@@ -57,6 +57,11 @@
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="73.0" prefWidth="1021.0" spacing="15.0" style="-fx-border-width: 1 0 0 0; -fx-border-color: white;">
                      <children>
+                        <JFXButton fx:id="saveButton" disable="true" prefHeight="53.0" prefWidth="89.0" style="-fx-background-color: white;" text="Save">
+                           <font>
+                              <Font size="17.0" />
+                           </font>
+                        </JFXButton>
                         <JFXButton fx:id="rotateButton" disable="true" prefHeight="53.0" prefWidth="89.0" style="-fx-background-color: white;" text="Rotate">
                            <font>
                               <Font size="17.0" />

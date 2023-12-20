@@ -19,12 +19,15 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import jfxtras.labs.util.event.MouseControlUtil;
 import model.quadTree.Area;
 import model.quadTree.RegionQuadTree;
+import util.SaveImage;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -60,6 +63,8 @@ public class ImagePaneController {
     private JFXToggleButton animationsToggle;
     @FXML
     private ProgressBar progressBar;
+    @FXML
+    private JFXButton saveButton;
 
     private boolean isAnimated = true;
     private RegionQuadTree regionQuadTree;
@@ -92,6 +97,15 @@ public class ImagePaneController {
         blurButton.setOnAction(e -> blur());
         cropButton.setOnAction(e -> crop());
         rotateButton.setOnAction(e -> rotateImage());
+        saveButton.setOnAction(e -> saveImage());
+    }
+
+    private void saveImage() {
+        try {
+            SaveImage.saveImageFile(qtImage, (Stage) blurButton.getScene().getWindow());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void crop() {
@@ -222,6 +236,7 @@ public class ImagePaneController {
             pixelWriter = qtImage.getPixelWriter();
             System.out.println("Original" + IMAGE_HEIGHT * IMAGE_WIDTH);
             encodeButton.setDisable(false);
+            saveButton.setDisable(true);
             treepane.getChildren().clear();
         }
     }
@@ -340,7 +355,7 @@ public class ImagePaneController {
         } else {
             renderImageFromTree(leaves, pixelWriter);
         }
-
+        saveButton.setDisable(false);
         infoLabel.setText(infoLabel.getText() + " | Decode: " + (int) (time / 1E6) + "ms");
     }
 
