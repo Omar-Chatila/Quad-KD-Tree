@@ -7,6 +7,7 @@ module application.quadkdtrees {
     requires jfxtras.labs;
     requires java.sql;
     requires java.desktop;
+    requires junit;
 
 
     opens application to javafx.fxml;
@@ -15,6 +16,7 @@ module application.quadkdtrees {
     exports model.kdTree;
     exports model.quadTree;
     exports model;
+    exports tests;
     exports util;
     opens controller to javafx.fxml;
 }
