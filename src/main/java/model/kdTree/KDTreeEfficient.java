@@ -156,6 +156,6 @@ public class KDTreeEfficient extends Tree<Point> {
     }
 
     private double getYMedian() {
-        return median(points, false, from, to);
+        return median(points, true, from, to);
     }
 }
