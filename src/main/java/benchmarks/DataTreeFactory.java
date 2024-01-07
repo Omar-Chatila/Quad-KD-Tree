@@ -41,7 +41,7 @@ public class DataTreeFactory {
         }
     }
 
-    public static Tree carDataKDTree(String dataSet, TreeType type) {
+    public static Tree<Point> carDataKDTree(String dataSet, TreeType type) {
         int index3 = dataSet.equals(American_New_Cars_and_Trucks_of_2004) ? 7 : 11;
         List<List<String>> records = setCarRecord(dataSet);
         HashSet<Point> pointSet = new HashSet<>();
@@ -62,11 +62,11 @@ public class DataTreeFactory {
         return getTree(points, domain, type);
     }
 
-    public static Tree getDBTree(TreeType type, String URL) {
+    public static Tree<Point> getDBTree(TreeType type, String URL) {
         return getTree(JDBCAccessTest.connectAndQuery(URL), new Area(0, 100000, 0, 100000), type);
     }
 
-    public static Tree getTree(Point[] points, Area domain, TreeType type) {
+    public static Tree<Point> getTree(Point[] points, Area domain, TreeType type) {
         return type == TreeType.KDTree ? new KDTreeEfficient(points, domain) : new PointQuadTree(new ArrayList<>(Arrays.asList(points)), domain);
     }
 
