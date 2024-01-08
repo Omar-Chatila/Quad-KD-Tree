@@ -52,6 +52,12 @@ public abstract class QuadTree<T extends HasCoordinates> extends Tree<T> {
         return this.southEast == null && this.southWest == null && this.northEast == null && this.northWest == null;
     }
 
+    public T nearestNeighbor(T queryPoint) {
+        List<T> candidates = kNearestNeighbors(queryPoint, 4);
+        candidates.sort(Comparator.comparingDouble(p -> p.distance(queryPoint)));
+        return candidates.get(0);
+    }
+
     public List<T> kNearestNeighbors(T queryPoint, int k) {
         PriorityQueue<QuadTree<T>> queue = new PriorityQueue<>(Comparator.comparingDouble(qt -> qt.square.sqDistanceFrom(queryPoint)));
         List<T> result = new ArrayList<>();

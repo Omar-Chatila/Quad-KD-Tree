@@ -44,10 +44,8 @@ public class QuadBenchMarks {
             PointQuadTree tree = new PointQuadTree(points, benchArea);
             PointQuadTree tree2 = new PointQuadTree(points, benchArea, (int) Math.log10(points.size()));
 
-
             tree.buildTree();
             tree2.buildTree();
-
 
             double timePerArea = 0;
             double timePerArea2 = 0;
