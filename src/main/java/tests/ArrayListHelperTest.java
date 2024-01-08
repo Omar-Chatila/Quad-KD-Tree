@@ -1,13 +1,13 @@
 package tests;
 
 import model.Point;
-import org.junit.Test;
+import org.testng.annotations.Test;
 import util.ArrayListHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static junit.framework.Assert.assertEquals;
+import static org.testng.AssertJUnit.assertEquals;
 import static util.ArrayListHelper.getMedian;
 import static util.ArrayListHelper.median;
 

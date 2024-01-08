@@ -8,6 +8,7 @@ module application.quadkdtrees {
     requires java.sql;
     requires java.desktop;
     requires junit;
+    requires org.testng;
 
 
     opens application to javafx.fxml;
@@ -19,4 +20,5 @@ module application.quadkdtrees {
     exports tests;
     exports util;
     opens controller to javafx.fxml;
+    opens tests to org.testng;
 }
