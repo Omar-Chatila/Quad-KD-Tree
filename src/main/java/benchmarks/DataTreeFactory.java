@@ -5,6 +5,7 @@ import model.Tree;
 import model.kdTree.KDTreeEfficient;
 import model.quadTree.Area;
 import model.quadTree.PointQuadTree;
+import model.quadTree.QuadTree;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -30,6 +31,13 @@ public class DataTreeFactory {
         KDTreeEfficient dbTree = (KDTreeEfficient) getDBTree(TreeType.KDTree, HEALTH_DB_URL);
         dbTree.buildTree();
         for (Point p : dbTree.query(new Area(2000, 2015, 50, 100))) {
+            System.out.println(p);
+        }
+        System.out.println(dbTree.query(new Area(2000, 2015, 50, 100)).size());
+
+        QuadTree<Point> pointQuadTree = (PointQuadTree) getDBTree(TreeType.QuadTree, HEALTH_DB_URL);
+        pointQuadTree.buildTree();
+        for (Point p : pointQuadTree.query(new Area(2000, 2015, 50, 100))) {
             System.out.println(p);
         }
 

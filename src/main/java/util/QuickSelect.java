@@ -1,6 +1,9 @@
 package util;
 
 import model.Point;
+import model.quadTree.Area;
+
+import java.util.List;
 
 public class QuickSelect {
 
@@ -40,5 +43,16 @@ public class QuickSelect {
         Point temp = points[first];
         points[first] = points[second];
         points[second] = temp;
+    }
+
+    public static Area getDomain(List<Point> points) {
+        double xMin = 0, xMax = 0, yMin = 0, yMax = 0;
+        for (Point p : points) {
+            xMin = Math.min(xMin, p.x());
+            xMax = Math.max(xMax, p.x());
+            yMin = Math.min(yMin, p.y());
+            yMax = Math.max(yMax, p.y());
+        }
+        return new Area(xMin, xMax, yMin, yMax);
     }
 }

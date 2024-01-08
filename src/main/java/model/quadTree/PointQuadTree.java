@@ -1,6 +1,7 @@
 package model.quadTree;
 
 import model.Point;
+import util.ArrayListHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,7 @@ public class PointQuadTree extends QuadTree<Point> {
     }
 
     public void buildTree() {
-        if (this.elements.size() > capacity) {
+        if (this.elements.size() > capacity && ArrayListHelper.isDistinct(this.elements)) {
             super.partition(this.clearList);
             this.northEast.buildTree();
             this.northWest.buildTree();

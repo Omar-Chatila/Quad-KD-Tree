@@ -2,8 +2,7 @@ package model.quadTree;
 
 import model.Point;
 
-import java.util.Objects;
-
+@SuppressWarnings("SuspiciousNameCombination")
 public record Area(double xMin, double xMax, double yMin, double yMax) {
 
     public static Area[] split(Area area) {
@@ -14,10 +13,6 @@ public record Area(double xMin, double xMax, double yMin, double yMax) {
         Area sW = new Area(area.xMin, xMid, area.yMin, yMid);
         Area sE = new Area(xMid, area.xMax, area.yMin, yMid);
         return new Area[]{nE, nW, sW, sE};
-    }
-
-    public Area rotate90degrees() {
-        return new Area(yMin, yMax, xMin, xMax);
     }
 
     public double getWidth() {
@@ -60,21 +55,12 @@ public record Area(double xMin, double xMax, double yMin, double yMax) {
         return (point.x() >= xMin && point.y() >= yMin && point.x() <= xMax && point.y() <= yMax);
     }
 
-    public Point center() {
-        return new Point(xMid(), yMid());
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Area area = (Area) o;
         return Double.compare(xMin, area.xMin) == 0 && Double.compare(xMax, area.xMax) == 0 && Double.compare(yMin, area.yMin) == 0 && Double.compare(yMax, area.yMax) == 0;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(xMin, xMax, yMin, yMax);
     }
 
     @Override
@@ -86,5 +72,9 @@ public record Area(double xMin, double xMax, double yMin, double yMax) {
         double dx = Math.max(Math.max(xMin - point.x(), 0), point.x() - xMax);
         double dy = Math.max(Math.max(yMin - point.y(), 0), point.y() - yMax);
         return dx * dx + dy * dy;
+    }
+
+    public Area rotate90degrees() {
+        return new Area(yMin, yMax, xMin, xMax);
     }
 }

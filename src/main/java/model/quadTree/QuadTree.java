@@ -55,20 +55,17 @@ public abstract class QuadTree<T extends HasCoordinates> extends Tree<T> {
     public List<T> kNearestNeighbors(T queryPoint, int k) {
         PriorityQueue<QuadTree<T>> queue = new PriorityQueue<>(Comparator.comparingDouble(qt -> qt.square.sqDistanceFrom(queryPoint)));
         List<T> result = new ArrayList<>();
-        kNearestNeighborsHelper(this, queryPoint, k, queue, result);
+        kNearestNeighborsHelper(this, k, queue, result);
         return result;
     }
 
-    private void kNearestNeighborsHelper(QuadTree<T> node, T queryPoint, int k, PriorityQueue<QuadTree<T>> queue, List<T> result) {
+    private void kNearestNeighborsHelper(QuadTree<T> node, int k, PriorityQueue<QuadTree<T>> queue, List<T> result) {
         if (node == null) {
             return;
         }
 
-        if (node.isNodeLeaf()) {
-            for (T element : node.getElements()) {
-                element.distance(queryPoint);
-                queue.offer(node);
-            }
+        if (node.isNodeLeaf() && !node.elements.isEmpty()) {
+            queue.offer(node);
         } else {
             queue.offer(node.getNorthEast());
             queue.offer(node.getNorthWest());
@@ -81,7 +78,7 @@ public abstract class QuadTree<T extends HasCoordinates> extends Tree<T> {
             if (current.isNodeLeaf()) {
                 result.addAll(current.getElements());
             } else {
-                kNearestNeighborsHelper(current, queryPoint, k, queue, result);
+                kNearestNeighborsHelper(current, k, queue, result);
             }
         }
     }
@@ -155,13 +152,6 @@ public abstract class QuadTree<T extends HasCoordinates> extends Tree<T> {
             this.furthestDistance = furthestDistance;
         }
 
-        public List<T> getFound() {
-            return found;
-        }
-
-        public double getFurthestDistance() {
-            return furthestDistance;
-        }
 
         @Override
         public String toString() {

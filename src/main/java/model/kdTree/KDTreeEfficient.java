@@ -38,36 +38,6 @@ public class KDTreeEfficient extends Tree<Point> {
         this.xMedian = getXMedian();
     }
 
-    public static void main(String[] args) {
-        Point[] points1 = {
-                new Point(3, 42345),
-                new Point(5, 22),
-                new Point(3234, 4),
-                new Point(5, 25),
-                new Point(312, 445),
-                new Point(554, 21),
-                new Point(31, 4456),
-                new Point(5, 2345),
-                new Point(3234, 4431),
-                new Point(5, 213),
-                new Point(311, 44),
-                new Point(5, 23),
-                new Point(333, 42),
-                new Point(555, 211),
-                new Point(32, 443),
-                new Point(325, 212),
-                new Point(3, 4),
-                new Point(51, 234),
-                new Point(3333, 43),
-                new Point(543, 21),
-                new Point(31, 42),
-                new Point(54, 254),
-        };
-        KDTreeEfficient kdTreeEfficient = new KDTreeEfficient(points1, new Area(0, 200000, 0, 200000));
-        kdTreeEfficient.buildTree();
-        System.out.println(kdTreeEfficient.size(kdTreeEfficient));
-    }
-
     public List<Point> query(Area queryRectangle) {
         List<Point> result = new ArrayList<>();
         if (this.isLeaf()) {
@@ -97,8 +67,8 @@ public class KDTreeEfficient extends Tree<Point> {
 
     public void buildTree(int level) {
         if ((this.to - this.from) > 0) {
-            // vertical split
             if (level % 2 == 0) {
+                // vertical split
                 this.setVerticalChildren(level);
             } else {
                 // horizontal split
@@ -156,6 +126,6 @@ public class KDTreeEfficient extends Tree<Point> {
     }
 
     private double getYMedian() {
-        return median(points, true, from, to);
+        return median(points, false, from, to);
     }
 }
