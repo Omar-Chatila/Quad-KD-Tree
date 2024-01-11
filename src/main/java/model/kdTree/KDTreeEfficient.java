@@ -38,6 +38,22 @@ public class KDTreeEfficient extends Tree<Point> {
         this.xMedian = getXMedian();
     }
 
+    public boolean contains(Point point) {
+        double pointX = point.x();
+        double pointY = point.y();
+        KDTreeEfficient current = this;
+        int level = 0;
+        while (!current.isLeaf()) {
+            if (level % 2 == 0) {
+                current = current.xMedian >= pointX ? current.leftChild : current.rightChild;
+            } else {
+                current = current.yMedian >= pointY ? current.leftChild : current.rightChild;
+            }
+            level++;
+        }
+        return (current.points[current.from].equals(point));
+    }
+
     public List<Point> query(Area queryRectangle) {
         List<Point> result = new ArrayList<>();
         if (this.isLeaf()) {

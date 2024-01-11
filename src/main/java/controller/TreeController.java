@@ -102,10 +102,13 @@ public class TreeController {
         circle.setFill(Color.DARKVIOLET);
         circle.setId("NN");
         System.out.println(x + " : " + y);
-        Point result = this.dynamicPointQuadTree.nearestNeighbor(new Point(x, y));
-        System.out.println(result);
+        Point result = null;
+        for (Point p : this.dynamicPointQuadTree.kNearestNeighbors(new Point(x, y), 3)) {
+            result = p;
+            highlightCircle(result, Color.RED);
+            System.out.println(result);
+        }
         statsLabel.setText(statsLabel.getText() + result);
-        highlightCircle(result, Color.RED);
     }
 
     @FXML
