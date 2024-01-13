@@ -7,6 +7,7 @@ import model.quadTree.Area;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import static util.ArrayListHelper.median;
 
@@ -36,6 +37,14 @@ public class KDTreeEfficient extends Tree<Point> {
         this.from = 0;
         this.to = points.length - 1;
         this.xMedian = getXMedian();
+    }
+
+    public KDTreeEfficient getLeftChild() {
+        return leftChild;
+    }
+
+    public KDTreeEfficient getRightChild() {
+        return rightChild;
     }
 
     public boolean contains(Point point) {
@@ -143,5 +152,10 @@ public class KDTreeEfficient extends Tree<Point> {
 
     private double getYMedian() {
         return median(points, false, from, to);
+    }
+
+    @Override
+    public String toString() {
+        return String.format(Locale.US, "A:%sf:%dt:%dxMed%.1fyMed%.1f%n", area, from, to, xMedian, yMedian);
     }
 }

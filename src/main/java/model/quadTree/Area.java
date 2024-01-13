@@ -2,6 +2,8 @@ package model.quadTree;
 
 import model.Point;
 
+import java.util.Locale;
+
 @SuppressWarnings("SuspiciousNameCombination")
 public record Area(double xMin, double xMax, double yMin, double yMax) {
 
@@ -65,7 +67,7 @@ public record Area(double xMin, double xMax, double yMin, double yMax) {
 
     @Override
     public String toString() {
-        return "[" + (int) xMin + ":" + (int) xMax + "] ⨯ [" + (int) yMin + ":" + (int) yMax + ']';
+        return String.format(Locale.US, "[%.1f:%.1f] : [%.1f:%.1f]", xMin, xMax, yMin, yMax);
     }
 
     public double sqDistanceFrom(HasCoordinates point) {
