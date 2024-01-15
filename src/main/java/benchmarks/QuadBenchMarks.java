@@ -26,8 +26,8 @@ public class QuadBenchMarks {
     static Point[] setTestData(int numberPoints) {
         Point[] pointSet = new Point[numberPoints];
         for (int i = 0; i < numberPoints; i++) {
-            double x = Math.random() * 1E5;
-            double y = Math.random() * 1E5;
+            double x = Math.random() * 1000000;
+            double y = Math.random() * 1000000;
             pointSet[i] = new Point(x, y);
         }
         return pointSet;
@@ -264,12 +264,20 @@ public class QuadBenchMarks {
 
     public static void main(String[] args) throws IOException {
         byte[] bytes = new byte[32000];
+        Point[] points = setTestData(100000);
+        List<Point> pointList = new ArrayList<>(Arrays.asList(points));
+        Area area = new Area(0, 1000000, 0, 1000000);
+        KDTreeEfficient kdTreeEfficient = new KDTreeEfficient(points, area);
+        //kdTreeEfficient.buildTree();
+        System.out.println(benchBuildTime(kdTreeEfficient));
+        System.out.println(kdTreeEfficient.getHeight());
+
         // System.out.println(getPRQTResults());
         // System.out.println(pqtHeights);
         //System.out.println(prqtHeights);
 
         //System.out.println(KDbenchQuery());
-        System.out.println(benchQuery());
+        //System.out.println(benchQuery());
     }
 
     static String getPRQTResults() {

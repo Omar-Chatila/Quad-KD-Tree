@@ -1,0 +1,78 @@
+$ ./benchKD.exe
+2024-01-15T02:23:30-00:00
+Running C:\Users\omarc\CLionProjects\QuadKDBench\src\benchKD.exe
+Run on (12 X 3600 MHz CPU s)
+CPU Caches:
+  L1 Data 32 KiB (x6)
+  L1 Instruction 32 KiB (x6)
+  L2 Unified 512 KiB (x6)
+  L3 Unified 16384 KiB (x1)
+-----------------------------------------------------------------------------------------------------
+Benchmark                                                           Time             CPU   Iterations
+-----------------------------------------------------------------------------------------------------
+Build KD-Tree-Efficient/512/iterations:200                      0.073 ms        0.000 ms          200
+Build KD-Tree-Efficient/1024/iterations:200                     0.149 ms        0.000 ms          200
+Build KD-Tree-Efficient/2048/iterations:200                     0.382 ms        0.391 ms          200
+Build KD-Tree-Efficient/4096/iterations:200                     0.806 ms        0.859 ms          200
+Build KD-Tree-Efficient/8192/iterations:200                      1.65 ms         1.48 ms          200
+Build KD-Tree-Efficient/16384/iterations:200                     3.70 ms         3.67 ms          200
+Build KD-Tree-Efficient/32768/iterations:200                     7.46 ms         7.19 ms          200
+Build KD-Tree-Efficient/65536/iterations:200                     15.0 ms         14.8 ms          200
+Build KD-Tree-Efficient/100000/iterations:200                    23.1 ms         22.9 ms          200
+Build KD-Tree-Efficient/iterations:200_BigO                    229.54 N        226.94 N
+Build KD-Tree-Efficient/iterations:200_RMS                          2 %             3 %
+Build Quadtree/512/iterations:200                               0.404 ms        0.391 ms          200
+Build Quadtree/1024/iterations:200                              0.813 ms        0.859 ms          200
+Build Quadtree/2048/iterations:200                               1.67 ms         1.56 ms          200
+Build Quadtree/4096/iterations:200                               3.26 ms         3.20 ms          200
+Build Quadtree/8192/iterations:200                               7.08 ms         6.95 ms          200
+Build Quadtree/16384/iterations:200                              14.4 ms         14.0 ms          200
+Build Quadtree/32768/iterations:200                              33.9 ms         33.2 ms          200
+Build Quadtree/65536/iterations:200                              98.1 ms         97.7 ms          200
+Build Quadtree/100000/iterations:200                              230 ms          203 ms          200
+Build Quadtree/iterations:200_BigO                            1961.79 N       1785.55 N
+Build Quadtree/iterations:200_RMS                                  45 %            36 %
+Build MyKDTree/512/iterations:200                               0.591 ms        0.469 ms          200
+Build MyKDTree/1024/iterations:200                               1.28 ms         1.17 ms          200
+Build MyKDTree/2048/iterations:200                               3.31 ms         3.20 ms          200
+Build MyKDTree/4096/iterations:200                               7.96 ms         7.89 ms          200
+Build MyKDTree/8192/iterations:200                               15.6 ms         15.5 ms          200
+Build MyKDTree/16384/iterations:200                              36.1 ms         34.6 ms          200
+Build MyKDTree/32768/iterations:200                              82.7 ms         78.5 ms          200
+Build MyKDTree/65536/iterations:200                               203 ms          191 ms          200
+Build MyKDTree/100000/iterations:200                              364 ms          342 ms          200
+Build MyKDTree/iterations:200_BigO                            3381.70 N       3184.15 N
+Build MyKDTree/iterations:200_RMS                                  20 %            20 %
+Query KD-E - Variable PointCount/512/iterations:200             0.063 ms        0.000 ms          200
+Query KD-E - Variable PointCount/1024/iterations:200            0.148 ms        0.078 ms          200
+Query KD-E - Variable PointCount/2048/iterations:200            0.257 ms        0.156 ms          200
+Query KD-E - Variable PointCount/4096/iterations:200            0.638 ms        0.703 ms          200
+Query KD-E - Variable PointCount/8192/iterations:200             1.23 ms         1.25 ms          200
+Query KD-E - Variable PointCount/16384/iterations:200            2.57 ms         2.58 ms          200
+Query KD-E - Variable PointCount/32768/iterations:200            4.34 ms         4.30 ms          200
+Query KD-E - Variable PointCount/65536/iterations:200            9.84 ms         9.38 ms          200
+Query KD-E - Variable PointCount/100000/iterations:200           14.1 ms         13.4 ms          200
+Query KD-E - Variable PointCount/iterations:200_BigO           143.49 N        137.01 N
+Query KD-E - Variable PointCount/iterations:200_RMS                 6 %             6 %
+Query Quadtree - Variable PointCount/512/iterations:200         0.038 ms        0.000 ms          200
+Query Quadtree - Variable PointCount/1024/iterations:200        0.090 ms        0.078 ms          200
+Query Quadtree - Variable PointCount/2048/iterations:200        0.159 ms        0.078 ms          200
+Query Quadtree - Variable PointCount/4096/iterations:200        0.324 ms        0.312 ms          200
+Query Quadtree - Variable PointCount/8192/iterations:200        0.661 ms        0.781 ms          200
+Query Quadtree - Variable PointCount/16384/iterations:200        1.64 ms         1.64 ms          200
+Query Quadtree - Variable PointCount/32768/iterations:200        2.68 ms         2.73 ms          200
+Query Quadtree - Variable PointCount/65536/iterations:200        5.98 ms         5.47 ms          200
+Query Quadtree - Variable PointCount/100000/iterations:200       8.76 ms         8.91 ms          200
+Query Quadtree - Variable PointCount/iterations:200_BigO        88.35 N         87.33 N
+Query Quadtree - Variable PointCount/iterations:200_RMS             5 %             6 %
+Query MyKDTree - Variable PointCount/512/iterations:200         0.077 ms        0.078 ms          200
+Query MyKDTree - Variable PointCount/1024/iterations:200        0.154 ms        0.156 ms          200
+Query MyKDTree - Variable PointCount/2048/iterations:200        0.316 ms        0.312 ms          200
+Query MyKDTree - Variable PointCount/4096/iterations:200        0.628 ms        0.625 ms          200
+Query MyKDTree - Variable PointCount/8192/iterations:200         1.24 ms         1.41 ms          200
+Query MyKDTree - Variable PointCount/16384/iterations:200        2.56 ms         2.50 ms          200
+Query MyKDTree - Variable PointCount/32768/iterations:200        5.10 ms         5.00 ms          200
+Query MyKDTree - Variable PointCount/65536/iterations:200        10.2 ms         9.69 ms          200
+Query MyKDTree - Variable PointCount/100000/iterations:200       14.4 ms         14.1 ms          200
+Query MyKDTree - Variable PointCount/iterations:200_BigO       148.44 N        143.76 N
+Query MyKDTree - Variable PointCount/iterations:200_RMS             6 %             5 %
