@@ -102,6 +102,33 @@ public class PointQuadTree extends QuadTree<Point> {
         return result;
     }
 
+    public List<Point> queryRange(Area range) {
+        // Prepare an array of results
+        List<Point> pointsInRange = new ArrayList<>();
+
+        // Automatically abort if the range does not intersect this quad
+        if (!square.intersects(range))
+            return pointsInRange; // empty list
+
+        // Check objects at this quad level
+        for (Point p : elements) {
+            if (range.containsPoint(p))
+                pointsInRange.add(p);
+        }
+
+        // Terminate here, if there are no children
+        if (northWest == null)
+            return pointsInRange;
+
+        // Otherwise, add the points from the children
+        pointsInRange.addAll(((PointQuadTree) northWest).queryRange(range));
+        pointsInRange.addAll(((PointQuadTree) northEast).queryRange(range));
+        pointsInRange.addAll(((PointQuadTree) southEast).queryRange(range));
+        pointsInRange.addAll(((PointQuadTree) southWest).queryRange(range));
+
+        return pointsInRange;
+    }
+
     private List<Point> reportSubTree() {
         return this.elements;
     }
@@ -123,7 +150,8 @@ public class PointQuadTree extends QuadTree<Point> {
 
     public void add(Point point) {
         PointQuadTree current = this;
-        if (!current.isEmpty()) {
+        if (!current.square.containsPoint(point)) return;
+        if (!current.isNodeLeaf()) {
             double pointX = point.x();
             double pointY = point.y();
             while (!current.isNodeLeaf()) {

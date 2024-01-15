@@ -45,7 +45,7 @@ public class TreeController {
     public ScrollPane scrollPane;
     TreeMode mode = TreeMode.QUAD_TREE;
     private boolean colorized = false;
-    private int leafCapacity = 1;
+    private int leafCapacity = 4;
     private PointQuadTree dynamicPointQuadTree = new PointQuadTree(rootArea, leafCapacity, false);
     private MyKDTree dynamicKDTree = new MyKDTree(rootArea);
     @FXML
