@@ -181,7 +181,7 @@ public class TreeController {
         if (isDemoMode) removeSquares();
         if (this.isDrawMode) {
             double x = event.getX();
-            double y = event.getY();
+            double y = PANE_HEIGHT - event.getY();
             addPoint(x, y);
         }
     }
@@ -270,9 +270,11 @@ public class TreeController {
 
     private void addPoint(double x, double y) {
         Point point = new Point(x, y);
+        System.out.println(point);
         if (!pointSet.contains(point)) {
             treePane.getChildren().clear();
-            addPointToGui(x, y, point);
+            pointSet.add(new Point(x, y));
+            addPointToGui(x, 400 - y, point);
             dynamicKDTree.add(point);
             dynamicPointQuadTree.add(point);
             removeLines();
@@ -403,9 +405,6 @@ public class TreeController {
 
         grid[(int) x][(int) y] = circle;
         drawingPane.getChildren().add(circle);
-        if (!pointSet.contains(p)) {
-            pointSet.add(new Point(x, y));
-        }
         pointsLabel.setText("P = { " + pointSet.toString().substring(1, pointSet.toString().length() - 1) + " }");
     }
 
@@ -459,7 +458,7 @@ public class TreeController {
         else square = ((MyKDTree) node).getArea();
         double width = square.xMax() - square.xMin();
         double height = square.yMax() - square.yMin();
-        Rectangle rectangle2 = new Rectangle(square.xMin(), square.yMin(), width, height);
+        Rectangle rectangle2 = new Rectangle(square.xMin(), 400 -square.yMax(), width, height);
         rectangle2.setOpacity(0.5);
         rectangle2.setFill(color);
         rectangle2.toBack();
