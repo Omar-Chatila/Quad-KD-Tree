@@ -319,10 +319,13 @@ public class ImagePaneController {
         timeline2.play();
     }
 
+    private int currentImageIndex;
+
     private void playBlurredDiashow() {
         this.timeline = new Timeline();
         for (int i = 0; i < regionQuadTree.getHeight(); i++) {
             int finalI = i;
+            this.currentImageIndex = i;
             KeyFrame keyFrame = new KeyFrame(Duration.millis(1000 * (i + 1)),
                     event -> {
                         treepane.getChildren().clear();
