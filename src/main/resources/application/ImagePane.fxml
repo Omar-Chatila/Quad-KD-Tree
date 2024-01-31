@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXCheckBox?>
+<?import com.jfoenix.controls.JFXSlider?>
 <?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
@@ -13,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxWidth="1024.0" prefHeight="641.0" prefWidth="963.0" stylesheets="@../imageStyle.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ImagePaneController">
+<AnchorPane maxWidth="1024.0" prefHeight="641.0" prefWidth="963.0" stylesheets="@../imageStyle.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ImagePaneController">
     <children>
         <VBox>
             <children>
@@ -45,11 +47,31 @@
                               <Insets left="-5.0" />
                            </padding>
                               </Label>
-                        <ProgressBar fx:id="progressBar" prefHeight="18.0" prefWidth="223.0" progress="0.0" visible="false">
+                        <VBox>
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
-                        </ProgressBar>
+                           <children>
+                              <ProgressBar fx:id="progressBar" prefHeight="18.0" prefWidth="223.0" progress="0.0" visible="false" />
+                              <HBox alignment="CENTER_LEFT" prefHeight="34.0" prefWidth="223.0">
+                                 <children>
+                                    <JFXCheckBox fx:id="fancy" onAction="#randomDecode" prefHeight="18.0" prefWidth="79.0" text="fancy decode" />
+                                    <VBox prefHeight="24.0" prefWidth="132.0">
+                                       <children>
+                                          <JFXSlider>
+                                             <VBox.margin>
+                                                <Insets left="10.0" />
+                                             </VBox.margin>
+                                          </JFXSlider>
+                                       </children>
+                                       <HBox.margin>
+                                          <Insets top="10.0" />
+                                       </HBox.margin>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
                      </children>
                      <VBox.margin>
                         <Insets />
