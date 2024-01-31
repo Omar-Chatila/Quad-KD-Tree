@@ -69,7 +69,7 @@ public class ImagePaneController {
     private boolean isAnimated = true;
     private RegionQuadTree regionQuadTree;
     private WritableImage qtImage;
-    private List<Image> blurredImages;
+    private List<WritableImage> blurredImages;
     private PixelWriter pixelWriter;
     private Timeline timeline;
 
@@ -102,7 +102,7 @@ public class ImagePaneController {
 
     private void saveImage() {
         try {
-            SaveImage.saveImageFile(qtImage, (Stage) blurButton.getScene().getWindow());
+            SaveImage.saveImageFile((WritableImage) compressedImageView.getImage(), (Stage) blurButton.getScene().getWindow());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -218,8 +218,8 @@ public class ImagePaneController {
         blurredImages.clear();
         compressedImageView.setImage(null);
         FileChooser fileChooser = new FileChooser();
-        FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");
-        FileChooser.ExtensionFilter extFilterPNG = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.PNG");
+        FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.jpg");
+        FileChooser.ExtensionFilter extFilterPNG = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.png");
         fileChooser.getExtensionFilters().addAll(extFilterJPG, extFilterPNG);
         File resourcesDirectory = new File("src/main/resources/images");
         fileChooser.setInitialDirectory(resourcesDirectory);
@@ -259,6 +259,7 @@ public class ImagePaneController {
     }
 
     private void blur() {
+        saveButton.setDisable(false);
         treepane.getChildren().clear();
         for (int i = 0; i < regionQuadTree.getHeight(); i++) {
             WritableImage image = new WritableImage(IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -308,14 +309,17 @@ public class ImagePaneController {
         timeline2.play();
     }
 
+    private int currentImageIndex;
+
     private void playBlurredDiashow() {
         this.timeline = new Timeline();
         for (int i = 0; i < regionQuadTree.getHeight(); i++) {
             int finalI = i;
+            this.currentImageIndex = i;
             KeyFrame keyFrame = new KeyFrame(Duration.millis(1000 * (i + 1)),
                     event -> {
                         treepane.getChildren().clear();
-                        WritableImage image = (WritableImage) blurredImages.get(finalI);
+                        WritableImage image = blurredImages.get(finalI);
                         compressedImageView.setImage(image);
                         showTreeSquares(regionQuadTree, finalI, false, false);
                     });
