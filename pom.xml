@@ -151,7 +151,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>application.quadkdtrees/application.Main</mainClass>
+                            <mainClass>application.quadkdtrees/application.Application</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>
@@ -163,39 +163,21 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.akathist.maven.plugins.launch4j</groupId>
-                <artifactId>launch4j-maven-plugin</artifactId>
-                <version>2.4.1</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>l4j-clui</id>
-                        <phase>package</phase>
                         <goals>
-                            <goal>launch4j</goal>
+                            <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <headerType>gui</headerType>
-                            <jar>target/Quad-KD-Trees-1.0-SNAPSHOT.jar</jar>
-                            <outfile>${project.build.directory}/KDandQuadtrees.exe</outfile>
-                            <downloadUrl>http://java.com/download</downloadUrl>
-                            <classPath>
-                                <mainClass>application.quadkdtrees/application.Main</mainClass>
-                                <preCp>anything</preCp>
-                            </classPath>
-                            <jre>
-                                <path>${java.home}</path> <!-- SEE THIS -->
-                            </jre>
-                            <versionInfo>
-                                <fileVersion>1.0.0.0</fileVersion>
-                                <txtFileVersion>${project.version}</txtFileVersion>
-                                <fileDescription>${project.name}</fileDescription>
-                                <copyright>2012 howtodoinjava.com</copyright>
-                                <productVersion>1.0.0.0</productVersion>
-                                <txtProductVersion>1.0.0.0</txtProductVersion>
-                                <productName>${project.name}</productName>
-                                <companyName>howtodoinjava.com</companyName>
-                                <internalName>howtodoinjava</internalName>
-                            </versionInfo>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <transformers>
+                                <transformer implementation=
+                                                     "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>application.Main</mainClass>
+                                </transformer>
+                            </transformers>
                         </configuration>
                     </execution>
                 </executions>

@@ -1,5 +1,6 @@
 package controller;
 
+import application.Application;
 import application.Main;
 import com.jfoenix.controls.JFXButton;
 import javafx.fxml.FXML;
@@ -34,13 +35,13 @@ public class MainMenuController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        Main.primaryStage.setTitle("QuadTree & KD-Tree - Demo");
-        Main.primaryStage.setScene(scene);
-        Main.primaryStage.setResizable(false);
-        Main.primaryStage.show();
-        
-        Main.primaryStage.setX((screenBounds.getWidth() - Main.primaryStage.getWidth()) / 2);
-        Main.primaryStage.setY((screenBounds.getHeight() - Main.primaryStage.getHeight()) / 2);
+        Application.primaryStage.setTitle("QuadTree & KD-Tree - Demo");
+        Application.primaryStage.setScene(scene);
+        Application.primaryStage.setResizable(false);
+        Application.primaryStage.show();
+
+        Application.primaryStage.setX((screenBounds.getWidth() - Application.primaryStage.getWidth()) / 2);
+        Application.primaryStage.setY((screenBounds.getHeight() - Application.primaryStage.getHeight()) / 2);
 
     }
 
