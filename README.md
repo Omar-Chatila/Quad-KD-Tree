@@ -84,7 +84,7 @@ Currently shown image can be saved via Save button. To stop animation, toggle th
 
 ```bash
     cmake ..
-    ./benchmark
+    ./mybenchmark
  ```
 
 2. Space benchmarks: Navigate to src/spacer/build
