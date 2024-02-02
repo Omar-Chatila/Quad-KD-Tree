@@ -78,13 +78,22 @@ Currently shown image can be saved via Save button. To stop animation, toggle th
 
 ## Running the C++ Project
 
-1. Google benchmarks: Navigate to src/build and run cmake .. and the ./mybenchmark
-2. Space benchmarks: Navigate to
+### Navigate to Quad-KD-Benchmarks/
+
+1. Google benchmarks: Navigate to src/build and run
+
+```bash
+    cmake ..
+    ./mybenchmark
+ ```
+
+2. Space benchmarks: Navigate to src/spacer/build
 
     ```bash
-    g++ benchmark.cpp -o benchmark
-    ./benchmark
+      cmake ..
+    ./benchspace
     ```
+3. Run tests with make (Makefile in tests directory)
 
 ## License
 
