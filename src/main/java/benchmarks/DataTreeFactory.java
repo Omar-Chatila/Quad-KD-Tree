@@ -27,26 +27,29 @@ public class DataTreeFactory {
     public static final String American_New_Cars_and_Trucks_of_1993 = "src/main/resources/Datasets/American New Cars of 1993.csv";
 
     public static void main(String[] args) {
-
-        KDTreeEfficient dbTree = (KDTreeEfficient) getDBTree(TreeType.KDTree, HEALTH_DB_URL);
-        dbTree.buildTree();
-        for (Point p : dbTree.query(new Area(2000, 2015, 50, 100))) {
-            System.out.println(p);
-        }
-        System.out.println(dbTree.query(new Area(2000, 2015, 50, 100)).size());
-
-        QuadTree<Point> pointQuadTree = (PointQuadTree) getDBTree(TreeType.QuadTree, HEALTH_DB_URL);
-        pointQuadTree.buildTree();
-        for (Point p : pointQuadTree.query(new Area(2000, 2015, 50, 100))) {
-            System.out.println(p);
-        }
-
-        KDTreeEfficient dbTree2 = (KDTreeEfficient) getDBTree(TreeType.KDTree, INCOME_DB_URL);
-        dbTree2.buildTree();
-        System.out.println(dbTree2.getHeight());
-        for (Point p : dbTree2.query(new Area(1900, 2015, 45000, 50000))) {
-            System.out.println(p);
-        }
+        long start = System.nanoTime();
+        int[] array = new int[1_000_000_000];
+        long end = (long) ((System.nanoTime() - start) / 1E9);
+        System.out.println(end);
+//        KDTreeEfficient dbTree = (KDTreeEfficient) getDBTree(TreeType.KDTree, HEALTH_DB_URL);
+//        dbTree.buildTree();
+//        for (Point p : dbTree.query(new Area(2000, 2015, 50, 100))) {
+//            System.out.println(p);
+//        }
+//        System.out.println(dbTree.query(new Area(2000, 2015, 50, 100)).size());
+//
+//        QuadTree<Point> pointQuadTree = (PointQuadTree) getDBTree(TreeType.QuadTree, HEALTH_DB_URL);
+//        pointQuadTree.buildTree();
+//        for (Point p : pointQuadTree.query(new Area(2000, 2015, 50, 100))) {
+//            System.out.println(p);
+//        }
+//
+//        KDTreeEfficient dbTree2 = (KDTreeEfficient) getDBTree(TreeType.KDTree, INCOME_DB_URL);
+//        dbTree2.buildTree();
+//        System.out.println(dbTree2.getHeight());
+//        for (Point p : dbTree2.query(new Area(1900, 2015, 45000, 50000))) {
+//            System.out.println(p);
+//        }
     }
 
     public static Tree<Point> carDataKDTree(String dataSet, TreeType type) {

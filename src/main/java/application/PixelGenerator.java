@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import model.quadTree.Pixel;
 import model.quadTree.RegionQuadTree;
 
+import javax.swing.plaf.IconUIResource;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -14,9 +15,9 @@ public class PixelGenerator implements Runnable {
     private final PixelWriter writer;
     private final List<RegionQuadTree> regionQuadTrees;
 
-    public PixelGenerator(PixelWriter pw, List<RegionQuadTree> regionQuadTrees) {
+    public PixelGenerator(PixelWriter pw, List<RegionQuadTree> regionQuadTrees, boolean randomDecode) {
         this.writer = Objects.requireNonNull(pw, "Writer cannot be null");
-        Collections.shuffle(regionQuadTrees);
+        if (randomDecode) Collections.shuffle(regionQuadTrees);
         this.regionQuadTrees = regionQuadTrees;
     }
 

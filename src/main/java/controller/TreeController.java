@@ -103,7 +103,7 @@ public class TreeController {
         circle.setId("NN");
         System.out.println(x + " : " + y);
         Point result = null;
-        for (Point p : this.dynamicPointQuadTree.kNearestNeighbors(new Point(x, y), 3)) {
+        for (Point p : this.dynamicPointQuadTree.kNearestNeighbors(new Point(x, 400 - y), 3)) {
             result = p;
             highlightCircle(result, Color.RED);
             System.out.println(result);
@@ -181,7 +181,7 @@ public class TreeController {
         if (isDemoMode) removeSquares();
         if (this.isDrawMode) {
             double x = event.getX();
-            double y = event.getY();
+            double y = PANE_HEIGHT - event.getY();
             addPoint(x, y);
         }
     }
@@ -199,8 +199,10 @@ public class TreeController {
         } else {
             for (int i = 0; i < 100; i++) {
                 double x = Math.random() * PANE_WIDTH;
-                double y = Math.random() * PANE_HEIGHT;
-                addPointToGui(x, y, new Point(x, y));
+                double y = PANE_HEIGHT - (Math.random() * PANE_HEIGHT);
+                Point p = new Point(x, y);
+                addPointToGui(x, PANE_HEIGHT - y, p);
+                pointSet.add(p);
             }
         }
     }
@@ -270,9 +272,11 @@ public class TreeController {
 
     private void addPoint(double x, double y) {
         Point point = new Point(x, y);
+        System.out.println(point);
         if (!pointSet.contains(point)) {
             treePane.getChildren().clear();
-            addPointToGui(x, y, point);
+            pointSet.add(new Point(x, y));
+            addPointToGui(x, 400 - y, point);
             dynamicKDTree.add(point);
             dynamicPointQuadTree.add(point);
             removeLines();
@@ -315,15 +319,11 @@ public class TreeController {
             Circle circle = new Circle(x, y, 10, color);
             if (!node.isNodeLeaf() && !stepByStep.isSelected()) {
                 drawSplitLines(node);
-            } else {
-                drawQuadrants(node);
             }
             treePane.getChildren().add(circle);
         }
-        if (node.getHeight() == 1) {
-            Rectangle rectangle2 = generateRectangle(node, color);
-            drawQuadrants(node);
-            rectanglePane.getChildren().add(rectangle2);
+        if (node.isNodeLeaf() || node.isPointLeaf()) {
+            drawQuadrants(node, color);
         }
         int h = node.getHeight();
         double delta = (Math.pow(1.9, h) * 3 + 30);
@@ -369,21 +369,20 @@ public class TreeController {
         return rectangle;
     }
 
-    private void drawQuadrants(PointQuadTree node) {
+    private void drawQuadrants(PointQuadTree node, Color color) {
         Area area = node.getSquare();
-        Rectangle rectangle = new Rectangle(area.xMin(), area.yMin(), area.getWidth(), area.getHeight());
-        rectangle.setStroke(Color.BLACK);
-        rectangle.setFill(Color.TRANSPARENT);
-        drawingPane.getChildren().add(rectangle);
+        Rectangle rectangle = new Rectangle(area.xMin(), PANE_HEIGHT - area.yMax(), area.getWidth(), area.getHeight());
+        rectangle.setFill(color);
+        rectangle.setOpacity(1);
+        rectanglePane.getChildren().add(rectangle);
     }
 
 
     private void drawSplitLines(PointQuadTree node) {
         Area area = node.getSquare();
-        Line horizontalSplit = new Line(area.xMin(), area.yMid(), area.xMax(), area.yMid());
-        Line verticalSplit = new Line(area.xMid(), area.yMin(), area.xMid(), area.yMax());
+        Line horizontalSplit = new Line(area.xMin(), 400 - area.yMid(), area.xMax(), 400 - area.yMid());
+        Line verticalSplit = new Line(area.xMid(), 400 - area.yMin(), area.xMid(), 400 - area.yMax());
         drawingPane.getChildren().addAll(horizontalSplit, verticalSplit);
-
     }
 
     private void addPointToGui(double x, double y, Point p) {
@@ -401,11 +400,8 @@ public class TreeController {
             });
         }
 
-        grid[(int) x][(int) y] = circle;
+        grid[(int) x][(int) (PANE_HEIGHT - y)] = circle;
         drawingPane.getChildren().add(circle);
-        if (!pointSet.contains(p)) {
-            pointSet.add(new Point(x, y));
-        }
         pointsLabel.setText("P = { " + pointSet.toString().substring(1, pointSet.toString().length() - 1) + " }");
     }
 
@@ -459,7 +455,7 @@ public class TreeController {
         else square = ((MyKDTree) node).getArea();
         double width = square.xMax() - square.xMin();
         double height = square.yMax() - square.yMin();
-        Rectangle rectangle2 = new Rectangle(square.xMin(), square.yMin(), width, height);
+        Rectangle rectangle2 = new Rectangle(square.xMin(), 400 - square.yMax(), width, height);
         rectangle2.setOpacity(0.5);
         rectangle2.setFill(color);
         rectangle2.toBack();

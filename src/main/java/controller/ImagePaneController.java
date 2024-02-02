@@ -2,6 +2,7 @@ package controller;
 
 import application.PixelGenerator;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXToggleButton;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -65,13 +66,16 @@ public class ImagePaneController {
     private ProgressBar progressBar;
     @FXML
     private JFXButton saveButton;
+    @FXML
+    private JFXCheckBox fancy;
 
     private boolean isAnimated = true;
     private RegionQuadTree regionQuadTree;
     private WritableImage qtImage;
-    private List<Image> blurredImages;
+    private List<WritableImage> blurredImages;
     private PixelWriter pixelWriter;
     private Timeline timeline;
+    private boolean randomDecode;
 
     static Rectangle setSelectionRect(Rectangle selectionRect, AtomicInteger[] width, AtomicInteger[] height, AtomicInteger[] x, AtomicInteger[] y, Pane cropPane) {
         width[0] = new AtomicInteger((int) selectionRect.getWidth());
@@ -102,11 +106,17 @@ public class ImagePaneController {
 
     private void saveImage() {
         try {
-            SaveImage.saveImageFile(qtImage, (Stage) blurButton.getScene().getWindow());
+            SaveImage.saveImageFile((WritableImage) compressedImageView.getImage(), (Stage) blurButton.getScene().getWindow());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
+    @FXML
+    void randomDecode() {
+        randomDecode = fancy.isSelected();
+    }
+
 
     private void crop() {
         showTreeSquares(this.regionQuadTree, 100, true, isAnimated);
@@ -218,8 +228,8 @@ public class ImagePaneController {
         blurredImages.clear();
         compressedImageView.setImage(null);
         FileChooser fileChooser = new FileChooser();
-        FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");
-        FileChooser.ExtensionFilter extFilterPNG = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.PNG");
+        FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.jpg");
+        FileChooser.ExtensionFilter extFilterPNG = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.png");
         fileChooser.getExtensionFilters().addAll(extFilterJPG, extFilterPNG);
         File resourcesDirectory = new File("src/main/resources/images");
         fileChooser.setInitialDirectory(resourcesDirectory);
@@ -259,6 +269,7 @@ public class ImagePaneController {
     }
 
     private void blur() {
+        saveButton.setDisable(false);
         treepane.getChildren().clear();
         for (int i = 0; i < regionQuadTree.getHeight(); i++) {
             WritableImage image = new WritableImage(IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -315,7 +326,7 @@ public class ImagePaneController {
             KeyFrame keyFrame = new KeyFrame(Duration.millis(1000 * (i + 1)),
                     event -> {
                         treepane.getChildren().clear();
-                        WritableImage image = (WritableImage) blurredImages.get(finalI);
+                        WritableImage image = blurredImages.get(finalI);
                         compressedImageView.setImage(image);
                         showTreeSquares(regionQuadTree, finalI, false, false);
                     });
@@ -346,9 +357,9 @@ public class ImagePaneController {
         long start = System.nanoTime();
         List<RegionQuadTree> leaves = this.regionQuadTree.gatherLeaves();
         long time = System.nanoTime() - start;
-        PixelGenerator generator = new PixelGenerator(this.pixelWriter, leaves);
+        PixelGenerator generator = new PixelGenerator(this.pixelWriter, leaves, randomDecode);
 
-        if (isAnimated && IMAGE_WIDTH == 512 && IMAGE_HEIGHT == 512) {
+        if (isAnimated) {
             Thread th = new Thread(generator);
             th.setDaemon(true);
             th.start();
