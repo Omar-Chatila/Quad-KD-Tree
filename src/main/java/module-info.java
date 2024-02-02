@@ -9,7 +9,6 @@ module application.quadkdtrees {
     requires java.desktop;
     requires junit;
     requires org.testng;
-    requires jmh.core;
 
 
     opens application to javafx.fxml;

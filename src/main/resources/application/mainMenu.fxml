@@ -3,13 +3,15 @@
 <?import com.jfoenix.controls.JFXButton?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-
-<VBox alignment="CENTER" prefHeight="245.0" prefWidth="328.0" spacing="20.0" stylesheets="@../imageStyle.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainMenuController">
+<VBox alignment="CENTER" prefHeight="245.0" prefWidth="321.0" spacing="20.0" stylesheets="@../imageStyle.css" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainMenuController">
    <children>
-      <Label prefHeight="55.0" prefWidth="297.0" text="KD-Tree / Quadtree - Demo" />
+      <Label prefHeight="55.0" prefWidth="312.0" text="KD-Tree / Quadtree - Demo">
+         <font>
+            <Font size="12.0" />
+         </font></Label>
       <JFXButton fx:id="demoButton" prefWidth="200.0" text="2D - Point Trees" />
       <JFXButton fx:id="rQTButton" prefWidth="200.0" text="Region Quad Tree" />
-      <JFXButton fx:id="kdTreeButton" prefWidth="200.0" text="K-Dimensional Tree" />
    </children>
 </VBox>
