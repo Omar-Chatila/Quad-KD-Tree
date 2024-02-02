@@ -43,16 +43,6 @@
             <version>1.0.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-core</artifactId>
-            <version>1.36</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-generator-annprocess</artifactId>
-            <version>1.36</version>
-        </dependency>
 
         <dependency>
             <groupId>net.sf.ucanaccess</groupId>
@@ -89,6 +79,12 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <version>5.8.0</version> <!-- Replace with the latest version -->
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.akathist.maven.plugins.launch4j</groupId>
+            <artifactId>launch4j-maven-plugin</artifactId>
+            <version>2.4.1</version>
         </dependency>
 
         <dependency>
@@ -166,8 +162,44 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>2.4.1</version>
+                <executions>
+                    <execution>
+                        <id>l4j-clui</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <headerType>gui</headerType>
+                            <jar>target/Quad-KD-Trees-1.0-SNAPSHOT.jar</jar>
+                            <outfile>${project.build.directory}/KDandQuadtrees.exe</outfile>
+                            <downloadUrl>http://java.com/download</downloadUrl>
+                            <classPath>
+                                <mainClass>application.quadkdtrees/application.Main</mainClass>
+                                <preCp>anything</preCp>
+                            </classPath>
+                            <jre>
+                                <path>${java.home}</path> <!-- SEE THIS -->
+                            </jre>
+                            <versionInfo>
+                                <fileVersion>1.0.0.0</fileVersion>
+                                <txtFileVersion>${project.version}</txtFileVersion>
+                                <fileDescription>${project.name}</fileDescription>
+                                <copyright>2012 howtodoinjava.com</copyright>
+                                <productVersion>1.0.0.0</productVersion>
+                                <txtProductVersion>1.0.0.0</txtProductVersion>
+                                <productName>${project.name}</productName>
+                                <companyName>howtodoinjava.com</companyName>
+                                <internalName>howtodoinjava</internalName>
+                            </versionInfo>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-
-
     </build>
 </project>
