@@ -18,7 +18,7 @@ public class SetPointsFile {
             Random random = new Random();
 
             // Generate and write 100,000 random points
-            for (int i = 0; i < 100000; i++) {
+            for (int i = 0; i < 1000000; i++) {
                 double x = random.nextDouble() * 10000;  // Change this as needed
                 double y = random.nextDouble() * 10000;  // Change this as needed
 

@@ -154,4 +154,33 @@ public class PointQuadTree extends QuadTree<Point> {
         }
         return current;
     }
+
+    @Override
+    public PointQuadTree getNorthEast() {
+        return (PointQuadTree) super.getNorthEast();
+    }
+
+    @Override
+    public PointQuadTree getNorthWest() {
+        return (PointQuadTree) super.getNorthWest();
+    }
+
+    @Override
+    public PointQuadTree getSouthWest() {
+        return (PointQuadTree) super.getSouthWest();
+    }
+
+    @Override
+    public PointQuadTree getSouthEast() {
+        return (PointQuadTree) super.getSouthEast();
+    }
+
+
+    @Override
+    public String toString() {
+        if (!this.elements.isEmpty()) {
+            return "A:" + this.square + "elements:" + this.elements.get(0) + "\n";
+        }
+        return "A:" + this.square + "\n";
+    }
 }

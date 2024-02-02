@@ -69,9 +69,11 @@ public class KDTreeEfficient extends Tree<Point> {
             Point leafPoint = this.points[from];
             if (queryRectangle.containsPoint(leafPoint)) {
                 result.add(leafPoint);
+                return result;
             }
         } else if (queryRectangle.containsArea(this.area)) {
             result.addAll(this.reportSubTree());
+            return result;
         }
         if (this.leftChild != null && queryRectangle.intersects(this.leftChild.area)) {
             result.addAll(this.leftChild.query(queryRectangle));

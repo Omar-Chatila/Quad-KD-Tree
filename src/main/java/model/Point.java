@@ -2,26 +2,16 @@ package model;
 
 import model.quadTree.HasCoordinates;
 
-import java.text.DecimalFormat;
+import java.util.Locale;
 
 public record Point(String id, double x, double y) implements HasCoordinates {
     public Point(double x, double y) {
         this("", x, y);
     }
 
-    private static String formatDouble(double value) {
-        DecimalFormat decimalFormat;
-        if (value == (int) value) {
-            decimalFormat = new DecimalFormat("#");
-        } else {
-            decimalFormat = new DecimalFormat("#.##");
-        }
-        return decimalFormat.format(value);
-    }
-
     @Override
     public String toString() {
-        return id + "(" + formatDouble(x) + ", " + formatDouble(y) + ")";
+        return String.format(Locale.US, "[%.1f:%.1f]", x, y);
     }
 
     @Override

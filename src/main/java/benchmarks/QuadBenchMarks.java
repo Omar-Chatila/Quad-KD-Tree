@@ -169,7 +169,7 @@ public class QuadBenchMarks {
     static double benchBuildTime(Tree<Point> tree) {
         long start = System.nanoTime();
         tree.buildTree();
-        return ((System.nanoTime() - start) / 1E6);
+        return ((System.nanoTime() - start));
     }
 
     static double pQTBuildTimes(Point[] pointSet) {
@@ -264,14 +264,19 @@ public class QuadBenchMarks {
 
     public static void main(String[] args) throws IOException {
         byte[] bytes = new byte[32000];
-        Point[] points = setTestData(100000);
+        Point[] points = setTestData(000);
         List<Point> pointList = new ArrayList<>(Arrays.asList(points));
-        Area area = new Area(0, 1000000, 0, 1000000);
-        KDTreeEfficient kdTreeEfficient = new KDTreeEfficient(points, area);
-        //kdTreeEfficient.buildTree();
-        System.out.println(benchBuildTime(kdTreeEfficient));
-        System.out.println(kdTreeEfficient.getHeight());
+        PointQuadTree quadTree = new PointQuadTree(new ArrayList<>(), new Area(0, 1000000, 0, 1000000));
 
+        long start = System.nanoTime();
+        for (Point p : pointList) {
+            quadTree.add(p);
+        }
+        System.out.println((System.nanoTime() - start) / 1E9);
+
+
+        //quadTree.buildTree();
+        System.out.println(quadTree.getHeight());
         // System.out.println(getPRQTResults());
         // System.out.println(pqtHeights);
         //System.out.println(prqtHeights);
