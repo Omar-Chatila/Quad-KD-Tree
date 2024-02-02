@@ -78,6 +78,8 @@ Currently shown image can be saved via Save button. To stop animation, toggle th
 
 ## Running the C++ Project
 
+### Navigate to Quad-KD-Benchmarks/
+
 1. Google benchmarks: Navigate to src/build and run
 
 ```bash
