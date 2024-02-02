@@ -13,7 +13,7 @@ public record Pixel(double x, double y, Color color) implements HasCoordinates {
 
     private boolean areColorsClose(Color a, Color b) {
         double colorDistance = getColorDistance(a, b);
-        return colorDistance == 0; //< 0.035;
+        return colorDistance < 0.035;
     }
 
     private double getColorDistance(Color a, Color b) {
